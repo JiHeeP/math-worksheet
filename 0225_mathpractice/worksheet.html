@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5학년 1학기 수학 연습지 만들기</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+    :root {
+      --paper-width: 210mm;
+      --paper-height: 297mm;
+      --control-width: 1180px;
+      --line-color: #4a4a4a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(180deg, #eef2f7 0%, #dde5ee 100%);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #2f3640;
+    }
+
+    .controls {
+      width: min(100%, var(--control-width));
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      padding: 18px 20px;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(31, 41, 55, 0.12);
+      margin-bottom: 22px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 18px;
+      z-index: 100;
+    }
+
+    .control-stack {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 620px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    select,
+    input[type="number"] {
+      padding: 9px 12px;
+      border: 2px solid #d8dee9;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+    }
+
+    #unitSelect { min-width: 250px; }
+    #worksheetSelect { min-width: 420px; }
+
+    input[type="number"] {
+      width: 58px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    button:hover { opacity: 0.88; }
+    button:active { transform: scale(0.98); }
+
+    .btn-refresh { background: #23b26d; color: white; }
+    .btn-add { background: #ef8f1d; color: white; }
+    .btn-answer { background: #6f58c9; color: white; }
+    .btn-print { background: #2d8ae2; color: white; }
+
+    .meta-note {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      color: #57606f;
+      font-size: 13px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #f4f7fb;
+      border: 1px solid #dce4ef;
+    }
+
+    .sheet {
+      width: var(--paper-width);
+      height: var(--paper-height);
+      background: white;
+      padding: 17mm 19mm 18mm;
+      box-shadow: 0 0 18px rgba(28, 37, 54, 0.13);
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 30px;
+      page-break-after: always;
+      overflow: hidden;
+    }
+
+    .sheet:last-child { margin-bottom: 0; }
+
+    .sheet-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 14px;
+      padding-bottom: 9px;
+      border-bottom: 2px solid #2f3640;
+    }
+
+    .sheet-title-main {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sheet-title-sub {
+      font-size: 11px;
+      color: #677188;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .problem-grid {
+      display: grid;
+      flex-grow: 1;
+      gap: 12px 8px;
+      align-content: stretch;
+    }
+
+    .problem-grid.standard { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(5, 1fr); }
+    .problem-grid.practice { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(5, 1fr); }
+    .problem-grid.dense { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(9, 1fr); gap: 6px 5px; }
+    .problem-grid.divgrid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); }
+    .problem-grid.concept { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); gap: 14px 14px; }
+    .problem-grid.wide { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); gap: 16px 16px; }
+
+    .problem-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 8px;
+      position: relative;
+    }
+
+    .problem-grid[data-layout-mode="spacious"] {
+      align-content: center;
+    }
+
+    .problem-grid[data-layout-mode="spacious"] .problem-item {
+      justify-content: center;
+      padding-top: 16px;
+    }
+
+    .problem-num {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 19px;
+      height: 19px;
+      border: 1.5px solid #5a6578;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: #5a6578;
+      background: white;
+    }
+
+    .calc-wrapper { display: flex; align-items: center; margin-top: 12px; }
+
+    .calc-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-size: calc(22px * var(--font-scale, 1));
+      letter-spacing: 2px;
+      min-width: calc(90px * var(--font-scale, 1));
+      padding: 4px 10px;
+      position: relative;
+      background: white;
+    }
+
+    .row { width: 100%; text-align: right; line-height: 1.35; }
+
+    .operator-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      border-bottom: 2px solid #2f3640;
+      margin-bottom: 6px;
+    }
+
+    .calc-ans {
+      height: calc(28px * var(--font-scale, 1));
+      text-align: right;
+      width: 100%;
+      font-weight: 700;
+      visibility: hidden;
+    }
+
+    .answers-shown .calc-ans { visibility: visible; color: #e74c3c; }
+
+    .ldiv-table {
+      margin-top: 22px;
+      border-collapse: collapse;
+      font-size: calc(22px * var(--font-scale, 1));
+    }
+
+    .ldiv-q-box {
+      display: inline-block;
+      min-width: 56px;
+      text-align: right;
+      border-bottom: 2px solid #555;
+      padding: 2px 6px;
+    }
+
+    .ldiv-dvsr-td {
+      text-align: right;
+      padding-right: 4px;
+      padding-top: 4px;
+      vertical-align: middle;
+    }
+
+    .ldiv-dvnd-td {
+      border-top: 2px solid #2f3640;
+      border-left: 2px solid #2f3640;
+      padding: 4px 12px 4px 6px;
+    }
+
+    .horiz-box,
+    .frac-row,
+    .concept-layout,
+    .relation-layout,
+    .shape-layout {
+      width: 100%;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .horiz-box,
+    .frac-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: calc(5px * var(--font-scale, 1));
+      padding: 0 3px;
+    }
+
+    .horiz-box {
+      font-size: calc(20px * var(--font-scale, 1));
+      line-height: 1.35;
+    }
+
+    .frac-row {
+      gap: calc(8px * var(--font-scale, 1));
+    }
+
+    .dense .horiz-box { margin-top: 8px; font-size: calc(16px * var(--font-scale, 1)); gap: 4px; }
+
+    .concept-layout,
+    .relation-layout,
+    .shape-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .concept-card,
+    .relation-card,
+    .shape-card {
+      width: 100%;
+      border: 1.5px solid #d7dee8;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+      padding: 10px 10px 12px;
+    }
+
+    .concept-question,
+    .relation-question,
+    .shape-question {
+      font-size: calc(16px * var(--font-scale, 1));
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .concept-answer,
+    .shape-answer {
+      margin-top: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: calc(16px * var(--font-scale, 1));
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: #6c7890;
+      line-height: 1.35;
+    }
+
+    .lcd-process-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(6px * var(--font-scale, 1));
+      margin-top: 6px;
+      font-size: calc(14px * var(--font-scale, 1));
+      flex-wrap: wrap;
+    }
+
+    .lcd-label {
+      background: #e8f0fe;
+      color: #1a73e8;
+      padding: 1px 8px;
+      border-radius: 8px;
+      font-size: calc(12px * var(--font-scale, 1));
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .frac-two-col {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .frac-col-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .frac-col-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-left: 1.5px dashed #d7dee8;
+      padding-left: 10px;
+    }
+
+    .frac-step-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      font-size: calc(15px * var(--font-scale, 1));
+      line-height: 1.6;
+    }
+
+    .frac-multi-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .frac-multi-line .concept-answer {
+      margin-top: 0;
+    }
+
+    .frac-d {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      font-size: calc(18px * var(--font-scale, 1));
+      min-width: 30px;
+    }
+
+    .frac-d .ft {
+      padding: 1px 8px;
+      border-bottom: 1.5px solid #2f3640;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .frac-d .fb {
+      padding: 1px 8px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .mixed-d {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      vertical-align: middle;
+    }
+
+    .mixed-d .whole {
+      font-size: calc(18px * var(--font-scale, 1));
+      font-weight: 500;
+    }
+
+    .op-txt,
+    .eq-txt { font-size: calc(18px * var(--font-scale, 1)); }
+
+    .num-blank,
+    .text-blank,
+    .table-blank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(32px * var(--font-scale, 1));
+      padding: 0 calc(8px * var(--font-scale, 1));
+      border: 1.5px solid #666;
+      border-radius: 6px;
+      background: white;
+      vertical-align: middle;
+      font-size: calc(16px * var(--font-scale, 1));
+      font-weight: 500;
+    }
+
+    .num-blank { min-width: calc(40px * var(--font-scale, 1)); }
+    .text-blank { min-width: calc(62px * var(--font-scale, 1)); }
+    .table-blank { min-width: calc(34px * var(--font-scale, 1)); padding: calc(2px * var(--font-scale, 1)) calc(8px * var(--font-scale, 1)); }
+
+    .sym-blank {
+      width: calc(28px * var(--font-scale, 1));
+      height: calc(28px * var(--font-scale, 1));
+      border: 1.5px solid #666;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(16px * var(--font-scale, 1));
+      background: white;
+    }
+
+    .frac-blank {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+    }
+
+    .frac-blank .fb-top,
+    .frac-blank .fb-bot {
+      min-width: calc(32px * var(--font-scale, 1));
+      height: calc(24px * var(--font-scale, 1));
+      padding: 0 calc(8px * var(--font-scale, 1));
+      border: 1.5px solid #666;
+      border-radius: 4px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(15px * var(--font-scale, 1));
+      line-height: 1;
+    }
+
+    .frac-blank .fb-line {
+      width: calc(38px * var(--font-scale, 1));
+      height: 2px;
+      background: #444;
+      margin: calc(2px * var(--font-scale, 1)) 0;
+    }
+
+    .div-method {
+      font-size: calc(16px * var(--font-scale, 1));
+    }
+
+    .div-method-split {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: calc(14px * var(--font-scale, 1));
+      width: 100%;
+    }
+
+    .div-method-left {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .div-method-workspace {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: calc(70px * var(--font-scale, 1));
+    }
+
+    .div-method-right {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-left: 1.5px dashed #d7dee8;
+      padding-left: calc(12px * var(--font-scale, 1));
+      min-width: calc(92px * var(--font-scale, 1));
+    }
+
+    .div-method-answer-label {
+      font-size: calc(13px * var(--font-scale, 1));
+      font-weight: 600;
+      color: #2f3640;
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    .div-method-answer-box .num-blank {
+      min-width: calc(70px * var(--font-scale, 1));
+      min-height: calc(38px * var(--font-scale, 1));
+      font-size: calc(18px * var(--font-scale, 1));
+    }
+
+    .div-method-title {
+      font-size: calc(14px * var(--font-scale, 1));
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .div-method-row {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .div-method-divisor {
+      min-width: calc(28px * var(--font-scale, 1));
+      text-align: right;
+      padding-right: 2px;
+    }
+
+    .div-method-divisor-blank {
+      display: inline-block;
+      width: calc(24px * var(--font-scale, 1));
+      height: calc(24px * var(--font-scale, 1));
+      border: 1.2px solid #666;
+      border-radius: 5px;
+      background: white;
+      vertical-align: middle;
+    }
+
+    .div-method-paren {
+      font-size: calc(18px * var(--font-scale, 1));
+      margin-right: 2px;
+    }
+
+    .div-method-values {
+      display: flex;
+      gap: calc(16px * var(--font-scale, 1));
+      padding: 3px calc(10px * var(--font-scale, 1));
+      border-bottom: 2px solid #333;
+      min-width: calc(100px * var(--font-scale, 1));
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .relation-table {
+      margin: 4px auto 0;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .relation-table th,
+    .relation-table td {
+      border: 1.5px solid #6b7788;
+      padding: 6px 8px;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .relation-table th {
+      background: #f6f8fb;
+      font-weight: 700;
+    }
+
+    .shape-svg {
+      width: 150px;
+      height: 96px;
+      overflow: visible;
+    }
+
+    .shape-svg text {
+      font-family: 'Noto Sans KR', sans-serif;
+      fill: #2f3640;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .shape-svg .outline {
+      fill: #f6fbff;
+      stroke: #2f3640;
+      stroke-width: 2;
+    }
+
+    .shape-svg .guide {
+      stroke: #6b7788;
+      stroke-width: 1.5;
+      stroke-dasharray: 4 3;
+      fill: none;
+    }
+
+    .shape-svg .grid-line {
+      stroke: #c9d4e2;
+      stroke-width: 1;
+    }
+
+    .shape-svg .grid-fill {
+      fill: #e8f3ff;
+      stroke: #94b9df;
+      stroke-width: 1;
+    }
+
+    .unit-tail { margin-left: 4px; }
+
+    [data-ans] { color: transparent; }
+    .answers-shown [data-ans] { color: #e74c3c; }
+
+    .pdf-grid-table {
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: calc(17px * var(--pdf-scale, 1));
+      font-weight: 500;
+    }
+
+    .pdf-grid-table td {
+      width: calc(26px * var(--pdf-scale, 1));
+      height: calc(26px * var(--pdf-scale, 1));
+      text-align: center;
+      vertical-align: middle;
+      border: 1.5px solid #555;
+      padding: 0;
+    }
+
+    .pdf-grid-table .pdf-op-cell { font-weight: 700; }
+    .pdf-grid-table .pdf-sep-bottom { border-bottom: 3px solid #2f3640; }
+    .pdf-grid-table .ans-digit { color: transparent; }
+    .answers-shown .pdf-grid-table .ans-digit { color: #e74c3c; }
+
+    .pdf-div-table {
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: calc(17px * var(--pdf-scale, 1));
+      font-weight: 500;
+    }
+
+    .pdf-div-table td {
+      width: calc(26px * var(--pdf-scale, 1));
+      height: calc(26px * var(--pdf-scale, 1));
+      text-align: center;
+      vertical-align: middle;
+      padding: 0;
+    }
+
+    .pdf-div-table .pdf-b { border: 1.5px solid #555; }
+    .pdf-div-table .pdf-quot-border { border-bottom: 2.5px solid #2f3640; }
+    .pdf-div-table .pdf-dvsr-border { border-right: 2.5px solid #2f3640; }
+    .pdf-div-table .ans-digit { color: transparent; }
+    .answers-shown .pdf-div-table .ans-digit { color: #e74c3c; }
+
+    @media print {
+      @page { size: A4; margin: 0; }
+
+      body {
+        display: block;
+        background: none;
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .controls { display: none !important; }
+
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+        break-inside: avoid;
+      }
+
+      .sheet:last-child { page-break-after: auto; }
+    }
+
+    @media screen and (max-width: 980px) {
+      .controls { align-items: stretch; }
+      .control-stack { flex-direction: column; align-items: stretch; }
+      .input-group { justify-content: space-between; }
+      #unitSelect,
+      #worksheetSelect { min-width: 0; width: 100%; }
+    }
+
+    @media screen and (max-width: 850px) {
+      .sheet {
+        transform: scale(0.55);
+        transform-origin: top center;
+        margin-bottom: -500px;
+      }
+
+      .sheet:last-child { margin-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <div class="control-stack">
+    <div class="input-group">
+      <label for="unitSelect">단원</label>
+      <select id="unitSelect"></select>
+    </div>
+
+    <div class="input-group">
+      <label for="worksheetSelect">연습지</label>
+      <select id="worksheetSelect"></select>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label for="pageCount">쪽수</label>
+    <input type="number" id="pageCount" value="1" min="1" max="20">
+  </div>
+
+  <div class="input-group">
+    <label for="problemCount">문제 수</label>
+    <input type="number" id="problemCount" value="" min="1" max="40" placeholder="기본">
+  </div>
+
+  <div class="input-group">
+    <label for="fontScale">글자 크기</label>
+    <select id="fontScale">
+      <option value="0.8">작게</option>
+      <option value="1" selected>보통</option>
+      <option value="1.2">크게</option>
+      <option value="1.5">아주 크게</option>
+    </select>
+  </div>
+
+  <button class="btn-refresh" onclick="generate('replace')">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+    새로 만들기
+  </button>
+
+  <button class="btn-add" onclick="generate('append')">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    이어 붙이기
+  </button>
+
+  <button class="btn-answer" onclick="toggleAnswers()">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+    정답 보기
+  </button>
+
+  <button class="btn-print" onclick="window.print()">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2M7 9h10V4H7v5zm10 8H7v5h10v-5z"/></svg>
+    인쇄
+  </button>
+
+  <div class="meta-note">
+    <span class="meta-chip" id="selectedSection"></span>
+    <span class="meta-chip" id="selectedLesson"></span>
+  </div>
+</div>
+
+<div id="sheets-container"></div>
+
+<script>
+'use strict';
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function randChoice(items) { return items[rand(0, items.length - 1)]; }
+function gcd(a, b) { return b === 0 ? Math.abs(a) : gcd(b, a % b); }
+function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+function simplify(n, d) {
+  const g = gcd(Math.abs(n), Math.abs(d));
+  return [n / g, d / g];
+}
+
+/* ── sheet-scoped context: tracks numbers used within a single sheet
+   so generators can avoid duplicates across problems ── */
+const sheetContext = {
+  usedNumbers: new Set(),
+};
+
+function resetSheetContext() {
+  sheetContext.usedNumbers.clear();
+}
+
+function sheetHasAny(nums) {
+  for (const n of nums) {
+    if (sheetContext.usedNumbers.has(n)) return true;
+  }
+  return false;
+}
+
+function markSheetNumbers(nums) {
+  nums.forEach((n) => sheetContext.usedNumbers.add(n));
+}
+
+/* Extract the "input numbers" of a generated problem so we can
+   detect duplicates across problems on the same sheet. For HTML
+   problems, parse visible text nodes while skipping `[data-ans]`
+   elements (those are answer blanks, not inputs). */
+function extractProblemNumbers(problem) {
+  if (!problem || typeof problem !== 'object') return [];
+  if (problem.kind === 'vertical') {
+    const out = [];
+    if (Number.isFinite(problem.num1)) out.push(problem.num1);
+    if (Number.isFinite(problem.num2)) out.push(problem.num2);
+    return out;
+  }
+  if (problem.kind === 'longdiv') {
+    const out = [];
+    if (Number.isFinite(problem.dvsr)) out.push(problem.dvsr);
+    if (Number.isFinite(problem.dvnd)) out.push(problem.dvnd);
+    return out;
+  }
+  if (problem.kind === 'html' && typeof problem.html === 'string') {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = problem.html;
+    tmp.querySelectorAll('[data-ans]').forEach((el) => el.remove());
+    const text = tmp.textContent || '';
+    const matches = text.match(/\d+/g);
+    if (!matches) return [];
+    return matches.map(Number);
+  }
+  return [];
+}
+
+/* Call a generator repeatedly until its produced problem contains no
+   numbers already used on the current sheet. After ~80 failed tries,
+   fall back to accepting a duplicate rather than hanging (some
+   generators have too small a number space for strict uniqueness). */
+function generateWithUnique(generatorFn, maxAttempts = 80) {
+  for (let i = 0; i < maxAttempts; i++) {
+    const problem = generatorFn();
+    const nums = extractProblemNumbers(problem);
+    if (nums.length === 0 || !sheetHasAny(nums)) {
+      markSheetNumbers(nums);
+      return problem;
+    }
+  }
+  const problem = generatorFn();
+  markSheetNumbers(extractProblemNumbers(problem));
+  return problem;
+}
+
+function escapeAttr(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function factorsOf(n) {
+  const result = [];
+  for (let i = 1; i <= n; i++) {
+    if (n % i === 0) result.push(i);
+  }
+  return result;
+}
+
+function multiplesOf(n, count) {
+  return Array.from({ length: count }, (_, idx) => n * (idx + 1));
+}
+
+function fracD(n, d) {
+  return `<span class="frac-d"><span class="ft">${n}</span><span class="fb">${d}</span></span>`;
+}
+
+function mixedD(w, n, d) {
+  return `<span class="mixed-d"><span class="whole">${w}</span>${fracD(n, d)}</span>`;
+}
+
+function numBlank(value, unit = '') {
+  return `<span class="num-blank" data-ans="${escapeAttr(value)}">${value}</span>${unit ? `<span class="unit-tail">${unit}</span>` : ''}`;
+}
+
+function textBlank(value, minWidth = 72) {
+  return `<span class="text-blank" style="min-width:${minWidth}px" data-ans="${escapeAttr(value)}">${value}</span>`;
+}
+
+function symBlank(value) {
+  return `<span class="sym-blank" data-ans="${escapeAttr(value)}">${value}</span>`;
+}
+
+function multiBlank(values) {
+  return values.map(v => numBlank(v)).join(' ');
+}
+
+function fracBlank(n, d) {
+  return `<span class="frac-blank">
+    <span class="fb-top" data-ans="${escapeAttr(n)}">${n}</span>
+    <span class="fb-line"></span>
+    <span class="fb-bot" data-ans="${escapeAttr(d)}">${d}</span>
+  </span>`;
+}
+
+function mixedBlank(w, n, d) {
+  return `<span class="mixed-d"><span class="num-blank" data-ans="${escapeAttr(w)}">${w}</span>${fracBlank(n, d)}</span>`;
+}
+
+function relationTableHtml(xLabel, yLabel, xs, ys) {
+  const headCells = xs.map((value) => `<td>${value}</td>`).join('');
+  const bodyCells = ys.map((value) => `<td>${value}</td>`).join('');
+  return `<table class="relation-table">
+    <tbody>
+      <tr><th>${xLabel}</th>${headCells}</tr>
+      <tr><th>${yLabel}</th>${bodyCells}</tr>
+    </tbody>
+  </table>`;
+}
+
+function svgShell(inner) {
+  return `<svg class="shape-svg" viewBox="0 0 160 104" aria-hidden="true">${inner}</svg>`;
+}
+
+function unitGridSvg(cols, rows) {
+  const cell = 20;
+  const width = cols * cell;
+  const height = rows * cell;
+  const startX = 18;
+  const startY = 18;
+  const rects = [];
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      rects.push(`<rect class="grid-fill" x="${startX + (x * cell)}" y="${startY + (y * cell)}" width="${cell}" height="${cell}"></rect>`);
+    }
+  }
+
+  for (let x = 0; x <= cols; x++) {
+    rects.push(`<line class="grid-line" x1="${startX + (x * cell)}" y1="${startY}" x2="${startX + (x * cell)}" y2="${startY + height}"></line>`);
+  }
+
+  for (let y = 0; y <= rows; y++) {
+    rects.push(`<line class="grid-line" x1="${startX}" y1="${startY + (y * cell)}" x2="${startX + width}" y2="${startY + (y * cell)}"></line>`);
+  }
+
+  rects.push(`<text x="${startX + width + 8}" y="${startY + 15}">한 칸 = 1㎠</text>`);
+  return svgShell(rects.join(''));
+}
+
+function rectangleSvg(w, h) {
+  return svgShell(`
+    <rect class="outline" x="30" y="20" width="95" height="58"></rect>
+    <text x="67" y="16">${w}cm</text>
+    <text x="131" y="54">${h}cm</text>
+  `);
+}
+
+function triangleSvg(base, height) {
+  return svgShell(`
+    <polygon class="outline" points="24,78 124,78 58,22"></polygon>
+    <line class="guide" x1="58" y1="22" x2="58" y2="78"></line>
+    <text x="68" y="18">높이 ${height}cm</text>
+    <text x="55" y="95">밑변 ${base}cm</text>
+  `);
+}
+
+function parallelogramSvg(base, height) {
+  return svgShell(`
+    <polygon class="outline" points="36,78 122,78 102,28 16,28"></polygon>
+    <line class="guide" x1="102" y1="28" x2="102" y2="78"></line>
+    <text x="44" y="95">밑변 ${base}cm</text>
+    <text x="109" y="56">높이 ${height}cm</text>
+  `);
+}
+
+function trapezoidSvg(top, bottom, height) {
+  return svgShell(`
+    <polygon class="outline" points="34,78 122,78 104,28 54,28"></polygon>
+    <line class="guide" x1="104" y1="28" x2="104" y2="78"></line>
+    <text x="62" y="20">윗변 ${top}cm</text>
+    <text x="48" y="95">아랫변 ${bottom}cm</text>
+    <text x="110" y="56">높이 ${height}cm</text>
+  `);
+}
+
+function rhombusSvg(d1, d2) {
+  return svgShell(`
+    <polygon class="outline" points="78,18 122,52 78,86 34,52"></polygon>
+    <line class="guide" x1="34" y1="52" x2="122" y2="52"></line>
+    <line class="guide" x1="78" y1="18" x2="78" y2="86"></line>
+    <text x="42" y="47">대각선 ${d1}cm</text>
+    <text x="84" y="34">대각선 ${d2}cm</text>
+  `);
+}
+
+function perimeterTriangleSvg(a, b, c) {
+  return svgShell(`
+    <polygon class="outline" points="24,78 124,78 70,18"></polygon>
+    <text x="54" y="94">${a}cm</text>
+    <text x="30" y="49">${b}cm</text>
+    <text x="97" y="48">${c}cm</text>
+  `);
+}
+
+function formulaResultHtml(num, den) {
+  const [sn, sd] = simplify(num, den);
+  if (sd === 1) return numBlank(sn);
+  if (sn > sd) {
+    const whole = Math.floor(sn / sd);
+    const remain = sn % sd;
+    if (remain === 0) return numBlank(whole);
+    return mixedBlank(whole, remain, sd);
+  }
+  return fracBlank(sn, sd);
+}
+
+function htmlProblem(layout, html, itemClass = '') {
+  return { kind: 'html', layout, html, itemClass };
+}
+
+function horizProblem(expression, answerHtml) {
+  return htmlProblem('horiz-box', `${expression} = ${answerHtml}`);
+}
+
+function conceptProblem(question, answerHtml, note = '') {
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-question">${question}</div>
+      <div class="concept-answer">${answerHtml}</div>
+      ${note ? `<div class="small-note">${note}</div>` : ''}
+    </div>
+  `);
+}
+
+function relationProblem(question, tableHtml, answerHtml = '', note = '') {
+  return htmlProblem('relation-layout', `
+    <div class="relation-card">
+      <div class="relation-question">${question}</div>
+      ${tableHtml}
+      ${answerHtml ? `<div class="concept-answer">${answerHtml}</div>` : ''}
+      ${note ? `<div class="small-note">${note}</div>` : ''}
+    </div>
+  `);
+}
+
+function shapeProblem(svg, prompt, answerHtml, note = '') {
+  return htmlProblem('shape-layout', `
+    <div class="shape-card">
+      ${svg}
+      <div class="shape-question">${prompt}</div>
+      <div class="shape-answer">${answerHtml}</div>
+      ${note ? `<div class="small-note">${note}</div>` : ''}
+    </div>
+  `);
+}
+
+function genU1PreAdd2d() {
+  const a1 = rand(1, 9), b1 = rand(10 - a1, 9);
+  const a10 = rand(1, 8), b10 = rand(1, 9 - a10);
+  const a = a10 * 10 + a1;
+  const b = b10 * 10 + b1;
+  return { kind: 'vertical', num1: a, num2: b, op: '+', ans: a + b };
+}
+
+function genU1PreSub2d() {
+  const a1 = rand(0, 7), b1 = rand(a1 + 1, 9);
+  const b10 = rand(1, 7);
+  const a10 = rand(b10 + 1, 9);
+  const a = a10 * 10 + a1;
+  const b = b10 * 10 + b1;
+  return { kind: 'vertical', num1: a, num2: b, op: '−', ans: a - b };
+}
+
+function genU1PreMul2d1d() {
+  const a = rand(12, 99);
+  const b = rand(2, 9);
+  return { kind: 'vertical', num1: a, num2: b, op: '×', ans: a * b };
+}
+
+function genU1PreDiv2d1d() {
+  const b = rand(2, 9);
+  const q = rand(3, Math.floor(99 / b));
+  const a = b * q;
+  return horizProblem(`${a} ÷ ${b}`, numBlank(q));
+}
+
+function genU1PreDiv2d1dNoRem() {
+  const b = rand(2, 9);
+  const q = rand(3, Math.floor(99 / b));
+  const a = b * q;
+  return { kind: 'vertical', dvsr: b, dvnd: a, quot: q, rem: 0 };
+}
+
+function genU1PreDiv2d1dRem() {
+  const b = rand(2, 9);
+  const q = rand(3, Math.floor((99 - b + 1) / b));
+  const r = rand(1, b - 1);
+  const a = b * q + r;
+  if (a > 99) return genU1PreDiv2d1dRem();
+  return { kind: 'vertical', dvsr: b, dvnd: a, quot: q, rem: r };
+}
+
+function genU1PreAdd() {
+  const a = rand(100, 499);
+  const b = rand(100, 400);
+  return { kind: 'vertical', num1: a, num2: b, op: '+', ans: a + b };
+}
+
+function genU1PreSub() {
+  const b = rand(100, 399);
+  const a = b + rand(10, 300);
+  return { kind: 'vertical', num1: a, num2: b, op: '−', ans: a - b };
+}
+
+function genU1PreMul() {
+  const a = rand(12, 45);
+  const b = rand(11, 25);
+  return { kind: 'vertical', num1: a, num2: b, op: '×', ans: a * b };
+}
+
+function genU1PreMul3x2() {
+  const a = rand(100, 399);
+  const b = rand(11, 25);
+  return { kind: 'vertical', num1: a, num2: b, op: '×', ans: a * b };
+}
+
+function genU1PreDiv() {
+  const b = rand(11, 25);
+  const q = rand(10, 30);
+  return horizProblem(`${b * q} ÷ ${b}`, numBlank(q));
+}
+
+function genDiv3d2() {
+  const dvsr = rand(11, 30);
+  const dvnd = rand(100, 900);
+  const quot = Math.floor(dvnd / dvsr);
+  if (quot < 10) return genDiv3d2();
+  return { kind: 'longdiv', dvsr, dvnd, quot, rem: dvnd % dvsr };
+}
+
+function genDiv3d1() {
+  const dvsr = rand(2, 9);
+  const dvnd = rand(100, 999);
+  return { kind: 'longdiv', dvsr, dvnd, quot: Math.floor(dvnd / dvsr), rem: dvnd % dvsr };
+}
+
+function genU1MainAddSubMix() {
+  const a = rand(20, 80);
+  const b = rand(20, 80);
+  const c = rand(10, 50);
+  return horizProblem(`${a} + ${b} − ${c}`, numBlank(a + b - c));
+}
+
+function genU1MainAddSubOrder() {
+  const type = rand(1, 4);
+  if (type === 1) {
+    const a = rand(20, 80);
+    const b = rand(20, 80);
+    const c = rand(10, Math.min(a + b - 1, 99));
+    return horizProblem(`${a} + ${b} − ${c}`, numBlank(a + b - c));
+  } else if (type === 2) {
+    const a = rand(30, 90);
+    const b = rand(10, a - 1);
+    const c = rand(10, 80);
+    return horizProblem(`${a} − ${b} + ${c}`, numBlank(a - b + c));
+  } else if (type === 3) {
+    const a = rand(20, 60);
+    const b = rand(10, 40);
+    const c = rand(10, 40);
+    const d = rand(10, Math.min(a + b + c - 1, 50));
+    return horizProblem(`${a} + ${b} + ${c} − ${d}`, numBlank(a + b + c - d));
+  } else {
+    const a = rand(50, 99);
+    const b = rand(10, 30);
+    const c = rand(10, 30);
+    return horizProblem(`${a} − ${b} − ${c}`, numBlank(a - b - c));
+  }
+}
+
+function genU1MainAddSubParen() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const b = rand(10, 40);
+    const c = rand(10, 40);
+    const a = rand(b + c, 99);
+    return horizProblem(`${a} − (${b} + ${c})`, numBlank(a - (b + c)));
+  } else if (type === 2) {
+    const a = rand(20, 60);
+    const c = rand(10, 40);
+    const b = rand(c + 1, c + 40);
+    return horizProblem(`${a} + (${b} − ${c})`, numBlank(a + (b - c)));
+  } else {
+    const b = rand(20, 60);
+    const c = rand(10, b - 1);
+    const a = rand(10, 50);
+    return horizProblem(`${a} − (${b} − ${c})`, numBlank(a - (b - c)));
+  }
+}
+
+function genU1MainAddSubParenOrder() {
+  return rand(1, 2) === 1 ? genU1MainAddSubOrder() : genU1MainAddSubParen();
+}
+
+function genU1MainMulDivOrder() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const a = rand(2, 9);
+    const c = rand(2, 8);
+    const k = rand(2, 6);
+    const b = c * k;
+    return horizProblem(`${a} × ${b} ÷ ${c}`, numBlank(a * k));
+  } else if (type === 2) {
+    const d = rand(2, 9);
+    const q = rand(2, 9);
+    const c = rand(2, 9);
+    return horizProblem(`${q * d} ÷ ${d} × ${c}`, numBlank(q * c));
+  } else {
+    const a = rand(2, 6);
+    const b = rand(2, 6);
+    const c = rand(2, 8);
+    const k = rand(2, 5);
+    const d = c * k;
+    return horizProblem(`${a} × ${b} × ${d} ÷ ${c}`, numBlank(a * b * k));
+  }
+}
+
+function genU1MainMulDivParen() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const a = rand(2, 6);
+    const b = rand(2, 6);
+    const c = rand(2, 8);
+    const k = rand(2, 5);
+    return horizProblem(`${a} × (${b} × ${k * c}) ÷ ${c}`, numBlank(a * b * k));
+  } else if (type === 2) {
+    const a = rand(10, 50);
+    const b = rand(2, 9);
+    const c = rand(2, 9);
+    return horizProblem(`(${a * b} ÷ ${b}) × ${c}`, numBlank(a * c));
+  } else {
+    const d = rand(2, 8);
+    const q1 = rand(2, 6);
+    const q2 = rand(2, 6);
+    return horizProblem(`${q1 * d} ÷ (${d} × ${q2}) × ${q2}`, numBlank(q1));
+  }
+}
+
+function genU1MainMulDivMix() {
+  return rand(1, 2) === 1 ? genU1MainMulDivOrder() : genU1MainMulDivParen();
+}
+
+function genU1MainAddSubMulOrder() {
+  const type = rand(1, 4);
+  if (type === 1) {
+    const a = rand(10, 60);
+    const b = rand(2, 9);
+    const c = rand(2, 9);
+    return horizProblem(`${a} + ${b} × ${c}`, numBlank(a + (b * c)));
+  } else if (type === 2) {
+    const a = rand(3, 9);
+    const b = rand(4, 9);
+    const c = rand(5, (a * b) - 1);
+    return horizProblem(`${a} × ${b} − ${c}`, numBlank((a * b) - c));
+  } else if (type === 3) {
+    const a = rand(2, 9);
+    const b = rand(2, 9);
+    const c = rand(10, 50);
+    return horizProblem(`${a} × ${b} + ${c}`, numBlank(a * b + c));
+  } else {
+    const a = rand(30, 80);
+    const b = rand(2, 9);
+    const c = rand(2, 9);
+    const result = a - b * c;
+    if (result <= 0) return genU1MainAddSubMulOrder();
+    return horizProblem(`${a} − ${b} × ${c}`, numBlank(result));
+  }
+}
+
+function genU1MainAddSubMulParen() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const a = rand(10, 40);
+    const b = rand(10, 40);
+    const c = rand(2, 6);
+    return horizProblem(`(${a} + ${b}) × ${c}`, numBlank((a + b) * c));
+  } else if (type === 2) {
+    const a = rand(20, 60);
+    const b = rand(10, a - 1);
+    const c = rand(2, 6);
+    return horizProblem(`(${a} − ${b}) × ${c}`, numBlank((a - b) * c));
+  } else {
+    const a = rand(2, 9);
+    const b = rand(10, 40);
+    const c = rand(10, 40);
+    return horizProblem(`${a} × (${b} + ${c})`, numBlank(a * (b + c)));
+  }
+}
+
+function genU1MainAddSubMulParenOrder() {
+  return rand(1, 2) === 1 ? genU1MainAddSubMulOrder() : genU1MainAddSubMulParen();
+}
+
+function genU1MainAddSubMul() {
+  return genU1MainAddSubMulParenOrder();
+}
+
+function genU1MainAddSubDivOrder() {
+  const type = rand(1, 4);
+  if (type === 1) {
+    const a = rand(30, 90);
+    const b = rand(10, 40);
+    const d = rand(2, 9);
+    const q = rand(2, 9);
+    return horizProblem(`${a} + ${b} − ${q * d} ÷ ${d}`, numBlank(a + b - q));
+  } else if (type === 2) {
+    const a = rand(50, 90);
+    const b = rand(10, 30);
+    const d = rand(2, 9);
+    const q = rand(2, 8);
+    return horizProblem(`${a} − ${b} + ${q * d} ÷ ${d}`, numBlank(a - b + q));
+  } else if (type === 3) {
+    const a = rand(20, 60);
+    const d = rand(2, 9);
+    const q = rand(2, 9);
+    return horizProblem(`${a} + ${q * d} ÷ ${d}`, numBlank(a + q));
+  } else {
+    const a = rand(50, 99);
+    const d = rand(2, 9);
+    const q = rand(2, 9);
+    return horizProblem(`${a} − ${q * d} ÷ ${d}`, numBlank(a - q));
+  }
+}
+
+function genU1MainAddSubDivParen() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const d = rand(2, 9);
+    const q = rand(3, 12);
+    const split1 = rand(1, q * d - 1);
+    const split2 = q * d - split1;
+    return horizProblem(`(${split1} + ${split2}) ÷ ${d}`, numBlank(q));
+  } else if (type === 2) {
+    const d = rand(2, 9);
+    const q = rand(2, 10);
+    const b = rand(1, 30);
+    const a = q * d + b;
+    return horizProblem(`(${a} − ${b}) ÷ ${d}`, numBlank(q));
+  } else {
+    const d = rand(2, 8);
+    const q1 = rand(2, 9);
+    const q2 = rand(2, 9);
+    return horizProblem(`${q1 * d} ÷ ${d} + ${q2 * d} ÷ ${d}`, numBlank(q1 + q2));
+  }
+}
+
+function genU1MainAddSubDivParenOrder() {
+  return rand(1, 2) === 1 ? genU1MainAddSubDivOrder() : genU1MainAddSubDivParen();
+}
+
+function genU1MainAddSubDiv() {
+  return genU1MainAddSubDivParenOrder();
+}
+
+function genU1MainMixOrder() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const a = rand(20, 60);
+    const b = rand(2, 9);
+    const c = rand(2, 6);
+    const d = rand(2, 8);
+    const q = rand(2, 8);
+    return horizProblem(`${a} + ${b} × ${c} − ${q * d} ÷ ${d}`, numBlank(a + (b * c) - q));
+  } else if (type === 2) {
+    const b = rand(2, 5);
+    const c = rand(2, 5);
+    const d = rand(2, 8);
+    const q = rand(2, 6);
+    const a = rand(b * c + 1, b * c + 30);
+    return horizProblem(`${a} − ${b} × ${c} + ${q * d} ÷ ${d}`, numBlank(a - (b * c) + q));
+  } else {
+    const a = rand(2, 9);
+    const b = rand(2, 9);
+    const c = rand(2, 8);
+    const k = rand(2, 5);
+    const d = rand(1, Math.max(1, a * b + k - 1));
+    return horizProblem(`${a} × ${b} + ${k * c} ÷ ${c} − ${d}`, numBlank(a * b + k - d));
+  }
+}
+
+function genU1MainMixParen() {
+  const type = rand(1, 3);
+  if (type === 1) {
+    const a = rand(6, 20);
+    const b = rand(5, 18);
+    const c = rand(2, 5);
+    const d = rand(2, 7);
+    const q = rand(2, 6);
+    return horizProblem(`(${a} + ${b}) × ${c} − ${q * d} ÷ ${d}`, numBlank((a + b) * c - q));
+  } else if (type === 2) {
+    const a = rand(2, 6);
+    const b = rand(2, 6);
+    const c = rand(10, 30);
+    const d = rand(2, 8);
+    const q = rand(2, 6);
+    return horizProblem(`${a} × ${b} − (${c} − ${q * d} ÷ ${d})`, numBlank(a * b - (c - q)));
+  } else {
+    const a = rand(10, 30);
+    const b = rand(10, 20);
+    const c = rand(2, 5);
+    const d = rand(2, 7);
+    const q = rand(2, 6);
+    return horizProblem(`(${a} + ${b}) × ${c} + ${q * d} ÷ ${d}`, numBlank((a + b) * c + q));
+  }
+}
+
+function genU1MainMixParenOrder() {
+  return rand(1, 2) === 1 ? genU1MainMixOrder() : genU1MainMixParen();
+}
+
+function genU1MainMix() {
+  return genU1MainMixParenOrder();
+}
+
+function genU2PreMul() {
+  const a = rand(2, 9);
+  const b = rand(1, 9);
+  return horizProblem(`${a} × ${b}`, numBlank(a * b));
+}
+
+function genU2PreDiv() {
+  const b = rand(2, 9);
+  const q = rand(2, 9);
+  return horizProblem(`${b * q} ÷ ${b}`, numBlank(q));
+}
+
+function genU2MainFactorConcept() {
+  const n = randChoice([12, 14, 15, 16, 18, 20, 24, 28, 30]);
+  const factors = factorsOf(n);
+  return conceptProblem(`${n}의 약수`, multiBlank(factors));
+}
+
+function genU2MainMultipleConcept() {
+  const n = rand(3, 9);
+  const multiples = multiplesOf(n, 5);
+  return conceptProblem(`${n}의 배수 5개`, multiBlank(multiples));
+}
+
+function genU2MainCommonFactorConcept() {
+  const g = rand(2, 6);
+  const p = rand(2, 5);
+  const q = rand(2, 5);
+  const a = g * p;
+  const b = g * q;
+  const commonFactors = factorsOf(gcd(a, b));
+  return conceptProblem(`${a}와 ${b}의 공약수`, multiBlank(commonFactors));
+}
+
+function divMethodSteps(a, b) {
+  const steps = [];
+  let x = a, y = b;
+  for (let d = 2; d <= Math.min(x, y); ) {
+    if (x % d === 0 && y % d === 0) {
+      steps.push({ divisor: d, vals: [x, y] });
+      x = x / d;
+      y = y / d;
+    } else {
+      d++;
+    }
+  }
+  steps.push({ divisor: null, vals: [x, y] });
+  return steps;
+}
+
+function buildDivMethodHtml(a, b, mode) {
+  const steps = divMethodSteps(a, b);
+  const divisors = steps.filter(s => s.divisor !== null).map(s => s.divisor);
+  const lastVals = steps[steps.length - 1].vals;
+  const gcdVal = divisors.reduce((acc, d) => acc * d, 1);
+  const lcmVal = gcdVal * lastVals[0] * lastVals[1];
+
+  const answerLabel = mode === 'gcd' ? '최대공약수' : '최소공배수';
+  const answerVal = mode === 'gcd' ? gcdVal : lcmVal;
+
+  const firstRowHtml = `<div class="div-method-row">
+    <span class="div-method-divisor"><span class="div-method-divisor-blank"></span></span>
+    <span class="div-method-paren">)</span>
+    <span class="div-method-values"><span>${a}</span><span>${b}</span></span>
+  </div>`;
+
+  return `<div class="div-method div-method-split">
+    <div class="div-method-left">
+      <div class="div-method-title">${a}과 ${b}의 ${answerLabel} 구하기</div>
+      ${firstRowHtml}
+      <div class="div-method-workspace"></div>
+    </div>
+    <div class="div-method-right">
+      <div class="div-method-answer-label">${answerLabel}</div>
+      <div class="div-method-answer-box">${numBlank(answerVal)}</div>
+    </div>
+  </div>`;
+}
+
+function pickGcdLcmPair() {
+  const g = randChoice([2, 3, 4, 6]);
+  let p, q;
+  do {
+    p = rand(2, 7);
+    q = rand(2, 7);
+  } while (gcd(p, q) !== 1 || p === q);
+  return [g * p, g * q];
+}
+
+function genU2MainGcd() {
+  const [a, b] = pickGcdLcmPair();
+  const html = buildDivMethodHtml(a, b, 'gcd');
+  return htmlProblem('concept-layout', `<div class="concept-card">${html}</div>`);
+}
+
+function genU2MainCommonMultipleConcept() {
+  const a = rand(2, 7);
+  const b = rand(2, 7);
+  const base = lcm(a, b);
+  const multiples = [base, base * 2, base * 3, base * 4, base * 5];
+  return conceptProblem(`${a}와 ${b}의 공배수 5개`, multiBlank(multiples));
+}
+
+function genU2MainLcm() {
+  const [a, b] = pickGcdLcmPair();
+  const html = buildDivMethodHtml(a, b, 'lcm');
+  return htmlProblem('concept-layout', `<div class="concept-card">${html}</div>`);
+}
+
+function genU2MainMix() {
+  return randChoice([
+    genU2MainCommonFactorConcept,
+    genU2MainGcd,
+    genU2MainCommonMultipleConcept,
+    genU2MainLcm,
+  ])();
+}
+
+const RELATION_SCENARIOS = [
+  { subject: '로봇', target: '바퀴', xLabel: '로봇 수', yLabel: '바퀴 수', factor: 4, unitA: '대', unitB: '개' },
+  { subject: '의자', target: '팔걸이', xLabel: '의자 수', yLabel: '팔걸이 수', factor: 2, unitA: '개', unitB: '개' },
+  { subject: '드론', target: '날개', xLabel: '드론 수', yLabel: '날개 수', factor: 4, unitA: '대', unitB: '개' },
+  { subject: '쟁반', target: '컵', xLabel: '쟁반 수', yLabel: '컵 수', factor: 3, unitA: '개', unitB: '개' },
+];
+
+function genU3MainRelationFind1() {
+  const scene = randChoice(RELATION_SCENARIOS);
+  const x = rand(2, 8);
+  const y = x * scene.factor;
+  return conceptProblem(`한 ${scene.subject}에 ${scene.target}가 ${scene.factor}${scene.unitB}씩 있습니다.<br>${scene.subject} ${x}${scene.unitA}의 ${scene.target} 수는?`, numBlank(y, scene.unitB));
+}
+
+function genU3MainRelationFind2() {
+  const scene = randChoice(RELATION_SCENARIOS);
+  const x = rand(2, 8);
+  const y = x * scene.factor;
+  return conceptProblem(`한 ${scene.subject}에 ${scene.target}가 ${scene.factor}${scene.unitB}씩 있습니다.<br>${scene.target}가 ${y}${scene.unitB}라면 ${scene.subject} 수는?`, numBlank(x, scene.unitA));
+}
+
+function genU3MainRelationTable() {
+  const scene = randChoice(RELATION_SCENARIOS);
+  const xs = [1, 2, 3, 4];
+  const blankIndex = rand(1, 3);
+  const ys = xs.map((x, idx) => idx === blankIndex ? numBlank(x * scene.factor) : `${x * scene.factor}`);
+  return relationProblem(
+    `${scene.subject} 수와 ${scene.target} 수의 관계표를 완성해 보세요.`,
+    relationTableHtml(scene.xLabel, scene.yLabel, xs, ys),
+    '',
+    `한 ${scene.subject}에 ${scene.target} ${scene.factor}${scene.unitB}씩입니다.`,
+  );
+}
+
+function genU3MainRelationFormula() {
+  const scene = randChoice(RELATION_SCENARIOS);
+  return conceptProblem(
+    `${scene.subject} 수를 □, ${scene.target} 수를 △라고 할 때 식을 완성해 보세요.<br>△ = □ × ${numBlank(scene.factor)}`,
+    textBlank(`${scene.target} 수 = ${scene.subject} 수 × ${scene.factor}`, 170),
+    '아래 문장은 정답 확인용입니다.',
+  );
+}
+
+function genU3MainRelationReal() {
+  const scene = randChoice(RELATION_SCENARIOS);
+  const xs = [2, 4, 6];
+  const ys = xs.map((x) => x * scene.factor);
+  return relationProblem(
+    `생활 속 대응 관계를 보고 빈칸을 채워 보세요.`,
+    relationTableHtml(scene.xLabel, scene.yLabel, xs, [ys[0], ys[1], numBlank(ys[2])]),
+    textBlank(`${scene.yLabel} = ${scene.xLabel} × ${scene.factor}`, 180),
+    `${scene.subject} 수가 늘어나면 ${scene.target} 수는 일정한 비율로 늘어납니다.`,
+  );
+}
+
+function genU4PreCmp() {
+  const den = rand(5, 12);
+  let a;
+  let b;
+  do {
+    a = rand(1, den - 1);
+    b = rand(1, den - 1);
+  } while (a === b);
+  return htmlProblem('frac-row', `${fracD(a, den)} ${symBlank(a > b ? '>' : '<')} ${fracD(b, den)}`);
+}
+
+function genU4PreConv() {
+  const den = rand(2, 7);
+  const whole = rand(1, 3);
+  const rem = rand(1, den - 1);
+  return htmlProblem('frac-row', `${fracD((whole * den) + rem, den)} <span class="eq-txt">=</span> ${mixedBlank(whole, rem, den)}`);
+}
+
+function genU4MainEquivFind() {
+  const den = rand(2, 8);
+  const num = rand(1, den - 1);
+  const multiplier = rand(2, 4);
+  const [sn, sd] = simplify(num, den);
+  return htmlProblem('frac-row', `${fracD(sn, sd)} <span class="eq-txt">=</span> ${fracBlank(sn * multiplier, sd * multiplier)}`);
+}
+
+function genU4MainEquivMake() {
+  const den = rand(2, 7);
+  const num = rand(1, den - 1);
+  const multiplier = rand(2, 5);
+  if (rand(1, 2) === 1) {
+    return htmlProblem('frac-row', `${fracD(num, den)} <span class="eq-txt">=</span> <span class="frac-blank"><span class="fb-top" data-ans="${num * multiplier}">${num * multiplier}</span><span class="fb-line"></span><span class="fb-bot">${den * multiplier}</span></span>`);
+  }
+  return htmlProblem('frac-row', `${fracD(num, den)} <span class="eq-txt">=</span> <span class="frac-blank"><span class="fb-top">${num * multiplier}</span><span class="fb-line"></span><span class="fb-bot" data-ans="${den * multiplier}">${den * multiplier}</span></span>`);
+}
+
+function genU4MainRedProcess() {
+  let n;
+  let d;
+  let g;
+  do {
+    g = rand(2, 6);
+    n = rand(1, 7);
+    d = rand(n + 1, 9);
+  } while (gcd(n, d) > 1);
+
+  const num = n * g;
+  const den = d * g;
+
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer">${fracD(num, den)} <span class="eq-txt">=</span> ${fracD(`${num} ÷ ${numBlank(g)}`, `${den} ÷ ${numBlank(g)}`)} <span class="eq-txt">=</span> ${fracBlank(n, d)}</div>
+    </div>
+  `);
+}
+
+function genU4MainRed() {
+  let n;
+  let d;
+  let g;
+  do {
+    g = rand(2, 6);
+    n = rand(1, 7);
+    d = rand(n + 1, 9);
+  } while (gcd(n, d) > 1);
+  return htmlProblem('frac-row', `${fracD(n * g, d * g)} <span class="eq-txt">=</span> ${fracBlank(n, d)}`);
+}
+
+function genU4MainLcdProcess() {
+  let d1;
+  let d2;
+  do {
+    d1 = rand(2, 6);
+    d2 = rand(2, 6);
+  } while (d1 === d2);
+
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer">${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracD(`${n1} × ${numBlank(m1)}`, `${d1} × ${numBlank(m1)}`)} <span class="eq-txt">=</span> ${fracBlank(n1 * m1, common)}</div>
+      <div class="concept-answer">${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracD(`${n2} × ${numBlank(m2)}`, `${d2} × ${numBlank(m2)}`)} <span class="eq-txt">=</span> ${fracBlank(n2 * m2, common)}</div>
+    </div>
+  `);
+}
+
+function genU4MainLcd() {
+  let d1;
+  let d2;
+  do {
+    d1 = rand(2, 6);
+    d2 = rand(2, 6);
+  } while (d1 === d2);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  return htmlProblem('frac-row', `${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracBlank(n1 * (common / d1), common)} <span class="op-txt">,</span> ${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(n2 * (common / d2), common)}`);
+}
+
+function genU4MainCmp() {
+  let d1;
+  let d2;
+  do {
+    d1 = rand(2, 8);
+    d2 = rand(2, 8);
+  } while (d1 === d2);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = n1 * m1;
+  const cn2 = n2 * m2;
+  const left = n1 / d1;
+  const right = n2 / d2;
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer">${fracD(n1, d1)} ${symBlank(left > right ? '>' : '<')} ${fracD(n2, d2)}</div>
+      <div class="lcd-process-row">
+        <span class="lcd-label">통분</span>
+        ${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracBlank(cn1, common)}
+        <span class="op-txt">,</span>
+        ${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(cn2, common)}
+      </div>
+    </div>
+  `);
+}
+
+function decToFrac(dec) {
+  const str = String(dec);
+  const dotIdx = str.indexOf('.');
+  if (dotIdx === -1) return { n: Number(dec), d: 1 };
+  const decimals = str.length - dotIdx - 1;
+  const d = Math.pow(10, decimals);
+  const n = Math.round(dec * d);
+  const g = gcd(n, d);
+  return { n: n / g, d: d / g };
+}
+
+function genU4MainDecCmp() {
+  const set = randChoice([
+    { n: 1, d: 2, dec: '0.6' },
+    { n: 3, d: 4, dec: '0.7' },
+    { n: 2, d: 5, dec: '0.5' },
+    { n: 7, d: 10, dec: '0.6' },
+    { n: 1, d: 4, dec: '0.3' },
+    { n: 3, d: 5, dec: '0.8' },
+    { n: 1, d: 5, dec: '0.3' },
+    { n: 3, d: 10, dec: '0.4' },
+    { n: 4, d: 5, dec: '0.7' },
+    { n: 9, d: 10, dec: '0.8' },
+  ]);
+  const answer = (set.n / set.d) > parseFloat(set.dec) ? '>' : '<';
+  const decFrac = decToFrac(parseFloat(set.dec));
+  const common = lcm(set.d, decFrac.d);
+  const m1 = common / set.d;
+  const m2 = common / decFrac.d;
+  const cn1 = set.n * m1;
+  const cn2 = decFrac.n * m2;
+  const needExtraLcd = set.d !== common || decFrac.d !== common;
+
+  let processHtml = '';
+  processHtml += `<div class="lcd-process-row"><span class="lcd-label">소수→분수</span> ${set.dec} <span class="eq-txt">=</span> ${fracBlank(decFrac.n, decFrac.d)}</div>`;
+
+  if (needExtraLcd && decFrac.d !== set.d) {
+    processHtml += `<div class="lcd-process-row"><span class="lcd-label">통분</span> ${fracD(set.n, set.d)} <span class="eq-txt">=</span> ${fracBlank(cn1, common)} <span class="op-txt">,</span> ${fracD(decFrac.n, decFrac.d)} <span class="eq-txt">=</span> ${fracBlank(cn2, common)}</div>`;
+  }
+
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer">${fracD(set.n, set.d)} ${symBlank(answer)} <span style="color:#2f3640;">${set.dec}</span></div>
+      ${processHtml}
+    </div>
+  `);
+}
+
+function genU5PreAdd() {
+  const d = rand(5, 12);
+  const a = rand(1, Math.floor(d / 2));
+  const b = rand(1, d - a - 1);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`);
+}
+
+function genU5PreAddGe1() {
+  const d = rand(3, 10);
+  let a, b;
+  do {
+    a = rand(1, d - 1);
+    b = rand(1, d - 1);
+  } while (a + b < d);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`);
+}
+
+function genU5PreMixedSub() {
+  const d = rand(3, 10);
+  const w = rand(1, 3);
+  const wn = rand(0, d - 1);
+  const b = rand(1, d - 1);
+  const totalNum = w * d + wn;
+  if (totalNum <= b) return genU5PreMixedSub();
+  const resultNum = totalNum - b;
+  return htmlProblem('frac-row', `${wn === 0 ? w : mixedD(w, wn, d)} <span class="op-txt">−</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, d)}`);
+}
+
+function genU5PreMixedToImproperProcess() {
+  const d = rand(2, 8);
+  const w = rand(1, 4);
+  const n = rand(1, d - 1);
+  const imp = w * d + n;
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer">${mixedD(w, n, d)} <span class="eq-txt">=</span> ${fracD(`${numBlank(w)} × ${numBlank(d)} + ${numBlank(n)}`, d)} <span class="eq-txt">=</span> ${fracBlank(imp, d)}</div>
+    </div>
+  `);
+}
+
+function genU5PreMixedToImproper() {
+  const d = rand(2, 8);
+  const w = rand(1, 4);
+  const n = rand(1, d - 1);
+  const imp = w * d + n;
+  return htmlProblem('frac-row', `${mixedD(w, n, d)} <span class="eq-txt">=</span> ${fracBlank(imp, d)}`);
+}
+
+function genU5PreSub() {
+  const d = rand(5, 12);
+  const b = rand(1, d - 2);
+  const a = rand(b + 1, d - 1);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">−</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a - b, d)}`);
+}
+
+/* ── U5 inline step-by-step expansion helpers ── */
+
+function fracExpand(n, d, m) {
+  return fracD(`${n} × ${numBlank(m)}`, `${d} × ${numBlank(m)}`);
+}
+
+function inlineFracAdd(n1, d1, n2, d2) {
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = n1 * m1;
+  const cn2 = n2 * m2;
+  const total = cn1 + cn2;
+  let steps = `${fracD(n1, d1)} <span class="op-txt">+</span> ${fracD(n2, d2)}`;
+  if (m1 !== 1 || m2 !== 1) {
+    steps += ` <span class="eq-txt">=</span> ${fracExpand(n1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(n2, d2, m2)}`;
+    steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(cn1), common)} <span class="op-txt">+</span> ${fracD(numBlank(cn2), common)}`;
+  }
+  steps += ` <span class="eq-txt">=</span> ${formulaResultHtml(total, common)}`;
+  return steps;
+}
+
+function inlineFracSub(n1, d1, n2, d2) {
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = n1 * m1;
+  const cn2 = n2 * m2;
+  const diff = cn1 - cn2;
+  let steps = `${fracD(n1, d1)} <span class="op-txt">−</span> ${fracD(n2, d2)}`;
+  if (m1 !== 1 || m2 !== 1) {
+    steps += ` <span class="eq-txt">=</span> ${fracExpand(n1, d1, m1)} <span class="op-txt">−</span> ${fracExpand(n2, d2, m2)}`;
+    steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(cn1), common)} <span class="op-txt">−</span> ${fracD(numBlank(cn2), common)}`;
+  }
+  steps += ` <span class="eq-txt">=</span> ${formulaResultHtml(diff, common)}`;
+  return steps;
+}
+
+function inlineMixedAddImproper(w1, n1, d1, w2, n2, d2) {
+  const imp1 = w1 * d1 + n1;
+  const imp2 = w2 * d2 + n2;
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = imp1 * m1;
+  const cn2 = imp2 * m2;
+  const total = cn1 + cn2;
+  let steps = `${mixedD(w1, n1, d1)} <span class="op-txt">+</span> ${mixedD(w2, n2, d2)}`;
+  steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(imp1), d1)} <span class="op-txt">+</span> ${fracD(numBlank(imp2), d2)}`;
+  if (m1 !== 1 || m2 !== 1) {
+    steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(cn1), common)} <span class="op-txt">+</span> ${fracD(numBlank(cn2), common)}`;
+  }
+  steps += ` <span class="eq-txt">=</span> ${formulaResultHtml(total, common)}`;
+  return steps;
+}
+
+function inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2) {
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = n1 * m1;
+  const cn2 = n2 * m2;
+  const fracSum = cn1 + cn2;
+  const wholeSum = w1 + w2;
+
+  const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">+</span> ${mixedD(w2, n2, d2)}`;
+  const line2 = `<span class="eq-txt">=</span> (${numBlank(w1)} + ${numBlank(w2)}) + (${fracExpand(n1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(n2, d2, m2)})`;
+
+  let line3 = `<span class="eq-txt">=</span> ${numBlank(wholeSum)} + ${fracD(numBlank(fracSum), common)}`;
+  if (fracSum >= common) {
+    const extraWhole = Math.floor(fracSum / common);
+    const remain = fracSum % common;
+    const finalWhole = wholeSum + extraWhole;
+    if (remain === 0) {
+      line3 += ` <span class="eq-txt">=</span> ${numBlank(finalWhole)}`;
+    } else {
+      const [sn, sd] = simplify(remain, common);
+      line3 += ` <span class="eq-txt">=</span> ${mixedBlank(finalWhole, sn, sd)}`;
+    }
+  } else {
+    const [sn, sd] = simplify(fracSum, common);
+    line3 += ` <span class="eq-txt">=</span> ${mixedBlank(wholeSum, sn, sd)}`;
+  }
+  return { line1, line2, line3 };
+}
+
+function inlineMixedSubImproper(w1, n1, d1, w2, n2, d2) {
+  const imp1 = w1 * d1 + n1;
+  const imp2 = w2 * d2 + n2;
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = imp1 * m1;
+  const cn2 = imp2 * m2;
+  const diff = cn1 - cn2;
+  let steps = `${mixedD(w1, n1, d1)} <span class="op-txt">−</span> ${mixedD(w2, n2, d2)}`;
+  steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(imp1), d1)} <span class="op-txt">−</span> ${fracD(numBlank(imp2), d2)}`;
+  if (m1 !== 1 || m2 !== 1) {
+    steps += ` <span class="eq-txt">=</span> ${fracD(numBlank(cn1), common)} <span class="op-txt">−</span> ${fracD(numBlank(cn2), common)}`;
+  }
+  steps += ` <span class="eq-txt">=</span> ${formulaResultHtml(diff, common)}`;
+  return steps;
+}
+
+function inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2) {
+  const common = lcm(d1, d2);
+  const m1 = common / d1;
+  const m2 = common / d2;
+  const cn1 = n1 * m1;
+  const cn2 = n2 * m2;
+
+  const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">−</span> ${mixedD(w2, n2, d2)}`;
+  let line2, line3;
+
+  if (cn1 >= cn2) {
+    const fracDiff = cn1 - cn2;
+    const wholeDiff = w1 - w2;
+    line2 = `<span class="eq-txt">=</span> (${numBlank(w1)} − ${numBlank(w2)}) + (${fracExpand(n1, d1, m1)} <span class="op-txt">−</span> ${fracExpand(n2, d2, m2)})`;
+    line3 = `<span class="eq-txt">=</span> ${numBlank(wholeDiff)} + ${fracD(numBlank(fracDiff), common)}`;
+    if (fracDiff === 0) {
+      line3 += ` <span class="eq-txt">=</span> ${numBlank(wholeDiff)}`;
+    } else {
+      const [sn, sd] = simplify(fracDiff, common);
+      if (wholeDiff === 0) {
+        line3 += ` <span class="eq-txt">=</span> ${fracBlank(sn, sd)}`;
+      } else {
+        line3 += ` <span class="eq-txt">=</span> ${mixedBlank(wholeDiff, sn, sd)}`;
+      }
+    }
+  } else {
+    const borrowedN1 = cn1 + common;
+    const fracDiff = borrowedN1 - cn2;
+    const wholeDiff = w1 - w2 - 1;
+    line2 = `<span class="eq-txt">=</span> (${numBlank(w1 - 1)} − ${numBlank(w2)}) + (${fracD(numBlank(borrowedN1), common)} <span class="op-txt">−</span> ${fracD(numBlank(cn2), common)})`;
+    line3 = `<span class="eq-txt">=</span> ${numBlank(wholeDiff)} + ${fracD(numBlank(fracDiff), common)}`;
+    if (fracDiff === 0) {
+      line3 += ` <span class="eq-txt">=</span> ${numBlank(wholeDiff)}`;
+    } else {
+      const [sn, sd] = simplify(fracDiff, common);
+      if (wholeDiff === 0) {
+        line3 += ` <span class="eq-txt">=</span> ${fracBlank(sn, sd)}`;
+      } else {
+        line3 += ` <span class="eq-txt">=</span> ${mixedBlank(wholeDiff, sn, sd)}`;
+      }
+    }
+  }
+  return { line1, line2, line3 };
+}
+
+function fracStepProblem(stepsHtml) {
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer frac-step-flow">${stepsHtml}</div>
+    </div>
+  `);
+}
+
+function fracStepProblemMultiLine({ line1, line2, line3 }) {
+  return htmlProblem('concept-layout', `
+    <div class="concept-card frac-multi-line">
+      <div class="concept-answer frac-step-flow">${line1}</div>
+      <div class="concept-answer frac-step-flow">${line2}</div>
+      <div class="concept-answer frac-step-flow">${line3}</div>
+    </div>
+  `);
+}
+
+/* ── U5 generators (진분수) ── */
+
+function genU5MainAdd() {
+  let d1, d2, n1, n2, total, common;
+  do {
+    d1 = rand(2, 8);
+    d2 = rand(2, 8);
+    n1 = rand(1, d1 - 1);
+    n2 = rand(1, d2 - 1);
+    common = lcm(d1, d2);
+    total = (n1 * (common / d1)) + (n2 * (common / d2));
+  } while (total >= common || d1 === d2);
+  return fracStepProblem(inlineFracAdd(n1, d1, n2, d2));
+}
+
+function genU5MainAddGe1() {
+  let d1, d2, n1, n2, total, common;
+  do {
+    d1 = rand(2, 6);
+    d2 = rand(2, 6);
+    n1 = rand(1, d1 - 1);
+    n2 = rand(1, d2 - 1);
+    common = lcm(d1, d2);
+    total = (n1 * (common / d1)) + (n2 * (common / d2));
+  } while (total < common || d1 === d2);
+  return fracStepProblem(inlineFracAdd(n1, d1, n2, d2));
+}
+
+function genU5MainSub() {
+  let d1, d2, n1, n2, diff, common;
+  do {
+    d1 = rand(3, 8);
+    d2 = rand(2, 7);
+    n1 = rand(1, d1 - 1);
+    n2 = rand(1, d2 - 1);
+    common = lcm(d1, d2);
+    diff = (n1 * (common / d1)) - (n2 * (common / d2));
+  } while (diff <= 0 || d1 === d2);
+  return fracStepProblem(inlineFracSub(n1, d1, n2, d2));
+}
+
+/* ── U5 generators: 대분수 덧셈 (가분수 방법) ── */
+
+function genU5MainMixedAddImproper() {
+  let d1, d2;
+  do {
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+  } while (d1 === d2);
+  const w1 = rand(1, 3);
+  const w2 = rand(1, 3);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const cn1 = n1 * (common / d1);
+  const cn2 = n2 * (common / d2);
+  const fracSum = cn1 + cn2;
+  if (fracSum >= common) return genU5MainMixedAddImproper();
+  return fracStepProblem(inlineMixedAddImproper(w1, n1, d1, w2, n2, d2));
+}
+
+/* ── U5 generators: 대분수 덧셈 (자연수/분수 따로) ── */
+
+function genU5MainMixedAddSeparate() {
+  let d1, d2;
+  do {
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+  } while (d1 === d2);
+  const w1 = rand(1, 3);
+  const w2 = rand(1, 3);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const cn1 = n1 * (common / d1);
+  const cn2 = n2 * (common / d2);
+  const fracSum = cn1 + cn2;
+  if (fracSum >= common) return genU5MainMixedAddSeparate();
+  return fracStepProblemMultiLine(inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2));
+}
+
+/* ── U5 generators: 대분수 뺄셈 (가분수 방법) ── */
+
+function genU5MainMixedSubImproperNoBorrow() {
+  const d1 = rand(2, 6);
+  const d2 = rand(2, 6);
+  const common = lcm(d1, d2);
+  const n2 = rand(1, d2 - 1);
+  const n2c = n2 * (common / d2);
+  const n1c = rand(n2c, common - 1);
+  const n1 = n1c / (common / d1);
+  if (!Number.isInteger(n1) || n1 < 1 || n1 >= d1 || d1 === d2) return genU5MainMixedSubImproperNoBorrow();
+  const w2 = rand(1, 3);
+  const w1 = w2 + rand(1, 3);
+  return fracStepProblem(inlineMixedSubImproper(w1, n1, d1, w2, n2, d2));
+}
+
+function genU5MainMixedSubImproperBorrow() {
+  const d1 = rand(2, 6);
+  const d2 = rand(2, 6);
+  const common = lcm(d1, d2);
+  const n2 = rand(1, d2 - 1);
+  const n2c = n2 * (common / d2);
+  const n1c = rand(1, Math.max(1, n2c - 1));
+  const n1 = n1c / (common / d1);
+  if (!Number.isInteger(n1) || n1 < 1 || n1 >= d1 || d1 === d2) return genU5MainMixedSubImproperBorrow();
+  const w2 = rand(1, 3);
+  const w1 = w2 + rand(1, 3);
+  return fracStepProblem(inlineMixedSubImproper(w1, n1, d1, w2, n2, d2));
+}
+
+/* ── U5 generators: 대분수 뺄셈 (자연수/분수 따로) ── */
+
+function genU5MainMixedSubSeparateNoBorrow() {
+  const d1 = rand(2, 6);
+  const d2 = rand(2, 6);
+  const common = lcm(d1, d2);
+  const n2 = rand(1, d2 - 1);
+  const n2c = n2 * (common / d2);
+  const n1c = rand(n2c, common - 1);
+  const n1 = n1c / (common / d1);
+  if (!Number.isInteger(n1) || n1 < 1 || n1 >= d1 || d1 === d2) return genU5MainMixedSubSeparateNoBorrow();
+  const w2 = rand(1, 3);
+  const w1 = w2 + rand(1, 3);
+  return fracStepProblemMultiLine(inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2));
+}
+
+function genU5MainMixedSubSeparateBorrow() {
+  const d1 = rand(2, 6);
+  const d2 = rand(2, 6);
+  const common = lcm(d1, d2);
+  const n2 = rand(1, d2 - 1);
+  const n2c = n2 * (common / d2);
+  const n1c = rand(1, Math.max(1, n2c - 1));
+  const n1 = n1c / (common / d1);
+  if (!Number.isInteger(n1) || n1 < 1 || n1 >= d1 || d1 === d2) return genU5MainMixedSubSeparateBorrow();
+  const w2 = rand(1, 3);
+  const w1 = w2 + rand(1, 3);
+  return fracStepProblemMultiLine(inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2));
+}
+
+/* ── U5 generators: 받아올림 있는 대분수 덧셈 ── */
+
+function genU5MainMixedAddCarryImproper() {
+  let d1, d2;
+  do {
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+  } while (d1 === d2);
+  const w1 = rand(1, 3);
+  const w2 = rand(1, 3);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const cn1 = n1 * (common / d1);
+  const cn2 = n2 * (common / d2);
+  const fracSum = cn1 + cn2;
+  if (fracSum < common) return genU5MainMixedAddCarryImproper();
+  return fracStepProblem(inlineMixedAddImproper(w1, n1, d1, w2, n2, d2));
+}
+
+function genU5MainMixedAddCarrySeparate() {
+  let d1, d2;
+  do {
+    d1 = rand(2, 5);
+    d2 = rand(2, 5);
+  } while (d1 === d2);
+  const w1 = rand(1, 3);
+  const w2 = rand(1, 3);
+  const n1 = rand(1, d1 - 1);
+  const n2 = rand(1, d2 - 1);
+  const common = lcm(d1, d2);
+  const cn1 = n1 * (common / d1);
+  const cn2 = n2 * (common / d2);
+  const fracSum = cn1 + cn2;
+  if (fracSum < common) return genU5MainMixedAddCarrySeparate();
+  return fracStepProblemMultiLine(inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2));
+}
+
+/* ── backward-compatible wrappers ── */
+
+function genU5MainMixedAdd() {
+  return genU5MainMixedAddImproper();
+}
+
+function genU5MainMixedSubNoBorrow() {
+  return genU5MainMixedSubImproperNoBorrow();
+}
+
+function genU5MainMixedSubBorrow() {
+  return genU5MainMixedSubImproperBorrow();
+}
+
+function genU5MainMix() {
+  return randChoice([
+    genU5MainAdd,
+    genU5MainAddGe1,
+    genU5MainMixedAddImproper,
+    genU5MainSub,
+    genU5MainMixedSubImproperNoBorrow,
+    genU5MainMixedSubImproperBorrow,
+  ])();
+}
+
+function genU6PreUnit() {
+  const type = rand(1, 4);
+  if (type === 1) {
+    const m = rand(1, 9);
+    return horizProblem(`${m} m`, numBlank(m * 100, 'cm'));
+  }
+  if (type === 2) {
+    const c = rand(1, 9) * 100;
+    return horizProblem(`${c} cm`, numBlank(c / 100, 'm'));
+  }
+  if (type === 3) {
+    const km = rand(1, 5);
+    return horizProblem(`${km} km`, numBlank(km * 1000, 'm'));
+  }
+  const m = rand(1, 5) * 1000;
+  return horizProblem(`${m} m`, numBlank(m / 1000, 'km'));
+}
+
+function genU6PreLen() {
+  const a = rand(10, 90);
+  const b = rand(10, 90);
+  if (rand(1, 2) === 1) return horizProblem(`${a} cm + ${b} cm`, numBlank(a + b, 'cm'));
+  const big = Math.max(a, b);
+  const small = Math.min(a, b);
+  return horizProblem(`${big} cm − ${small} cm`, numBlank(big - small, 'cm'));
+}
+
+function genU6MainPerimeter() {
+  if (rand(1, 2) === 1) {
+    const a = rand(4, 9);
+    const b = rand(4, 9);
+    const c = rand(4, 9);
+    return shapeProblem(perimeterTriangleSvg(a, b, c), '삼각형의 둘레를 구해 보세요.', numBlank(a + b + c, 'cm'));
+  }
+  const w = rand(4, 12);
+  const h = rand(3, 9);
+  return shapeProblem(rectangleSvg(w, h), '직사각형의 둘레를 구해 보세요.', numBlank((w * 2) + (h * 2), 'cm'));
+}
+
+function genU6MainUnitSquare() {
+  const cols = rand(2, 5);
+  const rows = rand(2, 4);
+  return shapeProblem(unitGridSvg(cols, rows), '그림의 넓이는 몇 ㎠인가요?', numBlank(cols * rows, '㎠'));
+}
+
+function genU6MainRect() {
+  const w = rand(3, 15);
+  const h = rand(3, 12);
+  return shapeProblem(rectangleSvg(w, h), '직사각형의 넓이를 구해 보세요.', numBlank(w * h, 'cm²'), '넓이 = 가로 × 세로');
+}
+
+function genU6MainAreaUnit() {
+  if (rand(1, 2) === 1) {
+    const sqm = rand(1, 4);
+    return horizProblem(`${sqm} m²`, numBlank(sqm * 10000, 'cm²'));
+  }
+  const sqcm = rand(1, 4) * 10000;
+  return horizProblem(`${sqcm} cm²`, numBlank(sqcm / 10000, 'm²'));
+}
+
+function genU6MainPara() {
+  const base = rand(4, 14);
+  const height = rand(3, 10);
+  return shapeProblem(parallelogramSvg(base, height), '평행사변형의 넓이를 구해 보세요.', numBlank(base * height, 'cm²'));
+}
+
+function genU6MainTri() {
+  const base = rand(2, 12) * 2;
+  const height = rand(2, 10);
+  return shapeProblem(triangleSvg(base, height), '삼각형의 넓이를 구해 보세요.', numBlank((base * height) / 2, 'cm²'));
+}
+
+function genU6MainTrap() {
+  const top = rand(3, 8);
+  const bottom = rand(top + 1, top + 8);
+  const height = rand(2, 7) * 2;
+  return shapeProblem(trapezoidSvg(top, bottom, height), '사다리꼴의 넓이를 구해 보세요.', numBlank(((top + bottom) * height) / 2, 'cm²'));
+}
+
+function genU6MainRhombus() {
+  const d1 = rand(3, 8) * 2;
+  const d2 = rand(3, 8);
+  return shapeProblem(rhombusSvg(d1, d2), '마름모의 넓이를 구해 보세요.', numBlank((d1 * d2) / 2, 'cm²'));
+}
+
+function genU6MainMix() {
+  return randChoice([
+    genU6MainRect,
+    genU6MainPara,
+    genU6MainTri,
+    genU6MainTrap,
+    genU6MainRhombus,
+  ])();
+}
+
+const UNIT_META = {
+  u1: { short: '1단원', name: '자연수의 혼합 계산' },
+  u2: { short: '2단원', name: '약수와 배수' },
+  u3: { short: '3단원', name: '대응 관계' },
+  u4: { short: '4단원', name: '약분과 통분' },
+  u5: { short: '5단원', name: '분수의 덧셈과 뺄셈' },
+  u6: { short: '6단원', name: '다각형의 둘레와 넓이' },
+};
+
+const WORKSHEET_CATALOG = [
+  { id: 'u1_pre_add_2d', unit: 'u1', section: '선수학습', label: '두 자리 수 덧셈', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 20, generator: genU1PreAdd2d },
+  { id: 'u1_pre_sub_2d', unit: 'u1', section: '선수학습', label: '두 자리 수 뺄셈', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 20, generator: genU1PreSub2d },
+  { id: 'u1_pre_mul_2d1d', unit: 'u1', section: '선수학습', label: '두 자리 수 × 한 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 15, generator: genU1PreMul2d1d },
+  { id: 'u1_pre_div_2d1d', unit: 'u1', section: '선수학습', label: '두 자리 수 ÷ 한 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 12, generator: genU1PreDiv2d1d },
+  { id: 'u1_pre_div_2d1d_norem', unit: 'u1', section: '선수학습', label: '두 자리 수 ÷ 한 자리 수 (나머지 없음)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 12, generator: genU1PreDiv2d1dNoRem },
+  { id: 'u1_pre_div_2d1d_rem', unit: 'u1', section: '선수학습', label: '두 자리 수 ÷ 한 자리 수 (나머지 있음)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 12, generator: genU1PreDiv2d1dRem },
+  { id: 'u1_pre_add', unit: 'u1', section: '선수학습', label: '세 자리 수 덧셈', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 15, generator: genU1PreAdd },
+  { id: 'u1_pre_sub', unit: 'u1', section: '선수학습', label: '세 자리 수 뺄셈', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 15, generator: genU1PreSub },
+  { id: 'u1_pre_mul', unit: 'u1', section: '선수학습', label: '두 자리 수 × 두 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 12, generator: genU1PreMul },
+  { id: 'u1_pre_mul_3x2', unit: 'u1', section: '선수학습', label: '세 자리 수 × 두 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'standard', count: 12, generator: genU1PreMul3x2 },
+  { id: 'u1_pre_div', unit: 'u1', section: '선수학습', label: '두 자리 수 나눗셈 (가로셈)', lessonRef: '선수학습', kind: 'html', grid: 'standard', count: 20, generator: genU1PreDiv },
+  { id: 'u1_pre_div_3d2', unit: 'u1', section: '선수학습', label: '세 자리 수 ÷ 두 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'divgrid', count: 9, generator: genDiv3d2 },
+  { id: 'u1_pre_div_3d1', unit: 'u1', section: '선수학습', label: '세 자리 수 ÷ 한 자리 수 (세로셈)', lessonRef: '선수학습', kind: 'pdf', grid: 'divgrid', count: 9, generator: genDiv3d1 },
+  { id: 'u1_main_addsub_order', unit: 'u1', section: '본단원', label: '덧셈·뺄셈 혼합(순서)', lessonRef: '1차시 덧셈과 뺄셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubOrder },
+  { id: 'u1_main_addsub_paren', unit: 'u1', section: '본단원', label: '덧셈·뺄셈 혼합(괄호)', lessonRef: '1차시 덧셈과 뺄셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubParen },
+  { id: 'u1_main_addsub_mix', unit: 'u1', section: '본단원', label: '덧셈·뺄셈 혼합(괄호, 순서)', lessonRef: '1차시 덧셈과 뺄셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubParenOrder },
+  { id: 'u1_main_muldiv_order', unit: 'u1', section: '본단원', label: '곱셈·나눗셈 혼합(순서)', lessonRef: '2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMulDivOrder },
+  { id: 'u1_main_muldiv_paren', unit: 'u1', section: '본단원', label: '곱셈·나눗셈 혼합(괄호)', lessonRef: '2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMulDivParen },
+  { id: 'u1_main_muldiv', unit: 'u1', section: '본단원', label: '곱셈·나눗셈 혼합(괄호, 순서)', lessonRef: '2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMulDivMix },
+  { id: 'u1_main_addsubmul_order', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·곱셈 혼합(순서)', lessonRef: '3차시 덧셈, 뺄셈, 곱셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubMulOrder },
+  { id: 'u1_main_addsubmul_paren', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·곱셈 혼합(괄호)', lessonRef: '3차시 덧셈, 뺄셈, 곱셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubMulParen },
+  { id: 'u1_main_addsubmul', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·곱셈 혼합(괄호, 순서)', lessonRef: '3차시 덧셈, 뺄셈, 곱셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubMul },
+  { id: 'u1_main_addsubdiv_order', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·나눗셈 혼합(순서)', lessonRef: '4차시 덧셈, 뺄셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubDivOrder },
+  { id: 'u1_main_addsubdiv_paren', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·나눗셈 혼합(괄호)', lessonRef: '4차시 덧셈, 뺄셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubDivParen },
+  { id: 'u1_main_addsubdiv', unit: 'u1', section: '본단원', label: '덧셈·뺄셈·나눗셈 혼합(괄호, 순서)', lessonRef: '4차시 덧셈, 뺄셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainAddSubDiv },
+  { id: 'u1_main_mix_order', unit: 'u1', section: '본단원', label: '사칙 혼합(순서)', lessonRef: '5차시 덧셈, 뺄셈, 곱셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMixOrder },
+  { id: 'u1_main_mix_paren', unit: 'u1', section: '본단원', label: '사칙 혼합(괄호)', lessonRef: '5차시 덧셈, 뺄셈, 곱셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMixParen },
+  { id: 'u1_main_mix', unit: 'u1', section: '본단원', label: '사칙 혼합(괄호, 순서)', lessonRef: '5차시 덧셈, 뺄셈, 곱셈, 나눗셈이 섞여 있는 식 계산하기', kind: 'html', grid: 'standard', count: 20, generator: genU1MainMix },
+
+  { id: 'u2_pre_mul', unit: 'u2', section: '선수학습', label: '곱셈구구', lessonRef: '선수학습', kind: 'html', grid: 'dense', count: 36, generator: genU2PreMul },
+  { id: 'u2_pre_div', unit: 'u2', section: '선수학습', label: '나눗셈 (한 자리 나누기)', lessonRef: '선수학습', kind: 'html', grid: 'dense', count: 36, generator: genU2PreDiv },
+  { id: 'u2_main_factor', unit: 'u2', section: '본단원', label: '약수 이해', lessonRef: '1차시 약수 이해하기', kind: 'html', grid: 'concept', count: 10, generator: genU2MainFactorConcept },
+  { id: 'u2_main_multiple', unit: 'u2', section: '본단원', label: '배수 이해', lessonRef: '2차시 배수 이해하기', kind: 'html', grid: 'concept', count: 10, generator: genU2MainMultipleConcept },
+  { id: 'u2_main_common_factor', unit: 'u2', section: '본단원', label: '공약수 이해', lessonRef: '3차시 공약수와 최대공약수 이해하기', kind: 'html', grid: 'concept', count: 10, generator: genU2MainCommonFactorConcept },
+  { id: 'u2_main_gcd', unit: 'u2', section: '본단원', label: '최대공약수', lessonRef: '4차시 두 수의 최대공약수 구하기', kind: 'html', grid: 'concept', count: 6, generator: genU2MainGcd },
+  { id: 'u2_main_common_multiple', unit: 'u2', section: '본단원', label: '공배수 이해', lessonRef: '5차시 공배수와 최소공배수 이해하기', kind: 'html', grid: 'concept', count: 10, generator: genU2MainCommonMultipleConcept },
+  { id: 'u2_main_lcm', unit: 'u2', section: '본단원', label: '최소공배수', lessonRef: '6차시 두 수의 최소공배수 구하기', kind: 'html', grid: 'concept', count: 6, generator: genU2MainLcm },
+  { id: 'u2_main_mix', unit: 'u2', section: '본단원', label: '약수·배수 혼합', lessonRef: '3~6차시 약수와 배수 혼합', kind: 'html', grid: 'concept', count: 10, generator: genU2MainMix },
+
+  { id: 'u3_main_relation_find1', unit: 'u3', section: '본단원', label: '두 양 사이의 관계 찾기 (1)', lessonRef: '1차시 두 양 사이의 관계 알아보기(1)', kind: 'html', grid: 'concept', count: 10, generator: genU3MainRelationFind1 },
+  { id: 'u3_main_relation_find2', unit: 'u3', section: '본단원', label: '두 양 사이의 관계 찾기 (2)', lessonRef: '2차시 두 양 사이의 관계 알아보기(2)', kind: 'html', grid: 'concept', count: 10, generator: genU3MainRelationFind2 },
+  { id: 'u3_main_relation_table', unit: 'u3', section: '본단원', label: '대응 관계 표 완성', lessonRef: '3차시 대응 관계를 식으로 나타내기', kind: 'html', grid: 'concept', count: 10, generator: genU3MainRelationTable },
+  { id: 'u3_main_relation_formula', unit: 'u3', section: '본단원', label: '대응 관계 식 쓰기', lessonRef: '4차시 실생활에서 대응 관계를 찾아 식으로 나타내기', kind: 'html', grid: 'concept', count: 10, generator: genU3MainRelationFormula },
+  { id: 'u3_main_relation_real', unit: 'u3', section: '본단원', label: '실생활 대응 관계', lessonRef: '1~4차시 대응 관계 복습', kind: 'html', grid: 'concept', count: 10, generator: genU3MainRelationReal },
+
+  { id: 'u4_pre_cmp', unit: 'u4', section: '선수학습', label: '분모 같은 분수 크기 비교', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU4PreCmp },
+  { id: 'u4_pre_conv', unit: 'u4', section: '선수학습', label: '가분수 → 대분수 변환', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU4PreConv },
+  { id: 'u4_main_equiv_find', unit: 'u4', section: '본단원', label: '크기가 같은 분수 찾기', lessonRef: '1차시 크기가 같은 분수 알아보기', kind: 'html', grid: 'practice', count: 15, generator: genU4MainEquivFind },
+  { id: 'u4_main_equiv_make', unit: 'u4', section: '본단원', label: '크기가 같은 분수 만들기', lessonRef: '2차시 크기가 같은 분수를 만드는 방법 알아보기', kind: 'html', grid: 'practice', count: 15, generator: genU4MainEquivMake },
+  { id: 'u4_main_red_process', unit: 'u4', section: '본단원', label: '약분 (과정 연습)', lessonRef: '3차시 약분 알아보기', kind: 'html', grid: 'concept', count: 8, generator: genU4MainRedProcess },
+  { id: 'u4_main_red', unit: 'u4', section: '본단원', label: '약분', lessonRef: '3차시 약분 알아보기', kind: 'html', grid: 'practice', count: 15, generator: genU4MainRed },
+  { id: 'u4_main_lcd_process', unit: 'u4', section: '본단원', label: '통분 (과정 연습)', lessonRef: '4차시 통분 알아보기', kind: 'html', grid: 'concept', count: 8, generator: genU4MainLcdProcess },
+  { id: 'u4_main_lcd', unit: 'u4', section: '본단원', label: '통분', lessonRef: '4차시 통분 알아보기', kind: 'html', grid: 'practice', count: 15, generator: genU4MainLcd },
+  { id: 'u4_main_cmp', unit: 'u4', section: '본단원', label: '분수 크기 비교', lessonRef: '5차시 분수의 크기 비교하기', kind: 'html', grid: 'concept', count: 8, generator: genU4MainCmp },
+  { id: 'u4_main_dec_cmp', unit: 'u4', section: '본단원', label: '분수와 소수 크기 비교', lessonRef: '6차시 분수와 소수의 크기 비교하기', kind: 'html', grid: 'concept', count: 8, generator: genU4MainDecCmp },
+
+  { id: 'u5_pre_add', unit: 'u5', section: '선수학습', label: '분모 같은 분수의 덧셈', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU5PreAdd },
+  { id: 'u5_pre_add_ge1', unit: 'u5', section: '선수학습', label: '분모 같은 분수의 덧셈 (합이 1 이상)', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU5PreAddGe1 },
+  { id: 'u5_pre_sub', unit: 'u5', section: '선수학습', label: '분모 같은 분수의 뺄셈', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU5PreSub },
+  { id: 'u5_pre_mixed_sub', unit: 'u5', section: '선수학습', label: '대분수 − 분수 (분모 같은)', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU5PreMixedSub },
+  { id: 'u5_pre_mixed_to_improper_process', unit: 'u5', section: '선수학습', label: '대분수 → 가분수 (과정 연습)', lessonRef: '선수학습', kind: 'html', grid: 'concept', count: 8, generator: genU5PreMixedToImproperProcess },
+  { id: 'u5_pre_mixed_to_improper', unit: 'u5', section: '선수학습', label: '대분수 → 가분수', lessonRef: '선수학습', kind: 'html', grid: 'practice', count: 15, generator: genU5PreMixedToImproper },
+  { id: 'u5_main_add', unit: 'u5', section: '본단원', label: '분모 다른 진분수의 덧셈 (합이 1 미만)', lessonRef: '1~2차시 (진분수)+(진분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainAdd },
+  { id: 'u5_main_add_ge1', unit: 'u5', section: '본단원', label: '분모 다른 진분수의 덧셈 (합이 1 이상)', lessonRef: '1~2차시 (진분수)+(진분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainAddGe1 },
+  { id: 'u5_main_mixed_add_improper', unit: 'u5', section: '본단원', label: '대분수 덧셈 (가분수 변환)', lessonRef: '3차시 (대분수)+(대분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedAddImproper },
+  { id: 'u5_main_mixed_add_separate', unit: 'u5', section: '본단원', label: '대분수 덧셈 (자연수·분수 따로)', lessonRef: '3차시 (대분수)+(대분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedAddSeparate },
+  { id: 'u5_main_sub', unit: 'u5', section: '본단원', label: '분모 다른 진분수의 뺄셈', lessonRef: '4차시 (진분수)-(진분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainSub },
+  { id: 'u5_main_mixed_sub_no_borrow_improper', unit: 'u5', section: '본단원', label: '대분수 뺄셈 - 받아내림 없음 (가분수 변환)', lessonRef: '5차시 (대분수)-(대분수) 계산하기(1)', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedSubImproperNoBorrow },
+  { id: 'u5_main_mixed_sub_no_borrow_separate', unit: 'u5', section: '본단원', label: '대분수 뺄셈 - 받아내림 없음 (자연수·분수 따로)', lessonRef: '5차시 (대분수)-(대분수) 계산하기(1)', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedSubSeparateNoBorrow },
+  { id: 'u5_main_mixed_sub_borrow_improper', unit: 'u5', section: '본단원', label: '대분수 뺄셈 - 받아내림 있음 (가분수 변환)', lessonRef: '6차시 (대분수)-(대분수) 계산하기(2)', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedSubImproperBorrow },
+  { id: 'u5_main_mixed_sub_borrow_separate', unit: 'u5', section: '본단원', label: '대분수 뺄셈 - 받아내림 있음 (자연수·분수 따로)', lessonRef: '6차시 (대분수)-(대분수) 계산하기(2)', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedSubSeparateBorrow },
+  { id: 'u5_main_mixed_add_carry_improper', unit: 'u5', section: '본단원', label: '받아올림 대분수 덧셈 (가분수 변환)', lessonRef: '3차시 (대분수)+(대분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedAddCarryImproper },
+  { id: 'u5_main_mixed_add_carry_separate', unit: 'u5', section: '본단원', label: '받아올림 대분수 덧셈 (자연수·분수 따로)', lessonRef: '3차시 (대분수)+(대분수) 계산하기', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMixedAddCarrySeparate },
+  { id: 'u5_main_mix', unit: 'u5', section: '본단원', label: '분수 덧셈·뺄셈 혼합', lessonRef: '1~6차시 분수의 덧셈과 뺄셈 혼합', kind: 'html', grid: 'wide', count: 8, generator: genU5MainMix },
+
+  { id: 'u6_pre_unit', unit: 'u6', section: '선수학습', label: '단위 변환 (cm, m, km)', lessonRef: '선수학습', kind: 'html', grid: 'standard', count: 20, generator: genU6PreUnit },
+  { id: 'u6_pre_len', unit: 'u6', section: '선수학습', label: '길이의 합과 차', lessonRef: '선수학습', kind: 'html', grid: 'standard', count: 20, generator: genU6PreLen },
+  { id: 'u6_main_perimeter', unit: 'u6', section: '본단원', label: '다각형의 둘레', lessonRef: '1차시 다각형의 둘레 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainPerimeter },
+  { id: 'u6_main_unit_square', unit: 'u6', section: '본단원', label: '1㎠ 이해', lessonRef: '2차시 1㎠ 알아보기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainUnitSquare },
+  { id: 'u6_main_rect', unit: 'u6', section: '본단원', label: '직사각형 넓이', lessonRef: '3차시 직사각형의 넓이 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainRect },
+  { id: 'u6_main_area_unit', unit: 'u6', section: '본단원', label: '넓이 단위 확장', lessonRef: '4차시 1㎠보다 더 큰 넓이의 단위 알아보기', kind: 'html', grid: 'standard', count: 20, generator: genU6MainAreaUnit },
+  { id: 'u6_main_para', unit: 'u6', section: '본단원', label: '평행사변형 넓이', lessonRef: '5차시 평행사변형의 넓이 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainPara },
+  { id: 'u6_main_tri', unit: 'u6', section: '본단원', label: '삼각형 넓이', lessonRef: '6~7차시 삼각형의 넓이 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainTri },
+  { id: 'u6_main_trap', unit: 'u6', section: '본단원', label: '사다리꼴 넓이', lessonRef: '8~9차시 사다리꼴의 넓이 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainTrap },
+  { id: 'u6_main_rhombus', unit: 'u6', section: '본단원', label: '마름모 넓이', lessonRef: '10~11차시 마름모의 넓이 구하기', kind: 'html', grid: 'wide', count: 8, generator: genU6MainRhombus },
+  { id: 'u6_main_mix', unit: 'u6', section: '본단원', label: '도형 넓이 혼합', lessonRef: '3~11차시 도형 넓이 혼합', kind: 'html', grid: 'wide', count: 8, generator: genU6MainMix },
+];
+
+const catalogMap = Object.fromEntries(WORKSHEET_CATALOG.map((item) => [item.id, item]));
+
+function getWorksheetsByUnit(unitId) {
+  return WORKSHEET_CATALOG.filter((item) => item.unit === unitId);
+}
+
+function buildSheetTitle(item) {
+  const meta = UNIT_META[item.unit];
+  return {
+    main: `${meta.short} [${item.section}] ${item.label}`,
+    sub: item.lessonRef,
+  };
+}
+
+const PDF_WORKSHEET_MAP = {
+  u1_pre_add_2d: 'add_2d',
+  u1_pre_add: 'add_3d',
+  u1_pre_sub_2d: 'sub_2d',
+  u1_pre_sub: 'sub_3d',
+  u1_pre_mul_2d1d: 'mul_2d1d',
+  u1_pre_mul: 'mul_2d2d',
+  u1_pre_mul_3x2: 'mul_3d2d',
+  u1_pre_div_2d1d: 'div_2d1d',
+  u1_pre_div_2d1d_norem: 'div_2d1d_norem',
+  u1_pre_div_2d1d_rem: 'div_2d1d_rem',
+  u1_pre_div_3d1: 'div_3d1d',
+  u1_pre_div_3d2: 'div_3d2d',
+};
+
+const PDF_GENERATORS = {
+  add_2d() {
+    const a = rand(11, 89);
+    const b = rand(11, 99 - a);
+    return { num1: a, num2: b, op: '+', ans: a + b };
+  },
+  add_3d() {
+    const a = rand(100, 499);
+    const b = rand(100, 400);
+    return { num1: a, num2: b, op: '+', ans: a + b };
+  },
+  sub_2d() {
+    const b = rand(11, 49);
+    const a = b + rand(10, 50);
+    return { num1: a, num2: b, op: '−', ans: a - b };
+  },
+  sub_3d() {
+    const b = rand(100, 399);
+    const a = b + rand(10, 300);
+    return { num1: a, num2: b, op: '−', ans: a - b };
+  },
+  mul_2d1d() {
+    const a = rand(12, 99);
+    const b = rand(2, 9);
+    return { num1: a, num2: b, op: '×', ans: a * b };
+  },
+  mul_2d2d() {
+    const a = rand(12, 45);
+    const b = rand(11, 25);
+    return { num1: a, num2: b, op: '×', ans: a * b };
+  },
+  mul_3d2d() {
+    const a = rand(100, 399);
+    const b = rand(11, 25);
+    return { num1: a, num2: b, op: '×', ans: a * b };
+  },
+  div_2d1d() {
+    const dvsr = rand(2, 9);
+    const dvnd = rand(10, 99);
+    return { dvsr, dvnd, quot: Math.floor(dvnd / dvsr), rem: dvnd % dvsr };
+  },
+  div_2d1d_norem() {
+    const dvsr = rand(2, 9);
+    const q = rand(3, Math.floor(99 / dvsr));
+    const dvnd = dvsr * q;
+    return { dvsr, dvnd, quot: q, rem: 0 };
+  },
+  div_2d1d_rem() {
+    const dvsr = rand(2, 9);
+    const q = rand(3, Math.floor((99 - dvsr + 1) / dvsr));
+    const r = rand(1, dvsr - 1);
+    const dvnd = dvsr * q + r;
+    if (dvnd > 99) return PDF_GENERATORS.div_2d1d_rem();
+    return { dvsr, dvnd, quot: q, rem: r };
+  },
+  div_3d1d() {
+    const dvsr = rand(2, 9);
+    const dvnd = rand(100, 999);
+    return { dvsr, dvnd, quot: Math.floor(dvnd / dvsr), rem: dvnd % dvsr };
+  },
+  div_3d2d() {
+    const dvsr = rand(11, 30);
+    const dvnd = rand(100, 999);
+    const quot = Math.floor(dvnd / dvsr);
+    if (quot < 10) return PDF_GENERATORS.div_3d2d();
+    return { dvsr, dvnd, quot, rem: dvnd % dvsr };
+  },
+};
+
+const SHEET_GRID_BOUNDS = { width: 172, height: 238 };
+
+const PDF_LAYOUTS = {
+  add_2d:   { type: 'addsub', minCols: 2, maxCols: 4, maxRows: 5, targetCellAspect: 0.7, minCellWidth: 28, minCellHeight: 35, baseGap: [12, 8] },
+  add_3d:   { type: 'addsub', minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 0.66, minCellWidth: 32, minCellHeight: 35, baseGap: [12, 8] },
+  sub_2d:   { type: 'addsub', minCols: 2, maxCols: 4, maxRows: 5, targetCellAspect: 0.7, minCellWidth: 28, minCellHeight: 35, baseGap: [12, 8] },
+  sub_3d:   { type: 'addsub', minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 0.66, minCellWidth: 32, minCellHeight: 35, baseGap: [12, 8] },
+  mul_2d1d: { type: 'mul_s',  minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 0.68, minCellWidth: 32, minCellHeight: 36, baseGap: [12, 8] },
+  mul_2d2d: { type: 'mul_l',  minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.62, minCellWidth: 34, minCellHeight: 48, baseGap: [10, 8] },
+  mul_3d2d: { type: 'mul_l',  minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.58, minCellWidth: 36, minCellHeight: 48, baseGap: [10, 8] },
+  div_2d1d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
+  div_2d1d_norem: { type: 'div', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
+  div_2d1d_rem: { type: 'div', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
+  div_3d1d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 3, targetCellAspect: 0.78, minCellWidth: 40, minCellHeight: 58, baseGap: [10, 8] },
+  div_3d2d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 3, targetCellAspect: 0.78, minCellWidth: 42, minCellHeight: 58, baseGap: [10, 8] },
+};
+
+const GRID_LAYOUTS = {
+  standard: { minCols: 2, maxCols: 4, maxRows: 5, targetCellAspect: 1.45, minCellWidth: 48, minCellHeight: 26, widthPriority: 1.2, baseGap: [12, 8] },
+  practice: { minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 1.32, minCellWidth: 52, minCellHeight: 28, widthPriority: 1.25, baseGap: [12, 8] },
+  dense:    { minCols: 2, maxCols: 4, maxRows: 9, targetCellAspect: 1.12, minCellWidth: 36, minCellHeight: 16, widthPriority: 0.8, baseGap: [6, 5] },
+  divgrid:  { minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 1.0,  minCellWidth: 50, minCellHeight: 30, widthPriority: 1.0, baseGap: [12, 8] },
+  concept:  { minCols: 1, maxCols: 2, maxRows: 5, targetCellAspect: 1.05, minCellWidth: 72, minCellHeight: 44, widthPriority: 0.9, baseGap: [14, 14] },
+  wide:     { minCols: 1, maxCols: 2, maxRows: 4, targetCellAspect: 1.08, minCellWidth: 78, minCellHeight: 66, widthPriority: 0.8, baseGap: [16, 16] },
+};
+
+const THREE_PLUS_HORIZONTAL_IDS = new Set([
+  'u1_main_addsub',
+  'u1_main_muldiv',
+  'u1_main_addsubmul',
+  'u1_main_addsubdiv',
+  'u1_main_mix',
+]);
+
+const TWO_COLUMN_WORKSHEET_IDS = new Set([
+  'u4_main_red_process',
+  'u4_main_lcd_process',
+]);
+
+function isPdfWorksheet(item) {
+  return Boolean(PDF_WORKSHEET_MAP[item.id]);
+}
+
+function getPdfOpType(item) {
+  return PDF_WORKSHEET_MAP[item.id];
+}
+
+function getPdfLimit(item) {
+  const cfg = PDF_LAYOUTS[getPdfOpType(item)];
+  return cfg.maxCols * cfg.maxRows;
+}
+
+function getHtmlLimit(item) {
+  const cfg = getHtmlLayoutConfig(item);
+  return cfg ? cfg.maxCols * cfg.maxRows : 40;
+}
+
+function getWorksheetLimit(item) {
+  return isPdfWorksheet(item) ? getPdfLimit(item) : getHtmlLimit(item);
+}
+
+function getHtmlLayoutConfig(item) {
+  const base = GRID_LAYOUTS[item.grid];
+  if (!base) return null;
+
+  if (TWO_COLUMN_WORKSHEET_IDS.has(item.id)) {
+    return {
+      ...base,
+      minCols: 2,
+      maxCols: 2,
+      widthPriority: 1.5,
+      minCellWidth: Math.max(base.minCellWidth || 0, 76),
+    };
+  }
+
+  if (!THREE_PLUS_HORIZONTAL_IDS.has(item.id)) return base;
+  return {
+    ...base,
+    minCols: 2,
+    maxCols: 2,
+    widthPriority: 2,
+    minCellWidth: Math.max(base.minCellWidth || 0, 78),
+  };
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function resolveGridLayout(config, count, fontScale = 1) {
+  const safeCount = Math.max(1, count);
+  const scale = Math.max(0.8, Number(fontScale) || 1);
+  const maxCols = Math.min(config.maxCols, safeCount);
+  const minCols = Math.min(config.minCols || 1, maxCols);
+  const usableWidth = config.usableWidth || SHEET_GRID_BOUNDS.width;
+  const usableHeight = config.usableHeight || SHEET_GRID_BOUNDS.height;
+  const requiredWidth = (config.minCellWidth || 40) * scale;
+  const requiredHeight = (config.minCellHeight || 28) * Math.min(scale, 1.2);
+  let best = null;
+
+  for (let cols = minCols; cols <= maxCols; cols++) {
+    const rows = Math.ceil(safeCount / cols);
+    if (rows > config.maxRows) continue;
+
+    const cells = cols * rows;
+    const emptyRatio = (cells - safeCount) / cells;
+    const fullness = safeCount / (config.maxCols * config.maxRows);
+    const cellWidth = usableWidth / cols;
+    const cellHeight = usableHeight / rows;
+    const cellAspect = cellWidth / cellHeight;
+    const widthFit = cellWidth / requiredWidth;
+    const heightFit = cellHeight / requiredHeight;
+    const preferredCols = clamp(
+      Math.round(config.maxCols * Math.pow(fullness, 0.35) - ((scale - 1) * (config.widthPriority || 0))),
+      minCols,
+      maxCols
+    );
+    let score = 100;
+
+    score -= Math.abs(cellAspect - (config.targetCellAspect || 1)) * 18;
+    score -= emptyRatio * 18;
+    score -= Math.abs(cols - preferredCols) * 4 * (1 - fullness);
+    score -= (rows / config.maxRows) * 6;
+    if (widthFit < 1) score -= (1 - widthFit) * 140;
+    else score += Math.min(widthFit - 1, 0.45) * 12;
+    if (heightFit < 1) score -= (1 - heightFit) * 110;
+    else score += Math.min(heightFit - 1, 0.5) * 8;
+
+    if (rows === 1 && safeCount > 2) score -= 8;
+    if (cols === 1 && (config.minCols || 1) > 1) score -= 12;
+
+    if (!best || score > best.score) {
+      best = { cols, rows, score, widthFit, heightFit };
+    }
+  }
+
+  if (!best) {
+    best = {
+      cols: maxCols,
+      rows: Math.min(config.maxRows, Math.ceil(safeCount / maxCols)),
+      score: 0,
+    };
+  }
+
+  const density = safeCount <= Math.max(4, best.cols * 2)
+    ? 'spacious'
+    : (safeCount >= Math.max(best.cols * (config.maxRows - 1), config.maxCols * config.maxRows * 0.75) ? 'dense' : 'regular');
+  const gapFactor = density === 'spacious' ? 1.15 : (density === 'dense' ? 0.9 : 1);
+  const [baseRowGap, baseColGap] = config.baseGap || [12, 8];
+
+  return {
+    cols: best.cols,
+    rows: best.rows,
+    density,
+    rowGap: Math.round(baseRowGap * gapFactor),
+    colGap: Math.round(baseColGap * gapFactor),
+  };
+}
+
+function applyGridLayout(grid, layout) {
+  grid.style.gridTemplateColumns = `repeat(${layout.cols}, minmax(0, 1fr))`;
+  grid.style.gridTemplateRows = `repeat(${layout.rows}, minmax(0, 1fr))`;
+  grid.style.rowGap = `${layout.rowGap}px`;
+  grid.style.columnGap = `${layout.colGap}px`;
+  grid.dataset.layoutMode = layout.density;
+}
+
+function pdfDigits(num, cols) {
+  const digits = String(Math.abs(num)).split('').map(Number);
+  while (digits.length < cols) digits.unshift(null);
+  return digits;
+}
+
+function pdfCell(digit) {
+  return digit !== null ? digit : '';
+}
+
+function renderPdfAddSub(problem, idx) {
+  const cols = Math.max(
+    String(problem.num1).length,
+    String(problem.num2).length,
+    String(Math.abs(problem.ans)).length
+  );
+  const d1 = pdfDigits(problem.num1, cols);
+  const d2 = pdfDigits(problem.num2, cols);
+  const da = pdfDigits(problem.ans, cols);
+
+  let rows = '';
+  rows += '<tr>' + '<td></td>' + d1.map((digit) => `<td>${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + `<td class="pdf-op-cell pdf-sep-bottom">${problem.op}</td>` + d2.map((digit) => `<td class="pdf-sep-bottom">${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td></td>' + da.map((digit) => `<td class="ans-digit">${pdfCell(digit)}</td>`).join('') + '</tr>';
+
+  return `<div class="problem-item"><div class="problem-num">${idx}</div><table class="pdf-grid-table">${rows}</table></div>`;
+}
+
+function renderPdfMulShort(problem, idx) {
+  const cols = Math.max(
+    String(problem.num1).length,
+    String(problem.num2).length,
+    String(problem.ans).length
+  );
+  const d1 = pdfDigits(problem.num1, cols);
+  const d2 = pdfDigits(problem.num2, cols);
+  const da = pdfDigits(problem.ans, cols);
+
+  let rows = '';
+  rows += '<tr>' + '<td></td>' + d1.map((digit) => `<td>${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td class="pdf-op-cell pdf-sep-bottom">×</td>' + d2.map((digit) => `<td class="pdf-sep-bottom">${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td></td>' + da.map((digit) => `<td class="ans-digit">${pdfCell(digit)}</td>`).join('') + '</tr>';
+
+  return `<div class="problem-item"><div class="problem-num">${idx}</div><table class="pdf-grid-table">${rows}</table></div>`;
+}
+
+function renderPdfMulLong(problem, idx) {
+  const ones = problem.num2 % 10;
+  const tens = Math.floor(problem.num2 / 10);
+  const partial1 = problem.num1 * ones;
+  const partial2 = problem.num1 * tens;
+  const cols = Math.max(
+    String(problem.num1).length,
+    String(problem.num2).length,
+    String(partial1).length,
+    String(partial2).length + 1,
+    String(problem.ans).length
+  );
+
+  const d1 = pdfDigits(problem.num1, cols);
+  const d2 = pdfDigits(problem.num2, cols);
+  const dp1 = pdfDigits(partial1, cols);
+  const dp2 = [];
+  const p2Digits = String(partial2).split('').map(Number);
+  while (dp2.length + p2Digits.length + 1 < cols) dp2.push(null);
+  dp2.push(...p2Digits);
+  dp2.push(null);
+  const da = pdfDigits(problem.ans, cols);
+
+  let rows = '';
+  rows += '<tr>' + '<td></td>' + d1.map((digit) => `<td>${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td class="pdf-op-cell pdf-sep-bottom">×</td>' + d2.map((digit) => `<td class="pdf-sep-bottom">${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td></td>' + dp1.map((digit) => `<td class="ans-digit">${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td class="pdf-sep-bottom"></td>' + dp2.map((digit) => `<td class="ans-digit pdf-sep-bottom">${pdfCell(digit)}</td>`).join('') + '</tr>';
+  rows += '<tr>' + '<td></td>' + da.map((digit) => `<td class="ans-digit">${pdfCell(digit)}</td>`).join('') + '</tr>';
+
+  return `<div class="problem-item"><div class="problem-num">${idx}</div><table class="pdf-grid-table">${rows}</table></div>`;
+}
+
+function simulatePdfDivision(dvsr, dvnd) {
+  const digits = String(dvnd);
+  const steps = [];
+  let current = 0;
+  let started = false;
+
+  for (let i = 0; i < digits.length; i++) {
+    current = (current * 10) + parseInt(digits[i], 10);
+    const quotientDigit = Math.floor(current / dvsr);
+    if (quotientDigit > 0 || started) {
+      started = true;
+      const sub = quotientDigit * dvsr;
+      steps.push({ sub, rem: current - sub });
+      current -= sub;
+    }
+  }
+
+  return steps;
+}
+
+function renderPdfDiv(problem, idx) {
+  const divisorCols = String(problem.dvsr).length;
+  const workCols = String(problem.dvnd).length;
+  const quotientDigits = pdfDigits(problem.quot, workCols);
+  const divisorDigits = pdfDigits(problem.dvsr, divisorCols);
+  const dividendDigits = pdfDigits(problem.dvnd, workCols);
+  const steps = simulatePdfDivision(problem.dvsr, problem.dvnd);
+  const workRowCount = Math.max(steps.length, 1);
+
+  let html = '<tr>';
+  for (let c = 0; c < divisorCols; c++) html += '<td></td>';
+  for (let c = 0; c < workCols; c++) html += `<td class="pdf-b pdf-quot-border ans-digit">${pdfCell(quotientDigits[c])}</td>`;
+  html += '</tr>';
+
+  html += '<tr>';
+  for (let c = 0; c < divisorCols; c++) {
+    const cls = c === divisorCols - 1 ? 'pdf-dvsr-border' : '';
+    html += `<td class="${cls}">${pdfCell(divisorDigits[c])}</td>`;
+  }
+  for (let c = 0; c < workCols; c++) html += `<td class="pdf-b">${pdfCell(dividendDigits[c])}</td>`;
+  html += '</tr>';
+
+  for (let row = 0; row < workRowCount; row++) {
+    html += '<tr>';
+    for (let c = 0; c < divisorCols; c++) html += '<td></td>';
+    for (let c = 0; c < workCols; c++) html += '<td class="pdf-b"></td>';
+    html += '</tr>';
+
+    html += '<tr>';
+    for (let c = 0; c < divisorCols; c++) html += '<td></td>';
+    for (let c = 0; c < workCols; c++) html += '<td class="pdf-b" style="border-top:2.5px solid #2f3640;"></td>';
+    html += '</tr>';
+  }
+
+  html += '<tr>';
+  for (let c = 0; c < divisorCols; c++) html += '<td></td>';
+  for (let c = 0; c < workCols; c++) html += '<td class="pdf-b"></td>';
+  html += '</tr>';
+
+  return `<div class="problem-item"><div class="problem-num">${idx}</div><table class="pdf-div-table">${html}</table></div>`;
+}
+
+function renderPdfProblem(opType, problem, idx) {
+  const type = PDF_LAYOUTS[opType].type;
+  if (type === 'addsub') return renderPdfAddSub(problem, idx);
+  if (type === 'mul_s') return renderPdfMulShort(problem, idx);
+  if (type === 'mul_l') return renderPdfMulLong(problem, idx);
+  return renderPdfDiv(problem, idx);
+}
+
+function renderItem(problem, idx) {
+  const num = `<div class="problem-num">${idx}</div>`;
+
+  if (problem.kind === 'vertical') {
+    return `<div class="problem-item">${num}
+      <div class="calc-wrapper"><div class="calc-box">
+        <div class="row">${problem.num1}</div>
+        <div class="operator-row"><span>${problem.op}</span><span>${problem.num2}</span></div>
+        <div class="calc-ans">${problem.ans}</div>
+      </div></div>
+    </div>`;
+  }
+
+  if (problem.kind === 'longdiv') {
+    const remStr = problem.rem > 0 ? ` … ${problem.rem}` : '';
+    return `<div class="problem-item">${num}
+      <table class="ldiv-table">
+        <tr>
+          <td></td>
+          <td><div class="ldiv-q-box"><span data-ans="${problem.quot}${remStr}">${problem.quot}${remStr}</span></div></td>
+        </tr>
+        <tr>
+          <td class="ldiv-dvsr-td">${problem.dvsr}</td>
+          <td class="ldiv-dvnd-td">${problem.dvnd}</td>
+        </tr>
+      </table>
+    </div>`;
+  }
+
+  const layoutClass = problem.layout || 'horiz-box';
+  const itemClass = problem.itemClass ? ` ${problem.itemClass}` : '';
+  return `<div class="problem-item${itemClass}">${num}<div class="${layoutClass}">${problem.html}</div></div>`;
+}
+
+function createSheet(item, countOverride, fontScale = 1) {
+  resetSheetContext();
+  if (isPdfWorksheet(item)) {
+    const opType = getPdfOpType(item);
+    const cfg = PDF_LAYOUTS[opType];
+    const count = countOverride || item.count;
+    const layout = resolveGridLayout(cfg, count, fontScale);
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'sheet-title';
+
+    const title = buildSheetTitle(item);
+    const main = document.createElement('div');
+    main.className = 'sheet-title-main';
+    main.textContent = title.main;
+    const sub = document.createElement('div');
+    sub.className = 'sheet-title-sub';
+    sub.textContent = title.sub;
+    titleWrap.appendChild(main);
+    titleWrap.appendChild(sub);
+    sheet.appendChild(titleWrap);
+
+    const grid = document.createElement('div');
+    grid.className = 'problem-grid';
+    applyGridLayout(grid, layout);
+
+    for (let i = 1; i <= count; i++) {
+      const problem = generateWithUnique(PDF_GENERATORS[opType]);
+      grid.insertAdjacentHTML('beforeend', renderPdfProblem(opType, problem, i));
+    }
+
+    sheet.appendChild(grid);
+    return sheet;
+  }
+
+  const count = countOverride || item.count;
+  const layoutCfg = getHtmlLayoutConfig(item) || { minCols: 1, maxCols: 4, maxRows: 10, targetCellAspect: 1, minCellWidth: 44, minCellHeight: 28, baseGap: [12, 8] };
+  const layout = resolveGridLayout(layoutCfg, count, fontScale);
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet';
+
+  const titleWrap = document.createElement('div');
+  titleWrap.className = 'sheet-title';
+
+  const title = buildSheetTitle(item);
+  const main = document.createElement('div');
+  main.className = 'sheet-title-main';
+  main.textContent = title.main;
+  const sub = document.createElement('div');
+  sub.className = 'sheet-title-sub';
+  sub.textContent = title.sub;
+  titleWrap.appendChild(main);
+  titleWrap.appendChild(sub);
+  sheet.appendChild(titleWrap);
+
+  const grid = document.createElement('div');
+  grid.className = `problem-grid ${item.grid}`;
+  applyGridLayout(grid, layout);
+
+  for (let i = 1; i <= count; i++) {
+    const problem = generateWithUnique(item.generator);
+    grid.insertAdjacentHTML('beforeend', renderItem(problem, i));
+  }
+
+  sheet.appendChild(grid);
+  return sheet;
+}
+
+function populateUnitSelect() {
+  const unitSelect = document.getElementById('unitSelect');
+  unitSelect.innerHTML = Object.entries(UNIT_META)
+    .map(([id, meta]) => `<option value="${id}">${meta.short}: ${meta.name}</option>`)
+    .join('');
+}
+
+function populateWorksheetSelect(unitId, preferredId) {
+  const worksheetSelect = document.getElementById('worksheetSelect');
+  const items = getWorksheetsByUnit(unitId);
+  worksheetSelect.innerHTML = items.map((item) => `<option value="${item.id}">[${item.section}] ${item.label}</option>`).join('');
+
+  const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : items[0].id;
+  worksheetSelect.value = nextId;
+  updateSelectedMeta();
+}
+
+function updateSelectedMeta() {
+  const item = catalogMap[document.getElementById('worksheetSelect').value];
+  const section = document.getElementById('selectedSection');
+  const lesson = document.getElementById('selectedLesson');
+  const countInput = document.getElementById('problemCount');
+  const limit = getWorksheetLimit(item);
+  const defaultCount = Math.min(item.count, limit);
+  section.textContent = `${UNIT_META[item.unit].short} · ${item.section}`;
+  lesson.textContent = `교과 차시: ${item.lessonRef}`;
+  countInput.placeholder = defaultCount;
+  countInput.max = limit;
+  if (countInput.value) {
+    countInput.value = Math.min(parseInt(countInput.value, 10) || defaultCount, limit);
+  }
+}
+
+let answerShown = false;
+
+function generate(mode) {
+  const container = document.getElementById('sheets-container');
+  const problemCountInput = document.getElementById('problemCount');
+  const worksheetId = document.getElementById('worksheetSelect').value;
+  const pageCount = Math.min(20, Math.max(1, parseInt(document.getElementById('pageCount').value, 10) || 1));
+  const item = catalogMap[worksheetId];
+
+  const customCount = parseInt(problemCountInput.value, 10);
+  const maxCount = getWorksheetLimit(item);
+  const defaultCount = Math.min(item.count, maxCount);
+  const effectiveCount = (customCount > 0) ? Math.min(maxCount, customCount) : defaultCount;
+
+  if (customCount > maxCount) {
+    problemCountInput.value = effectiveCount;
+  }
+
+  const fontScale = document.getElementById('fontScale').value;
+  container.style.setProperty('--font-scale', fontScale);
+  container.style.setProperty('--pdf-scale', fontScale);
+
+  if (mode === 'replace') container.innerHTML = '';
+
+  container.classList.remove('answers-shown');
+  answerShown = false;
+
+  for (let i = 0; i < pageCount; i++) {
+    container.appendChild(createSheet(item, effectiveCount, parseFloat(fontScale)));
+  }
+}
+
+function toggleAnswers() {
+  answerShown = !answerShown;
+  document.getElementById('sheets-container').classList.toggle('answers-shown', answerShown);
+}
+
+document.getElementById('unitSelect').addEventListener('change', (event) => {
+  populateWorksheetSelect(event.target.value);
+});
+
+document.getElementById('worksheetSelect').addEventListener('change', () => {
+  updateSelectedMeta();
+});
+
+document.getElementById('fontScale').addEventListener('change', () => {
+  const container = document.getElementById('sheets-container');
+  const scale = document.getElementById('fontScale').value;
+  container.style.setProperty('--font-scale', scale);
+  container.style.setProperty('--pdf-scale', scale);
+});
+
+populateUnitSelect();
+populateWorksheetSelect('u1');
+generate('replace');
+</script>
+</body>
+</html>
