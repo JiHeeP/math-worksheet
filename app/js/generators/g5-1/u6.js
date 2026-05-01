@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand, randChoice } from '../utils.js';
-import { numBlank, perimeterTriangleSvg, rectangleSvg, triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg, unitGridSvg } from '../helpers.js';
-import { horizProblem, shapeProblem } from '../templates.js';
+import { rand, randChoice } from '../../utils.js';
+import { numBlank, perimeterTriangleSvg, rectangleSvg, triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg, unitGridSvg } from '../../helpers.js';
+import { horizProblem, shapeProblem } from '../../templates.js';
 
 export function genU6PreUnit() {
   const type = rand(1, 4);

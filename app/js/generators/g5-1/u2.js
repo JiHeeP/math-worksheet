@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand, randChoice, gcd, lcm, factorsOf, multiplesOf } from '../utils.js';
-import { numBlank, multiBlank } from '../helpers.js';
-import { horizProblem, conceptProblem } from '../templates.js';
+import { rand, randChoice, gcd, lcm, factorsOf, multiplesOf } from '../../utils.js';
+import { numBlank, multiBlank } from '../../helpers.js';
+import { horizProblem, conceptProblem } from '../../templates.js';
 
 export function genU2PreMul() {
   const a = rand(2, 9), b = rand(1, 9);

@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand } from '../utils.js';
-import { numBlank } from '../helpers.js';
-import { horizProblem } from '../templates.js';
+import { rand } from '../../utils.js';
+import { numBlank } from '../../helpers.js';
+import { horizProblem } from '../../templates.js';
 
 /* ── 선수학습 ── */
 

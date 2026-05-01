@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand, randChoice, lcm } from '../utils.js';
-import { fracD, mixedD, numBlank, fracBlank, mixedBlank, formulaResultHtml } from '../helpers.js';
-import { htmlProblem } from '../templates.js';
+import { rand, randChoice, lcm } from '../../utils.js';
+import { fracD, mixedD, numBlank, fracBlank, mixedBlank, formulaResultHtml } from '../../helpers.js';
+import { htmlProblem } from '../../templates.js';
 
 /* ── 선수학습: 분모 같은 분수 (직접 렌더링) ── */
 

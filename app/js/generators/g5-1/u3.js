@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand, randChoice } from '../utils.js';
-import { numBlank, textBlank, relationTableHtml } from '../helpers.js';
-import { conceptProblem, relationProblem } from '../templates.js';
+import { rand, randChoice } from '../../utils.js';
+import { numBlank, textBlank, relationTableHtml } from '../../helpers.js';
+import { conceptProblem, relationProblem } from '../../templates.js';
 
 const RELATION_SCENARIOS = [
   { subject: '로봇', target: '바퀴', xLabel: '로봇 수', yLabel: '바퀴 수', factor: 4, unitA: '대', unitB: '개' },

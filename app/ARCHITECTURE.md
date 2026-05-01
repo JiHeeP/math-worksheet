@@ -42,26 +42,33 @@
 |------|------|------|
 | `worksheet.html` | 74 | HTML 껍데기. 컨트롤(셀렉트/버튼)과 시트 컨테이너만. |
 | `css/worksheet.css` | 746 | 화면 + `@media print` 스타일 전체 |
-| `js/app.js` | 102 | UI 이벤트 바인딩, 초기화, `generate()` 함수 |
-| `js/catalog.js` | 413 | 학습지 카탈로그 정의 + 빌더 함수 (`defineUnit`, `차시`, `학습지`) |
-| `js/templates.js` | 397 | 풀이 과정 템플릿 (`T.fracLcdStep` 등) |
-| `js/renderers.js` | 277 | `createSheet()` — 한 페이지 조립 |
-| `js/layout.js` | 133 | 그리드 레이아웃 엔진 (격자 배치) |
-| `js/helpers.js` | 153 | HTML 조각 (`fracD`, `numBlank`, SVG 도형 등) |
-| `js/utils.js` | 105 | 수학 유틸 (`rand`, `gcd`, `lcm`, `simplify`) |
-| `js/generators/u1.js` | 186 | 1단원 문제 데이터 생성기 |
-| `js/generators/u2.js` | 53 | 2단원 |
-| `js/generators/u3.js` | 38 | 3단원 |
-| `js/generators/u4.js` | 94 | 4단원 |
-| `js/generators/u5.js` | 112 | 5단원 |
-| `js/generators/u6.js` | 68 | 6단원 |
+| `js/app.js` | UI 이벤트 바인딩, 초기화, `generate()` 함수. 학년·단원·학습지 캐스케이드 제어 |
+| `js/catalog.js` | 빌더 함수(`defineUnit`, `차시`, `학습지`) + 학기 카탈로그 통합 진입점 |
+| `js/catalogs/g5-1.js` | 5학년 1학기 단원 정의 묶음 (학기당 한 파일). 같은 학기는 여기서만 수정 |
+| `js/templates.js` | 풀이 과정 템플릿 (`T.fracLcdStep` 등) |
+| `js/renderers.js` | `createSheet()` — 한 페이지 조립 |
+| `js/layout.js` | 그리드 레이아웃 엔진 (격자 배치) |
+| `js/helpers.js` | HTML 조각 (`fracD`, `numBlank`, SVG 도형 등) |
+| `js/utils.js` | 수학 유틸 (`rand`, `gcd`, `lcm`, `simplify`) |
+| `js/generators/g5-1/u1.js` | 5-1 1단원 문제 데이터 생성기 |
+| `js/generators/g5-1/u2.js` | 5-1 2단원 |
+| `js/generators/g5-1/u3.js` | 5-1 3단원 |
+| `js/generators/g5-1/u4.js` | 5-1 4단원 |
+| `js/generators/g5-1/u5.js` | 5-1 5단원 |
+| `js/generators/g5-1/u6.js` | 5-1 6단원 |
+
+> 새 학년·학기는 `js/generators/g{학년}-{학기}/` + `js/catalogs/g{학년}-{학기}.js` 한 쌍을 추가하면 됨.
 
 ## 카탈로그 빌더
 
-`catalog.js` 의 빌더 함수로 학습지를 등록합니다.
+`catalog.js` 의 빌더 함수(`defineUnit` / `선수학습` / `차시` / `학습지`)를
+학기별 카탈로그(`catalogs/g{학년}-{학기}.js`)에서 호출해 학습지를 등록합니다.
+`defineUnit` 의 첫 인자는 학기 ID (`'g5-1'` 등), 두 번째 인자는 학기 안에서
+유일한 단원 ID (`'u1'` 등)입니다. 학습지 ID에는 `g{학년}-{학기}_` prefix가
+자동으로 부착됩니다.
 
 ```js
-defineUnit('u1', '자연수의 혼합 계산', [
+defineUnit('g5-1', 'u1', '자연수의 혼합 계산', [
   // 선수학습 그룹: 공통 속성을 한 번만 지정
   선수학습({ kind: 'pdf', grid: 'standard', count: 20 }, [
     학습지('두 자리 수 덧셈', genU1PreAdd2d),
@@ -109,7 +116,7 @@ defineUnit('u1', '자연수의 혼합 계산', [
 
 #### 1. 제너레이터 작성
 
-`js/generators/u1.js` 열고 함수 추가:
+`js/generators/g5-1/u1.js` 열고 함수 추가:
 
 ```js
 export function genU1PreAdd3d() {
@@ -143,7 +150,7 @@ export const T = {
 
 #### 3. 카탈로그 등록
 
-`js/catalog.js` 에서 해당 단원의 `선수학습([...])` 배열에 한 줄 추가:
+`js/catalogs/g5-1.js` 에서 해당 단원의 `선수학습([...])` 배열에 한 줄 추가:
 
 ```js
 선수학습({ kind: 'pdf', grid: 'standard', count: 20 }, [
@@ -153,14 +160,14 @@ export const T = {
 ]);
 ```
 
-`u1.js` 에서 `export` 한 함수는 `catalog.js` 가 자동으로 `import` 하지 않음 — `catalog.js` 상단의 `import` 구문에 추가해야 함:
+`u1.js` 에서 `export` 한 함수는 `catalogs/g5-1.js` 가 자동으로 `import` 하지 않음 — 상단의 `import` 구문에 추가해야 함:
 
 ```js
 import {
   genU1PreAdd2d,
   genU1PreAdd3d,  // ← 추가
   // ...
-} from './generators/u1.js';
+} from '../generators/g5-1/u1.js';
 ```
 
 #### 4. 검수

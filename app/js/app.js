@@ -1,43 +1,111 @@
 'use strict';
 
-import { UNIT_META, catalogMap, getWorksheetsByUnit } from './catalog.js';
+import {
+  GRADE_META, DEFAULT_GRADE_ID,
+  catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit,
+  resolvePrereq,
+} from './catalog.js';
 import { createSheet, getWorksheetLimit } from './renderers.js';
 
 let answerShown = false;
 
-function populateUnitSelect() {
+function populateGradeSelect() {
+  const gradeSelect = document.getElementById('gradeSelect');
+  gradeSelect.innerHTML = Object.values(GRADE_META)
+    .map((g) => `<option value="${g.id}">${g.name}</option>`)
+    .join('');
+  gradeSelect.value = DEFAULT_GRADE_ID;
+}
+
+function populateUnitSelect(gradeId) {
   const unitSelect = document.getElementById('unitSelect');
-  unitSelect.innerHTML = Object.entries(UNIT_META)
+  const units = getUnitsOfGrade(gradeId);
+  unitSelect.innerHTML = Object.entries(units)
     .map(([id, meta]) => `<option value="${id}">${meta.short}: ${meta.name}</option>`)
     .join('');
 }
 
 function updateSelectedMeta() {
   const item = catalogMap[document.getElementById('worksheetSelect').value];
+  if (!item) return;
   const section = document.getElementById('selectedSection');
   const lesson = document.getElementById('selectedLesson');
   const countInput = document.getElementById('problemCount');
   const limit = getWorksheetLimit(item);
   const defaultCount = Math.min(item.count, limit);
-  section.textContent = `${UNIT_META[item.unit].short} \u00b7 ${item.section}`;
+  const unitMeta = getUnitMeta(item.grade, item.unit);
+  const unitShort = unitMeta ? unitMeta.short : item.unit;
+  section.textContent = `${unitShort} · ${item.section}`;
   lesson.textContent = `교과 차시: ${item.lessonRef}`;
   countInput.placeholder = defaultCount;
   countInput.max = limit;
   if (countInput.value) {
     countInput.value = Math.min(parseInt(countInput.value, 10) || defaultCount, limit);
   }
+  renderPrereqs(item);
 }
 
-function populateWorksheetSelect(unitId, preferredId) {
+function renderPrereqs(item) {
+  const panel = document.getElementById('prereqPanel');
+  panel.innerHTML = '';
+  if (!item.prereqs || item.prereqs.length === 0) {
+    panel.hidden = true;
+    return;
+  }
+
+  const label = document.createElement('span');
+  label.className = 'prereq-label';
+  label.textContent = '선수학습';
+  panel.appendChild(label);
+
+  for (const p of item.prereqs) {
+    const r = resolvePrereq(p, item.grade);
+    if (r.action) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'prereq-chip clickable';
+      btn.textContent = r.label;
+      btn.addEventListener('click', () => navigateToPrereq(r.action));
+      panel.appendChild(btn);
+    } else {
+      const span = document.createElement('span');
+      span.className = 'prereq-chip external';
+      span.textContent = r.label;
+      panel.appendChild(span);
+    }
+  }
+  panel.hidden = false;
+}
+
+function navigateToPrereq(action) {
+  const gradeSelect = document.getElementById('gradeSelect');
+  const unitSelect = document.getElementById('unitSelect');
+
+  if (gradeSelect.value !== action.grade) {
+    gradeSelect.value = action.grade;
+    populateUnitSelect(action.grade);
+  }
+  unitSelect.value = action.unit;
+  populateWorksheetSelect(action.grade, action.unit, action.sheet);
+  generate('replace');
+}
+
+function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
-  const items = getWorksheetsByUnit(unitId);
+  const items = getWorksheetsByUnit(gradeId, unitId);
   worksheetSelect.innerHTML = items.map((item) =>
     `<option value="${item.id}">[${item.section}] ${item.label}</option>`
   ).join('');
 
-  const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : items[0].id;
-  worksheetSelect.value = nextId;
-  updateSelectedMeta();
+  const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : (items[0] && items[0].id);
+  if (nextId) {
+    worksheetSelect.value = nextId;
+    updateSelectedMeta();
+  }
+}
+
+function currentGradeId() {
+  return document.getElementById('gradeSelect').value;
 }
 
 function generate(mode) {
@@ -46,6 +114,7 @@ function generate(mode) {
   const worksheetId = document.getElementById('worksheetSelect').value;
   const pageCount = Math.min(20, Math.max(1, parseInt(document.getElementById('pageCount').value, 10) || 1));
   const item = catalogMap[worksheetId];
+  if (!item) return;
 
   const customCount = parseInt(problemCountInput.value, 10);
   const maxCount = getWorksheetLimit(item);
@@ -76,8 +145,15 @@ function toggleAnswers() {
 
 /* ── 이벤트 바인딩 ── */
 
+document.getElementById('gradeSelect').addEventListener('change', (event) => {
+  const gradeId = event.target.value;
+  populateUnitSelect(gradeId);
+  const firstUnitId = Object.keys(getUnitsOfGrade(gradeId))[0];
+  populateWorksheetSelect(gradeId, firstUnitId);
+});
+
 document.getElementById('unitSelect').addEventListener('change', (event) => {
-  populateWorksheetSelect(event.target.value);
+  populateWorksheetSelect(currentGradeId(), event.target.value);
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {
@@ -91,12 +167,13 @@ document.getElementById('fontScale').addEventListener('change', () => {
   container.style.setProperty('--pdf-scale', scale);
 });
 
-// 버튼 이벤트를 전역에 노출 (HTML onclick 사용)
 window.generate = generate;
 window.toggleAnswers = toggleAnswers;
 
 /* ── 초기화 ── */
 
-populateUnitSelect();
-populateWorksheetSelect('u1');
+populateGradeSelect();
+populateUnitSelect(DEFAULT_GRADE_ID);
+const firstUnitId = Object.keys(getUnitsOfGrade(DEFAULT_GRADE_ID))[0];
+populateWorksheetSelect(DEFAULT_GRADE_ID, firstUnitId);
 generate('replace');

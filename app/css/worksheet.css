@@ -116,6 +116,59 @@ button:active { transform: scale(0.98); }
   border: 1px solid #dce4ef;
 }
 
+.prereq-note {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  font-size: 13px;
+  color: #57606f;
+}
+
+.prereq-note[hidden] { display: none; }
+
+.prereq-label {
+  font-weight: 600;
+  color: #2d8ae2;
+  margin-right: 2px;
+}
+
+.prereq-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.2;
+  border: 1px solid #cfdcef;
+  background: #eef4fb;
+  color: #2d4060;
+}
+
+.prereq-chip.clickable {
+  cursor: pointer;
+  background: #d8e8f8;
+  border-color: #9ec0e6;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.prereq-chip.clickable:hover {
+  background: #bcd6f0;
+}
+
+.prereq-chip.clickable:active {
+  transform: translateY(1px);
+}
+
+.prereq-chip.external {
+  background: #f4f4f6;
+  border-color: #d6d6dc;
+  color: #6b6f78;
+  font-style: italic;
+}
+
 .sheet {
   width: var(--paper-width);
   height: var(--paper-height);

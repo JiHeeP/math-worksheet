@@ -76,22 +76,29 @@ defineUnit('u1', '자연수의 혼합 계산', [
 
 ### 새 학습지 추가하기
 
-1. 적절한 단원의 제너레이터 파일 열기 (`js/generators/uN.js`)
+1. 적절한 단원의 제너레이터 파일 열기 (`js/generators/g{학년}-{학기}/uN.js`)
 2. 함수 작성: 순수 데이터 객체 반환 (HTML 금지)
 3. `js/templates.js` 에서 적합한 템플릿 확인. 없으면 새로 추가.
-4. `js/catalog.js` 에서 `학습지(...)` 호출로 등록.
+4. `js/catalogs/g{학년}-{학기}.js` 에서 `학습지(...)` 호출로 등록.
 5. 브라우저에서 새로 만들기 → 정답 보기로 검수.
 
 자세한 단계와 예시는 [app/ARCHITECTURE.md](app/ARCHITECTURE.md).
 
-### 새 학년 추가하기 (예: 4학년 1학기)
+### 새 학년·학기 추가하기 (예: 4학년 1학기)
 
-> ⚠️ 아직 한 학년만 구현되어 있어서 학년 분리 구조가 정해지지 않음.
-> 추가 시 다음 중 하나를 사용자와 결정해야 함:
-> - **옵션 A**: `js/generators/g4-1/u1.js`, `g5-1/u1.js` … (학년/학기별 폴더)
-> - **옵션 B**: 학년별 별도 앱 (`app-g4-1/`, `app-g5-1/`)
->
-> 학년 선택 UI도 함께 설계 필요. 작업 전 반드시 사용자와 상의.
+학년·학기 다중 지원 구조 (2026-05-01 도입). 한 앱에서 학년·학기 드롭다운으로 전환.
+
+추가 절차:
+1. `app/js/generators/g{학년}-{학기}/uN.js` 작성 (예: `g4-1/u1.js`).
+   - 다른 학기 generators를 참고하되, 상대 import 경로는 `../../utils.js`, `../../helpers.js`, `../../templates.js`.
+2. `app/js/catalogs/g{학년}-{학기}.js` 작성. `catalogs/g5-1.js` 와 동일한 형식.
+   - `const GRADE_ID = 'g4-1';` 로 변경
+   - 단원 import 경로를 새 폴더로 변경
+   - `meta.short`, `meta.name`, `meta.units` 작성
+3. `app/js/catalog.js` 하단 `GRADES` 배열에 `import * as g4_1 from './catalogs/g4-1.js';` 추가하고 `const GRADES = [g4_1, g5_1, ...];` 형태로 push.
+4. 단원 ID는 학기 안에서만 유일하면 됨 (`u1`, `u2`...). 학기 prefix는 빌더가 자동 부착.
+
+[CURRICULUM.md](CURRICULUM.md)에 1~6학년 학기별 단원 목록과 선수학습 체인이 정리되어 있음 — 카탈로그 작성 시 참고.
 
 ## 작업 스타일 가이드
 

@@ -1,8 +1,8 @@
 'use strict';
 
-import { rand, randChoice, gcd, lcm } from '../utils.js';
-import { fracD, mixedD, numBlank, symBlank, fracBlank, mixedBlank } from '../helpers.js';
-import { htmlProblem } from '../templates.js';
+import { rand, randChoice, gcd, lcm } from '../../utils.js';
+import { fracD, mixedD, numBlank, symBlank, fracBlank, mixedBlank } from '../../helpers.js';
+import { htmlProblem } from '../../templates.js';
 
 export function genU4PreCmp() {
   const den = rand(5, 12);

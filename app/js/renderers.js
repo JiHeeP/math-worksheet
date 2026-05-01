@@ -6,7 +6,7 @@ import {
   PDF_LAYOUTS, GRID_LAYOUTS, resolveGridLayout, applyGridLayout, getHtmlLayoutConfig,
 } from './layout.js';
 import {
-  UNIT_META, PDF_WORKSHEET_MAP, catalogMap,
+  PDF_WORKSHEET_MAP, catalogMap,
   isPdfWorksheet, getPdfOpType, buildSheetTitle, PDF_GENERATORS,
 } from './catalog.js';
 

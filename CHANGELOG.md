@@ -1,5 +1,55 @@
 # 변경 이력
 
+## 2026-05-01: 학년·학기 다중 지원 구조로 재편
+
+### 배경
+- 1학년 1학기부터 6학년 2학기까지 12개 학기 확장 계획
+- 기존 단원 ID(`u1` 등)는 학기 사이에서 충돌
+- 단일 `catalog.js`에 모든 학기 정의가 들어가면 파일이 비대해짐
+
+### 변경 내용
+
+#### 1. 폴더 구조 재편
+
+| 기존 | 변경 후 |
+|---|---|
+| `js/generators/u1.js` … `u6.js` | `js/generators/g5-1/u1.js` … `u6.js` |
+| (없음) | `js/catalogs/g5-1.js` (학기별 카탈로그) |
+| `js/catalog.js` (모든 정의 포함) | `js/catalog.js` (빌더 + 학기 통합 진입점) |
+
+#### 2. 데이터 구조 변경
+
+- 카탈로그 항목에 `grade` 필드 추가: `{ grade: 'g5-1', unit: 'u1', ... }`
+- 학습지 ID에 학기 prefix 자동 부착: `u1_pre_add_2d` → `g5-1_u1_pre_add_2d`
+- `UNIT_META` (1단계 객체) → `GRADE_META` (학기→단원 2단계 구조)
+- `defineUnit(unitId, ...)` → `defineUnit(gradeId, unitId, ...)`
+- `getWorksheetsByUnit(unitId)` → `getWorksheetsByUnit(gradeId, unitId)`
+- 새 헬퍼: `getGradeMeta`, `getUnitMeta`, `getUnitsOfGrade`
+
+#### 3. UI 변경
+
+- 컨트롤바에 **학년·학기** 드롭다운 추가 (현재 옵션은 5-1만)
+- 학기 변경 시 단원 선택지 자동 재구성
+
+#### 4. 신규 학기 추가 절차
+
+1. `js/generators/g{학년}-{학기}/uN.js` 작성
+2. `js/catalogs/g{학년}-{학기}.js` 작성 (`g5-1.js` 형식 참고)
+3. `js/catalog.js` 의 `GRADES` 배열에 `import * as ... ` 추가
+
+### 검증
+- 79개 학습지 그대로 유지, 모든 ID 정상 prefix 부착
+- PDF 매핑 무결 (12개 매핑 모두 카탈로그와 일치)
+- node syntax check, 동적 import 로드 모두 정상
+
+### 영향받은 파일
+- 이동: `app/js/generators/u{1..6}.js` → `app/js/generators/g5-1/u{1..6}.js`
+- 신규: `app/js/catalogs/g5-1.js`
+- 수정: `app/js/catalog.js`, `app/js/app.js`, `app/js/renderers.js` (UNIT_META import 제거), `app/worksheet.html`
+- 함께 추가: 프로젝트 루트 `CURRICULUM.md` (1~6학년 계열표)
+
+---
+
 ## 2026-05-01: 모듈화 리팩토링 + 템플릿 시스템 도입
 
 ### 배경
