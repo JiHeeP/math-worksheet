@@ -1,0 +1,6 @@
+# Netlify 배포 설정
+# 이 파일은 Netlify 대시보드의 UI 설정보다 우선합니다.
+# (Build settings → Publish directory 등을 코드로 고정)
+
+[build]
+  publish = "app"
