@@ -230,6 +230,90 @@ function inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2) {
   return { line1, line2, line3 };
 }
 
+/* ── 분모 같은 분수 받아올림/받아내림 단계 풀이 (4-2용) ── */
+
+/** (진분수)+(진분수), 합이 1 이상 — 가분수 → 대분수 변환 단계 */
+function inlineSameFracAddGe1(a, b, d) {
+  const sum = a + b;
+  const whole = Math.floor(sum / d);
+  const remain = sum % d;
+  let s = `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)}`;
+  s += ` <span class="eq-txt">=</span> ${fracD(numBlank(sum), d)}`;
+  if (remain === 0) {
+    s += ` <span class="eq-txt">=</span> ${numBlank(whole)}`;
+  } else {
+    s += ` <span class="eq-txt">=</span> ${mixedBlank(whole, remain, d)}`;
+  }
+  return s;
+}
+
+/** 1 − (진분수): 1 = d/d 변환 단계 */
+function inline1MinusFrac(n, d) {
+  let s = `1 <span class="op-txt">−</span> ${fracD(n, d)}`;
+  s += ` <span class="eq-txt">=</span> ${fracBlank(d, d)} <span class="op-txt">−</span> ${fracD(n, d)}`;
+  s += ` <span class="eq-txt">=</span> ${formulaResultHtml(d - n, d)}`;
+  return s;
+}
+
+/** (자연수) − (진분수): 자연수에서 1 받아내림 */
+function inlineIntMinusFrac(w, n, d) {
+  let s = `${w} <span class="op-txt">−</span> ${fracD(n, d)}`;
+  s += ` <span class="eq-txt">=</span> ${mixedBlank(w - 1, d, d)} <span class="op-txt">−</span> ${fracD(n, d)}`;
+  s += ` <span class="eq-txt">=</span> ${mixedBlank(w - 1, d - n, d)}`;
+  return s;
+}
+
+/** (자연수) − (대분수): 자연수에서 1 받아내림 */
+function inlineIntMinusMixed(w, wm, n, d) {
+  const wholeDiff = w - wm - 1;
+  let s = `${w} <span class="op-txt">−</span> ${mixedD(wm, n, d)}`;
+  s += ` <span class="eq-txt">=</span> ${mixedBlank(w - 1, d, d)} <span class="op-txt">−</span> ${mixedD(wm, n, d)}`;
+  if (wholeDiff === 0) {
+    s += ` <span class="eq-txt">=</span> ${fracBlank(d - n, d)}`;
+  } else {
+    s += ` <span class="eq-txt">=</span> ${mixedBlank(wholeDiff, d - n, d)}`;
+  }
+  return s;
+}
+
+/** 분모 같은 (대분수)+(대분수), 받아올림 있음 — 자연수·분수 따로 (3줄) */
+function inlineSameMixedAddCarry(w1, n1, w2, n2, d) {
+  const fracSum = n1 + n2;
+  const wholeSum = w1 + w2;
+  const extraWhole = Math.floor(fracSum / d);
+  const remain = fracSum % d;
+  const finalWhole = wholeSum + extraWhole;
+
+  const line1 = `${mixedD(w1, n1, d)} <span class="op-txt">+</span> ${mixedD(w2, n2, d)}`;
+  const line2 = `<span class="eq-txt">=</span> (${numBlank(w1)} + ${numBlank(w2)}) + (${fracD(n1, d)} <span class="op-txt">+</span> ${fracD(n2, d)})`;
+  let line3 = `<span class="eq-txt">=</span> ${numBlank(wholeSum)} + ${fracD(numBlank(fracSum), d)}`;
+  if (remain === 0) {
+    line3 += ` <span class="eq-txt">=</span> ${numBlank(finalWhole)}`;
+  } else {
+    line3 += ` <span class="eq-txt">=</span> ${mixedBlank(finalWhole, remain, d)}`;
+  }
+  return { line1, line2, line3 };
+}
+
+/** 분모 같은 (대분수)−(대분수), 받아내림 있음 — 자연수·분수 따로 (3줄) */
+function inlineSameMixedSubBorrow(w1, n1, w2, n2, d) {
+  const borrowedN1 = n1 + d;
+  const fracDiff = borrowedN1 - n2;
+  const wholeDiff = w1 - w2 - 1;
+
+  const line1 = `${mixedD(w1, n1, d)} <span class="op-txt">−</span> ${mixedD(w2, n2, d)}`;
+  const line2 = `<span class="eq-txt">=</span> (${numBlank(w1 - 1)} − ${numBlank(w2)}) + (${fracD(numBlank(borrowedN1), d)} <span class="op-txt">−</span> ${fracD(n2, d)})`;
+  let line3 = `<span class="eq-txt">=</span> ${numBlank(wholeDiff)} + ${fracD(numBlank(fracDiff), d)}`;
+  if (fracDiff === 0) {
+    line3 += ` <span class="eq-txt">=</span> ${numBlank(wholeDiff)}`;
+  } else if (wholeDiff === 0) {
+    line3 += ` <span class="eq-txt">=</span> ${fracBlank(fracDiff, d)}`;
+  } else {
+    line3 += ` <span class="eq-txt">=</span> ${mixedBlank(wholeDiff, fracDiff, d)}`;
+  }
+  return { line1, line2, line3 };
+}
+
 /** 나눗셈법 (최대공약수/최소공배수) */
 function buildDivMethodHtml(a, b, mode) {
   const steps = [];
@@ -356,6 +440,42 @@ export const T = {
         : inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2);
       return fracStepProblemMultiLine(lines);
     },
+  },
+
+  /** 분모 같은 (진분수)+(진분수), 합 ≥ 1 — 가분수→대분수 변환 단계 */
+  sameFracAddGe1Step: {
+    grid: 'wide', count: 8,
+    render: ({ a, b, d }) => fracStepProblem(inlineSameFracAddGe1(a, b, d)),
+  },
+
+  /** 1 − (진분수) — 1 = d/d 변환 단계 */
+  oneMinusFracStep: {
+    grid: 'wide', count: 8,
+    render: ({ n, d }) => fracStepProblem(inline1MinusFrac(n, d)),
+  },
+
+  /** (자연수) − (진분수) — 자연수 받아내림 단계 */
+  intMinusFracStep: {
+    grid: 'wide', count: 8,
+    render: ({ w, n, d }) => fracStepProblem(inlineIntMinusFrac(w, n, d)),
+  },
+
+  /** (자연수) − (대분수) — 자연수 받아내림 단계 */
+  intMinusMixedStep: {
+    grid: 'wide', count: 8,
+    render: ({ w, wm, n, d }) => fracStepProblem(inlineIntMinusMixed(w, wm, n, d)),
+  },
+
+  /** 분모 같은 (대분수)+(대분수), 받아올림 — 자연수·분수 따로 (3줄) */
+  sameMixedAddCarryStep: {
+    grid: 'wide', count: 8,
+    render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedAddCarry(w1, n1, w2, n2, d)),
+  },
+
+  /** 분모 같은 (대분수)−(대분수), 받아내림 — 자연수·분수 따로 (3줄) */
+  sameMixedSubBorrowStep: {
+    grid: 'wide', count: 8,
+    render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedSubBorrow(w1, n1, w2, n2, d)),
   },
 
   /** 나눗셈법 (최대공약수/최소공배수 구하기) */
