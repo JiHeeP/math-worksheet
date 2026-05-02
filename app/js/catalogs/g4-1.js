@@ -13,7 +13,7 @@
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
 
 import {
-  genU1PreMul3x2, genDiv3d2,
+  genU1PreMul3x2, genDiv3d2, genU1PreDiv,
   PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
 
@@ -25,6 +25,9 @@ const u3 = defineUnit(GRADE_ID, 'u3', '곱셈과 나눗셈(7)', [
   ]),
   차시('2차시 세 자리 ÷ 두 자리 (세로셈)', { kind: 'pdf', grid: 'divgrid', count: 9 }, [
     학습지('세 자리 ÷ 두 자리 (세로셈)', genDiv3d2, { id: 'u3_main_div_3d2d' }),
+  ]),
+  차시('3차시 두 자리 수로 나누는 가로셈 (몫·나머지)', { kind: 'html', grid: 'standard', count: 20 }, [
+    학습지('두 자리 수로 나누는 가로셈', genU1PreDiv, { id: 'u3_main_div_2d_horiz' }),
   ]),
 ]);
 

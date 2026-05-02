@@ -74,7 +74,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합 계산', [
     학습지('세 자리 수 뺄셈', genU1PreSub, { id: 'u1_pre_sub', count: 15, from: 'g3-1' }),
     학습지('두 자리 수 × 두 자리 수 (세로셈)', genU1PreMul, { id: 'u1_pre_mul', count: 12, from: 'g3-2' }),
     학습지('세 자리 수 × 두 자리 수 (세로셈)', genU1PreMul3x2, { id: 'u1_pre_mul_3x2', count: 12, from: 'g4-1' }),
-    학습지('두 자리 수 나눗셈 (가로셈)', genU1PreDiv, { id: 'u1_pre_div', kind: 'html', from: 'g3-1' }),
+    학습지('두 자리 수 나눗셈 (가로셈)', genU1PreDiv, { id: 'u1_pre_div', kind: 'html', from: 'g4-1' }),
     학습지('세 자리 수 ÷ 두 자리 수 (세로셈)', genDiv3d2, { id: 'u1_pre_div_3d2', grid: 'divgrid', count: 9, from: 'g4-1' }),
     학습지('세 자리 수 ÷ 한 자리 수 (세로셈)', genDiv3d1, { id: 'u1_pre_div_3d1', grid: 'divgrid', count: 9, from: 'g3-2' }),
   ]),

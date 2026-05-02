@@ -18,7 +18,6 @@ import { defineUnit, 차시, 학습지 } from '../catalog.js';
 import {
   genU1PreAdd, genU1PreSub,
   genU1PreMul2d1d,
-  genU1PreDiv,
   PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
 import { genU2PreDiv } from '../generators/g5-1/u2.js';
@@ -36,10 +35,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '덧셈과 뺄셈(6)', [
 ]);
 
 const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈(3)', [
-  차시('1차시 두 자리 나눗셈 (가로셈)', { kind: 'html', grid: 'standard', count: 20 }, [
-    학습지('두 자리 나눗셈 (가로셈)', genU1PreDiv, { id: 'u3_main_div_2d_horiz' }),
-  ]),
-  차시('2차시 한 자리 수로 나누는 단순 나눗셈', { grid: 'dense', count: 36 }, [
+  차시('1차시 한 자리 수로 나누는 나눗셈 (몫 한 자리)', { grid: 'dense', count: 36 }, [
     학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u3_main_div_one_digit' }),
   ]),
 ]);
