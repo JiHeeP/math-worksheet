@@ -1,0 +1,83 @@
+'use strict';
+
+/**
+ * 2학년 1학기 카탈로그
+ *
+ * 현재 구현 단원:
+ *   3단원 덧셈과 뺄셈(5)
+ *
+ * 미구현: 1단원 세 자리 수, 2단원 여러 가지 도형, 4단원 길이재기,
+ *         5단원 분류하기, 6단원 곱셈(1) — Phase 5 또는 별도
+ */
+
+import { defineUnit, 차시, 학습지, unitRef, ext } from '../catalog.js';
+
+import {
+  genG21U3Add2d2dNoCarry, genG21U3Add2d2dSingle, genG21U3Add2d2dDouble, genG21U3Add2d2dMix,
+  genG21U3Sub2d2dNoBorrow, genG21U3Sub2d2dBorrow, genG21U3Sub2d2dMix,
+  genG21U3Sub2d1dBorrow,
+} from '../generators/g2-1/u3.js';
+
+const GRADE_ID = 'g2-1';
+
+const u3 = defineUnit(GRADE_ID, 'u3', '덧셈과 뺄셈(5)', [
+  차시('1차시 (두 자리) + (두 자리), 받아올림 없음', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 + 두 자리 (받아올림 없음)', genG21U3Add2d2dNoCarry, {
+      id: 'u3_main_add_no_carry',
+      prereqs: [unitRef('g1-2', 'u4')],
+    }),
+  ]),
+  차시('2차시 (두 자리) + (두 자리), 받아올림 1회', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 + 두 자리 (받아올림 1회)', genG21U3Add2d2dSingle, {
+      id: 'u3_main_add_single',
+      prereqs: [unitRef('g1-2', 'u7')],
+    }),
+  ]),
+  차시('3차시 (두 자리) + (두 자리), 받아올림 2회', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 + 두 자리 (받아올림 2회)', genG21U3Add2d2dDouble, {
+      id: 'u3_main_add_double',
+      prereqs: [],
+    }),
+  ]),
+  차시('4차시 (두 자리) + (두 자리) 혼합', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 + 두 자리 (혼합)', genG21U3Add2d2dMix, {
+      id: 'u3_main_add_mix',
+    }),
+  ]),
+  차시('5차시 (두 자리) − (한 자리), 받아내림', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 − 한 자리 (받아내림)', genG21U3Sub2d1dBorrow, {
+      id: 'u3_main_sub_2d1d_borrow',
+      prereqs: [unitRef('g1-2', 'u7')],
+    }),
+  ]),
+  차시('6차시 (두 자리) − (두 자리), 받아내림 없음', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 − 두 자리 (받아내림 없음)', genG21U3Sub2d2dNoBorrow, {
+      id: 'u3_main_sub_no_borrow',
+      prereqs: [unitRef('g1-2', 'u4')],
+    }),
+  ]),
+  차시('7차시 (두 자리) − (두 자리), 받아내림 있음', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 − 두 자리 (받아내림 있음)', genG21U3Sub2d2dBorrow, {
+      id: 'u3_main_sub_borrow',
+    }),
+  ]),
+  차시('8차시 (두 자리) − (두 자리) 혼합', { grid: 'standard', count: 20 }, [
+    학습지('두 자리 − 두 자리 (혼합)', genG21U3Sub2d2dMix, {
+      id: 'u3_main_sub_mix',
+    }),
+  ]),
+]);
+
+export const meta = {
+  id: GRADE_ID,
+  short: '2-1',
+  name: '2학년 1학기',
+  units: {
+    u3: { short: '3단원', name: '덧셈과 뺄셈(5)' },
+  },
+};
+
+export const entries = [...u3];
+
+export const pdfMap = {};
+export const pdfGenerators = {};
