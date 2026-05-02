@@ -290,13 +290,16 @@ button:active { transform: scale(0.98); }
   width: calc(54px * var(--font-scale, 1));
   margin-top: 2px;
 }
-/* 가지 끝 두 수의 자리 — 테두리 없이 공간만 확보 (인쇄 잉크 절약). */
+/* 가지 끝 두 수의 자리 — 가르기 다이어그램 원본 PoC 스타일 (사용자 요청 유지). */
 .small-box {
   width: calc(22px * var(--font-scale, 1));
   height: calc(22px * var(--font-scale, 1));
+  border: 1.5px solid #555;
+  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: white;
   font-size: calc(14px * var(--font-scale, 1));
 }
 .small-box-answer {
