@@ -148,14 +148,14 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
 
 /* ── 학기 카탈로그 통합 ── */
 
+import * as g1_1 from './catalogs/g1-1.js';
+import * as g1_2 from './catalogs/g1-2.js';
 import * as g4_2 from './catalogs/g4-2.js';
 import * as g5_1 from './catalogs/g5-1.js';
 import * as g5_2 from './catalogs/g5-2.js';
 
-const GRADES = [g4_2, g5_1, g5_2];
-// 새 학기 추가 시:
-//   import * as g4_1 from './catalogs/g4-1.js';
-//   const GRADES = [g4_1, g4_2, g5_1, g5_2, ...];
+const GRADES = [g1_1, g1_2, g4_2, g5_1, g5_2];
+// 새 학기 추가 시: import 추가하고 GRADES 배열에 학기 순서대로 push.
 
 /**
  * 모든 학기의 학습지를 한 배열로 모음.
