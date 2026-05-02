@@ -3,26 +3,23 @@
 /**
  * 3학년 1학기 카탈로그
  *
- * 5-1 선수학습 generator 들이 본래 다루는 학기. 같은 generator 를
- * 본단원으로 등록하여 중복 작성 없이 학기 간 매핑을 정합화.
+ * 5-1 선수학습 generator 들이 본래 다루는 학기.
+ * 본단원 학습지는 세로셈(PDF) 형태가 표준 — 5-1 의 선수학습 매핑과 동일.
  *
  * 현재 구현 단원:
- *   1단원 덧셈과 뺄셈(6) — 세 자리 수 덧·뺄셈
- *   3단원 나눗셈(3) — 두 자리 ÷ 한 자리 (가로셈)
- *   4단원 곱셈(4) — 두 자리 × 한 자리
+ *   1단원 덧셈과 뺄셈(6) — 세 자리 수 덧·뺄셈 (세로셈)
+ *   3단원 나눗셈(3) — 두 자리 ÷ 한 자리
+ *   4단원 곱셈(4) — 두 자리 × 한 자리 (세로셈)
  *   5단원 길이와 시간
- *
- * 미구현: 2단원 평면도형, 6단원 분수와 소수 — Phase 5 또는 별도
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
 
-// generator 들은 g5-1 폴더에 있던 5-1 선수학습용을 그대로 본단원으로 재사용.
-// 향후 generators/g3-1/ 로 옮기는 리팩토링 가능.
 import {
-  genU1PreAdd, genU1PreSub,                  // 세 자리 수 덧·뺄셈
-  genU1PreMul2d1d,                            // 두 자리 × 한 자리
-  genU1PreDiv,                                // 두 자리 나눗셈 (가로셈)
+  genU1PreAdd, genU1PreSub,
+  genU1PreMul2d1d,
+  genU1PreDiv,
+  PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
 import { genU2PreDiv } from '../generators/g5-1/u2.js';
 import { genU6PreUnit, genU6PreLen } from '../generators/g5-1/u6.js';
@@ -30,11 +27,11 @@ import { genU6PreUnit, genU6PreLen } from '../generators/g5-1/u6.js';
 const GRADE_ID = 'g3-1';
 
 const u1 = defineUnit(GRADE_ID, 'u1', '덧셈과 뺄셈(6)', [
-  차시('1차시 세 자리 수 덧셈', { grid: 'standard', count: 15 }, [
-    학습지('세 자리 수 덧셈', genU1PreAdd, { id: 'u1_main_add_3d' }),
+  차시('1차시 세 자리 수 덧셈 (세로셈)', { kind: 'pdf', grid: 'standard', count: 15 }, [
+    학습지('세 자리 수 덧셈 (세로셈)', genU1PreAdd, { id: 'u1_main_add_3d' }),
   ]),
-  차시('2차시 세 자리 수 뺄셈', { grid: 'standard', count: 15 }, [
-    학습지('세 자리 수 뺄셈', genU1PreSub, { id: 'u1_main_sub_3d' }),
+  차시('2차시 세 자리 수 뺄셈 (세로셈)', { kind: 'pdf', grid: 'standard', count: 15 }, [
+    학습지('세 자리 수 뺄셈 (세로셈)', genU1PreSub, { id: 'u1_main_sub_3d' }),
   ]),
 ]);
 
@@ -48,7 +45,7 @@ const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈(3)', [
 ]);
 
 const u4 = defineUnit(GRADE_ID, 'u4', '곱셈(4)', [
-  차시('1차시 두 자리 × 한 자리 (세로셈)', { grid: 'standard', count: 15 }, [
+  차시('1차시 두 자리 × 한 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 15 }, [
     학습지('두 자리 × 한 자리 (세로셈)', genU1PreMul2d1d, { id: 'u4_main_mul_2d1d' }),
   ]),
 ]);
@@ -76,5 +73,12 @@ export const meta = {
 
 export const entries = [...u1, ...u3, ...u4, ...u5];
 
-export const pdfMap = {};
-export const pdfGenerators = {};
+/* ── PDF 매핑 (세로셈 출력 학습지 ID → PDF 제너레이터 키) ── */
+
+export const pdfMap = {
+  'g3-1_u1_main_add_3d': 'add_3d',
+  'g3-1_u1_main_sub_3d': 'sub_3d',
+  'g3-1_u4_main_mul_2d1d': 'mul_2d1d',
+};
+
+export const pdfGenerators = { ...PDF_GENERATORS_U1 };

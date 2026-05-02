@@ -4,21 +4,21 @@
  * 3학년 2학기 카탈로그
  *
  * 5-1 선수학습 generator 들이 본래 다루는 학기.
+ * 곱셈/나눗셈은 세로셈(PDF) 표준 출력.
  *
  * 현재 구현 단원:
- *   1단원 곱셈(5) — 두 자리 × 두 자리
+ *   1단원 곱셈(5) — 두 자리 × 두 자리 (세로셈)
  *   3단원 나눗셈(6) — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
  *   5단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
- *
- * 미구현: 2단원 원, 4단원 들이와 무게, 6단원 그림그래프
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
 
 import {
-  genU1PreMul,                                // 두 자리 × 두 자리
-  genU1PreDiv2d1d, genU1PreDiv2d1dNoRem, genU1PreDiv2d1dRem,  // 두 자리 ÷ 한 자리
-  genDiv3d1,                                  // 세 자리 ÷ 한 자리
+  genU1PreMul,
+  genU1PreDiv2d1d, genU1PreDiv2d1dNoRem, genU1PreDiv2d1dRem,
+  genDiv3d1,
+  PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
 import { genU4PreCmp, genU4PreConv } from '../generators/g5-1/u4.js';
 import {
@@ -28,7 +28,7 @@ import {
 const GRADE_ID = 'g3-2';
 
 const u1 = defineUnit(GRADE_ID, 'u1', '곱셈(5)', [
-  차시('1차시 두 자리 × 두 자리 (세로셈)', { grid: 'standard', count: 12 }, [
+  차시('1차시 두 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 × 두 자리 (세로셈)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
   ]),
 ]);
@@ -37,13 +37,13 @@ const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈(6)', [
   차시('1차시 두 자리 ÷ 한 자리 (세로셈)', { kind: 'html', grid: 'standard', count: 12 }, [
     학습지('두 자리 ÷ 한 자리 (세로셈)', genU1PreDiv2d1d, { id: 'u3_main_div_2d1d' }),
   ]),
-  차시('2차시 두 자리 ÷ 한 자리 (나머지 없음)', { grid: 'standard', count: 12 }, [
+  차시('2차시 두 자리 ÷ 한 자리 (나머지 없음)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 ÷ 한 자리 (나머지 없음)', genU1PreDiv2d1dNoRem, { id: 'u3_main_div_norem' }),
   ]),
-  차시('3차시 두 자리 ÷ 한 자리 (나머지 있음)', { grid: 'standard', count: 12 }, [
+  차시('3차시 두 자리 ÷ 한 자리 (나머지 있음)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 ÷ 한 자리 (나머지 있음)', genU1PreDiv2d1dRem, { id: 'u3_main_div_rem' }),
   ]),
-  차시('4차시 세 자리 ÷ 한 자리 (세로셈)', { grid: 'divgrid', count: 9 }, [
+  차시('4차시 세 자리 ÷ 한 자리 (세로셈)', { kind: 'pdf', grid: 'divgrid', count: 9 }, [
     학습지('세 자리 ÷ 한 자리 (세로셈)', genDiv3d1, { id: 'u3_main_div_3d1' }),
   ]),
 ]);
@@ -76,5 +76,12 @@ export const meta = {
 
 export const entries = [...u1, ...u3, ...u5];
 
-export const pdfMap = {};
-export const pdfGenerators = {};
+export const pdfMap = {
+  'g3-2_u1_main_mul_2d2d': 'mul_2d2d',
+  'g3-2_u3_main_div_2d1d': 'div_2d1d',
+  'g3-2_u3_main_div_norem': 'div_2d1d_norem',
+  'g3-2_u3_main_div_rem': 'div_2d1d_rem',
+  'g3-2_u3_main_div_3d1': 'div_3d1d',
+};
+
+export const pdfGenerators = { ...PDF_GENERATORS_U1 };
