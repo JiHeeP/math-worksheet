@@ -268,6 +268,44 @@ button:active { transform: scale(0.98); }
   gap: calc(8px * var(--font-scale, 1));
 }
 
+/* 가르기 다이어그램 (1·2학년 받아올림/내림 단계 풀이) */
+.split-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: top;
+  line-height: 1;
+}
+.split-target-num {
+  font-size: inherit;
+  margin-bottom: 2px;
+}
+.split-line-svg {
+  width: calc(54px * var(--font-scale, 1));
+  height: calc(14px * var(--font-scale, 1));
+}
+.bottom-boxes {
+  display: flex;
+  justify-content: space-between;
+  width: calc(54px * var(--font-scale, 1));
+  margin-top: 2px;
+}
+.small-box {
+  width: calc(22px * var(--font-scale, 1));
+  height: calc(22px * var(--font-scale, 1));
+  border: 1.5px solid #555;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  font-size: calc(14px * var(--font-scale, 1));
+}
+.small-box-answer {
+  font-weight: 600;
+}
+/* 정답 가시성은 전역 [data-ans] 규칙으로 처리됨 */
+
 .dense .horiz-box { margin-top: 8px; font-size: calc(16px * var(--font-scale, 1)); gap: 4px; }
 
 .concept-layout,

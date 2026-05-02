@@ -13,6 +13,7 @@
  */
 
 import { defineUnit, 차시, 학습지, sheetRef } from '../catalog.js';
+import { T } from '../templates.js';
 
 import {
   genG12U4Add2d1d, genG12U4Add2d2d, genG12U4Sub2d1d, genG12U4Sub2d2d,
@@ -59,20 +60,20 @@ const u6 = defineUnit(GRADE_ID, 'u6', '덧셈과 뺄셈(3)', [
 /* ── 7단원 덧셈과 뺄셈(4) — 받아올림·내림 ── */
 
 const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(4)', [
-  차시('1차시 (한 자리) + (한 자리), 받아올림', { grid: 'standard', count: 20 }, [
-    학습지('(한 자리) + (한 자리), 받아올림', genG12U71d1dCarry, {
+  차시('1차시 (한 자리) + (한 자리), 받아올림 (가르기 풀이)', [
+    학습지('(한 자리) + (한 자리), 받아올림', T.makeTenAddStep, genG12U71d1dCarry, {
       id: 'u7_main_1d1d_carry',
       prereqs: [sheetRef('u6_main_make_ten_add')],
     }),
   ]),
-  차시('2차시 (십몇) − (몇), 받아내림', { grid: 'standard', count: 20 }, [
-    학습지('(십몇) − (몇), 받아내림', genG12U7TeenBorrow, {
+  차시('2차시 (십몇) − (몇), 받아내림 (가르기 풀이)', [
+    학습지('(십몇) − (몇), 받아내림', T.teenBorrowStep, genG12U7TeenBorrow, {
       id: 'u7_main_teen_borrow',
       prereqs: [sheetRef('u6_main_make_ten_sub')],
     }),
   ]),
-  차시('3차시 (두 자리) + (한 자리), 받아올림', { grid: 'standard', count: 20 }, [
-    학습지('(두 자리) + (한 자리), 받아올림', genG12U72d1dCarry, {
+  차시('3차시 (두 자리) + (한 자리), 받아올림 (가르기 풀이)', [
+    학습지('(두 자리) + (한 자리), 받아올림', T.twoDigitOneDigitCarryStep, genG12U72d1dCarry, {
       id: 'u7_main_2d1d_carry',
       prereqs: [sheetRef('u7_main_1d1d_carry')],
     }),

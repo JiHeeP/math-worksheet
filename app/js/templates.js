@@ -22,7 +22,7 @@ import {
   fracBlank, mixedBlank, formulaResultHtml,
   relationTableHtml, perimeterTriangleSvg, rectangleSvg,
   triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg,
-  unitGridSvg,
+  unitGridSvg, splitDiagramHtml,
 } from './helpers.js';
 
 /* ================================================================
@@ -314,6 +314,42 @@ function inlineSameMixedSubBorrow(w1, n1, w2, n2, d) {
   return { line1, line2, line3 };
 }
 
+/* ── 1·2학년 받아올림/내림 가르기 단계 풀이 ── */
+
+/** (한 자리)+(한 자리), 받아올림 — 두 번째 수 가르기 (3줄) */
+function inlineMakeTenAdd(a, b) {
+  const need = 10 - a;          // a 를 10 으로 만들기 위해 필요한 부분
+  const remain = b - need;      // 가르고 남는 부분
+  const total = a + b;
+  const line1 = `${a} <span class="op-txt">+</span> ${splitDiagramHtml(b, need, remain)}`;
+  const line2 = `<span class="eq-txt">=</span> 10 <span class="op-txt">+</span> ${numBlank(remain)}`;
+  const line3 = `<span class="eq-txt">=</span> ${numBlank(total)}`;
+  return { line1, line2, line3 };
+}
+
+/** (십몇)−(몇), 받아내림 — 첫 번째 수를 10과 일의 자리로 가르기 (3줄) */
+function inlineTeenBorrow(a, b) {
+  const ones = a % 10;
+  const subResult = 10 - b;     // 10 에서 b 를 빼고
+  const total = a - b;
+  const line1 = `${splitDiagramHtml(a, 10, ones)} <span class="op-txt">−</span> ${b}`;
+  const line2 = `<span class="eq-txt">=</span> ${numBlank(subResult)} <span class="op-txt">+</span> ${ones}`;
+  const line3 = `<span class="eq-txt">=</span> ${numBlank(total)}`;
+  return { line1, line2, line3 };
+}
+
+/** (두 자리)+(한 자리), 받아올림 — 두 번째 수 가르기, 일의 자리 부분에서 십을 만듦 (3줄) */
+function inline2d1dCarry(a, b) {
+  const need = 10 - (a % 10);   // a 의 일의 자리를 10 으로 채우기 위해 필요한 부분
+  const remain = b - need;
+  const newTens = a + need;     // 십 단위로 떨어진 수
+  const total = a + b;
+  const line1 = `${a} <span class="op-txt">+</span> ${splitDiagramHtml(b, need, remain)}`;
+  const line2 = `<span class="eq-txt">=</span> ${numBlank(newTens)} <span class="op-txt">+</span> ${numBlank(remain)}`;
+  const line3 = `<span class="eq-txt">=</span> ${numBlank(total)}`;
+  return { line1, line2, line3 };
+}
+
 /** 나눗셈법 (최대공약수/최소공배수) */
 function buildDivMethodHtml(a, b, mode) {
   const steps = [];
@@ -473,10 +509,28 @@ export const T = {
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedAddCarry(w1, n1, w2, n2, d)),
   },
 
-  /** 분모 같은 (대분수)−(대분수), 받아내림 — 자연수·분수 따로 (3줄) */
+  /** 분모 같은 (대분수)−(대분수), 받아내임 — 자연수·분수 따로 (3줄) */
   sameMixedSubBorrowStep: {
     grid: 'wide', count: 8,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedSubBorrow(w1, n1, w2, n2, d)),
+  },
+
+  /** (한 자리)+(한 자리), 받아올림 — 가르기 단계 풀이 (3줄) */
+  makeTenAddStep: {
+    grid: 'wide', count: 8,
+    render: ({ a, b }) => fracStepProblemMultiLine(inlineMakeTenAdd(a, b)),
+  },
+
+  /** (십몇)−(몇), 받아내림 — 가르기 단계 풀이 (3줄) */
+  teenBorrowStep: {
+    grid: 'wide', count: 8,
+    render: ({ a, b }) => fracStepProblemMultiLine(inlineTeenBorrow(a, b)),
+  },
+
+  /** (두 자리)+(한 자리), 받아올림 — 가르기 단계 풀이 (3줄) */
+  twoDigitOneDigitCarryStep: {
+    grid: 'wide', count: 8,
+    render: ({ a, b }) => fracStepProblemMultiLine(inline2d1dCarry(a, b)),
   },
 
   /** 나눗셈법 (최대공약수/최소공배수 구하기) */
