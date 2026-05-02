@@ -86,14 +86,23 @@ export function genU1MainAddSubOrder() {
   if (type === 1) { const a = rand(20, 80), b = rand(20, 80), c = rand(10, Math.min(a + b - 1, 99)); return horizProblem(`${a} + ${b} \u2212 ${c}`, numBlank(a + b - c)); }
   if (type === 2) { const a = rand(30, 90), b = rand(10, a - 1), c = rand(10, 80); return horizProblem(`${a} \u2212 ${b} + ${c}`, numBlank(a - b + c)); }
   if (type === 3) { const a = rand(20, 60), b = rand(10, 40), c = rand(10, 40), d = rand(10, Math.min(a + b + c - 1, 50)); return horizProblem(`${a} + ${b} + ${c} \u2212 ${d}`, numBlank(a + b + c - d)); }
-  const a = rand(50, 99), b = rand(10, 30), c = rand(10, 30); return horizProblem(`${a} \u2212 ${b} \u2212 ${c}`, numBlank(a - b - c));
+  // a \u2212 b \u2212 c: a > b + c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
+  const b = rand(10, 30), c = rand(10, 30), a = rand(b + c + 1, 99);
+  return horizProblem(`${a} \u2212 ${b} \u2212 ${c}`, numBlank(a - b - c));
 }
 
 export function genU1MainAddSubParen() {
   const type = rand(1, 3);
-  if (type === 1) { const b = rand(10, 40), c = rand(10, 40), a = rand(b + c, 99); return horizProblem(`${a} \u2212 (${b} + ${c})`, numBlank(a - (b + c))); }
+  if (type === 1) {
+    // a \u2212 (b + c): a > b + c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
+    const b = rand(10, 40), c = rand(10, 40), a = rand(b + c + 1, 99);
+    return horizProblem(`${a} \u2212 (${b} + ${c})`, numBlank(a - (b + c)));
+  }
   if (type === 2) { const a = rand(20, 60), c = rand(10, 40), b = rand(c + 1, c + 40); return horizProblem(`${a} + (${b} \u2212 ${c})`, numBlank(a + (b - c))); }
-  const b = rand(20, 60), c = rand(10, b - 1), a = rand(10, 50); return horizProblem(`${a} \u2212 (${b} \u2212 ${c})`, numBlank(a - (b - c)));
+  // a \u2212 (b \u2212 c): a > b \u2212 c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
+  const b = rand(20, 60), c = rand(10, b - 1), innerDiff = b - c;
+  const a = rand(innerDiff + 1, innerDiff + 50);
+  return horizProblem(`${a} \u2212 (${b} \u2212 ${c})`, numBlank(a - innerDiff));
 }
 
 export function genU1MainAddSubParenOrder() { return rand(1, 2) === 1 ? genU1MainAddSubOrder() : genU1MainAddSubParen(); }
@@ -161,7 +170,13 @@ export function genU1MainMixOrder() {
 export function genU1MainMixParen() {
   const type = rand(1, 3);
   if (type === 1) { const a = rand(6, 20), b = rand(5, 18), c = rand(2, 5), d = rand(2, 7), q = rand(2, 6); return horizProblem(`(${a} + ${b}) \u00d7 ${c} \u2212 ${q * d} \u00f7 ${d}`, numBlank((a + b) * c - q)); }
-  if (type === 2) { const a = rand(2, 6), b = rand(2, 6), c = rand(10, 30), d = rand(2, 8), q = rand(2, 6); return horizProblem(`${a} \u00d7 ${b} \u2212 (${c} \u2212 ${q * d} \u00f7 ${d})`, numBlank(a * b - (c - q))); }
+  if (type === 2) {
+    // a \u00d7 b \u2212 (c \u2212 q*d \u00f7 d): \uc548\ucabd c \u2212 q \u2265 1, \ubc14\uae65 a*b \u2212 (c \u2212 q) \u2265 1 \ubcf4\uc7a5
+    const a = rand(2, 6), b = rand(2, 6), ab = a * b;
+    const d = rand(2, 8), q = rand(2, 6);
+    const c = rand(q + 1, q + ab - 1); // c \u2212 q \u2208 [1, ab \u2212 1]
+    return horizProblem(`${a} \u00d7 ${b} \u2212 (${c} \u2212 ${q * d} \u00f7 ${d})`, numBlank(ab - (c - q)));
+  }
   const a = rand(10, 30), b = rand(10, 20), c = rand(2, 5), d = rand(2, 7), q = rand(2, 6);
   return horizProblem(`(${a} + ${b}) \u00d7 ${c} + ${q * d} \u00f7 ${d}`, numBlank((a + b) * c + q));
 }
