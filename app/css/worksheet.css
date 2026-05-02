@@ -268,33 +268,43 @@ button:active { transform: scale(0.98); }
   gap: calc(8px * var(--font-scale, 1));
 }
 
-/* 가르기 다이어그램 (1·2학년 받아올림/내림 단계 풀이)
-   부모 컨텍스트와 같은 글자 크기로 통일. 박스 없이 가지(branch) 만 SVG 로. */
+/* 가르기 다이어그램 (원본 PoC 스타일 — 위 숫자 + 가지 SVG + 두 작은 박스) */
 .split-container {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   vertical-align: middle;
   line-height: 1;
-  margin: 0 calc(2px * var(--font-scale, 1));
 }
-.split-num {
+.split-target-num {
   font-size: inherit;
-  font-weight: 500;
-  min-width: 1.2em;
-  text-align: center;
+  margin-bottom: 2px;
 }
 .split-line-svg {
-  width: calc(40px * var(--font-scale, 1));
+  width: calc(54px * var(--font-scale, 1));
   height: calc(14px * var(--font-scale, 1));
-  margin: calc(2px * var(--font-scale, 1)) 0;
 }
-.split-bottom {
+.bottom-boxes {
   display: flex;
   justify-content: space-between;
-  width: calc(40px * var(--font-scale, 1));
+  width: calc(54px * var(--font-scale, 1));
+  margin-top: 2px;
 }
-/* 가지 끝 두 숫자(.split-num) 의 정답 토글은 전역 [data-ans] 규칙이 처리 */
+.small-box {
+  width: calc(22px * var(--font-scale, 1));
+  height: calc(22px * var(--font-scale, 1));
+  border: 1.5px solid #555;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  font-size: calc(14px * var(--font-scale, 1));
+}
+.small-box-answer {
+  font-weight: 600;
+}
+/* 박스 안 정답 가시성은 전역 [data-ans] 규칙이 처리 */
 
 .dense .horiz-box { margin-top: 8px; font-size: calc(16px * var(--font-scale, 1)); gap: 4px; }
 
