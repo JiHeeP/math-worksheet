@@ -62,7 +62,7 @@ export function shapeProblem(svg, prompt, answerHtml, note = '') {
   return htmlProblem('shape-layout', `
     <div class="shape-card">
       ${svg}
-      <div class="shape-question">${prompt}</div>
+      ${prompt ? `<div class="shape-question">${prompt}</div>` : ''}
       <div class="shape-answer">${answerHtml}</div>
       ${note ? `<div class="small-note">${note}</div>` : ''}
     </div>
@@ -334,9 +334,10 @@ function buildDivMethodHtml(a, b, mode) {
   const answerLabel = mode === 'gcd' ? '최대공약수' : '최소공배수';
   const answerVal = mode === 'gcd' ? gcdVal : lcmVal;
 
+  // 시트 제목에 이미 "최대공약수" 또는 "최소공배수"가 있으므로
+  // 개별 문제에는 두 수만 표시 (div-method-row 의 values 가 그 역할).
   return `<div class="div-method div-method-split">
     <div class="div-method-left">
-      <div class="div-method-title">${a}과 ${b}의 ${answerLabel} 구하기</div>
       <div class="div-method-row">
         <span class="div-method-divisor"><span class="div-method-divisor-blank"></span></span>
         <span class="div-method-paren">)</span>

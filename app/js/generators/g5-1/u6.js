@@ -22,20 +22,20 @@ export function genU6PreLen() {
 export function genU6MainPerimeter() {
   if (rand(1, 2) === 1) {
     const a = rand(4, 9), b = rand(4, 9), c = rand(4, 9);
-    return shapeProblem(perimeterTriangleSvg(a, b, c), '삼각형의 둘레를 구해 보세요.', numBlank(a + b + c, 'cm'));
+    return shapeProblem(perimeterTriangleSvg(a, b, c), '', numBlank(a + b + c, 'cm'));
   }
   const w = rand(4, 12), h = rand(3, 9);
-  return shapeProblem(rectangleSvg(w, h), '직사각형의 둘레를 구해 보세요.', numBlank((w * 2) + (h * 2), 'cm'));
+  return shapeProblem(rectangleSvg(w, h), '', numBlank((w * 2) + (h * 2), 'cm'));
 }
 
 export function genU6MainUnitSquare() {
   const cols = rand(2, 5), rows = rand(2, 4);
-  return shapeProblem(unitGridSvg(cols, rows), '그림의 넓이는 몇 ㎠인가요?', numBlank(cols * rows, '㎠'));
+  return shapeProblem(unitGridSvg(cols, rows), '', numBlank(cols * rows, '㎠'));
 }
 
 export function genU6MainRect() {
   const w = rand(3, 15), h = rand(3, 12);
-  return shapeProblem(rectangleSvg(w, h), '직사각형의 넓이를 구해 보세요.', numBlank(w * h, 'cm\u00b2'), '넓이 = 가로 \u00d7 세로');
+  return shapeProblem(rectangleSvg(w, h), '', numBlank(w * h, 'cm\u00b2'));
 }
 
 export function genU6MainAreaUnit() {
@@ -45,22 +45,22 @@ export function genU6MainAreaUnit() {
 
 export function genU6MainPara() {
   const base = rand(4, 14), height = rand(3, 10);
-  return shapeProblem(parallelogramSvg(base, height), '평행사변형의 넓이를 구해 보세요.', numBlank(base * height, 'cm\u00b2'));
+  return shapeProblem(parallelogramSvg(base, height), '', numBlank(base * height, 'cm\u00b2'));
 }
 
 export function genU6MainTri() {
   const base = rand(2, 12) * 2, height = rand(2, 10);
-  return shapeProblem(triangleSvg(base, height), '삼각형의 넓이를 구해 보세요.', numBlank((base * height) / 2, 'cm\u00b2'));
+  return shapeProblem(triangleSvg(base, height), '', numBlank((base * height) / 2, 'cm\u00b2'));
 }
 
 export function genU6MainTrap() {
   const top = rand(3, 8), bottom = rand(top + 1, top + 8), height = rand(2, 7) * 2;
-  return shapeProblem(trapezoidSvg(top, bottom, height), '사다리꼴의 넓이를 구해 보세요.', numBlank(((top + bottom) * height) / 2, 'cm\u00b2'));
+  return shapeProblem(trapezoidSvg(top, bottom, height), '', numBlank(((top + bottom) * height) / 2, 'cm\u00b2'));
 }
 
 export function genU6MainRhombus() {
   const d1 = rand(3, 8) * 2, d2 = rand(3, 8);
-  return shapeProblem(rhombusSvg(d1, d2), '마름모의 넓이를 구해 보세요.', numBlank((d1 * d2) / 2, 'cm\u00b2'));
+  return shapeProblem(rhombusSvg(d1, d2), '', numBlank((d1 * d2) / 2, 'cm\u00b2'));
 }
 
 export function genU6MainMix() {

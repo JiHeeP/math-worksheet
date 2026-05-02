@@ -33,17 +33,13 @@ function formatGradeShort(gradeId) {
 }
 
 function updateSelectedMeta() {
+  // 메타 칩(단원·구분, 교과 차시) 은 드롭다운 라벨과 중복되어 제거됨 (2026-05-02).
+  // 여기서는 문제 수 입력 한도만 갱신.
   const item = catalogMap[document.getElementById('worksheetSelect').value];
   if (!item) return;
-  const section = document.getElementById('selectedSection');
-  const lesson = document.getElementById('selectedLesson');
   const countInput = document.getElementById('problemCount');
   const limit = getWorksheetLimit(item);
   const defaultCount = Math.min(item.count, limit);
-  const unitMeta = getUnitMeta(item.grade, item.unit);
-  const unitShort = unitMeta ? unitMeta.short : item.unit;
-  section.textContent = `${unitShort} · ${item.section}`;
-  lesson.textContent = `교과 차시: ${item.lessonRef}`;
   countInput.placeholder = defaultCount;
   countInput.max = limit;
   if (countInput.value) {

@@ -96,26 +96,6 @@ button:active { transform: scale(0.98); }
 .btn-answer { background: #6f58c9; color: white; }
 .btn-print { background: #2d8ae2; color: white; }
 
-.meta-note {
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  color: #57606f;
-  font-size: 13px;
-}
-
-.meta-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  background: #f4f7fb;
-  border: 1px solid #dce4ef;
-}
-
 .sheet {
   width: var(--paper-width);
   height: var(--paper-height);
@@ -143,14 +123,6 @@ button:active { transform: scale(0.98); }
 .sheet-title-main {
   font-size: 14px;
   font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sheet-title-sub {
-  font-size: 11px;
-  color: #677188;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

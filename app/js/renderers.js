@@ -221,11 +221,7 @@ export function createSheet(item, countOverride, fontScale = 1) {
     const main = document.createElement('div');
     main.className = 'sheet-title-main';
     main.textContent = title.main;
-    const sub = document.createElement('div');
-    sub.className = 'sheet-title-sub';
-    sub.textContent = title.sub;
     titleWrap.appendChild(main);
-    titleWrap.appendChild(sub);
     sheet.appendChild(titleWrap);
 
     const grid = document.createElement('div');
@@ -256,11 +252,7 @@ export function createSheet(item, countOverride, fontScale = 1) {
   const main = document.createElement('div');
   main.className = 'sheet-title-main';
   main.textContent = title.main;
-  const sub = document.createElement('div');
-  sub.className = 'sheet-title-sub';
-  sub.textContent = title.sub;
   titleWrap.appendChild(main);
-  titleWrap.appendChild(sub);
   sheet.appendChild(titleWrap);
 
   const grid = document.createElement('div');

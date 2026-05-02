@@ -34,5 +34,5 @@ export function genU3MainRelationFormula() {
 
 export function genU3MainRelationReal() {
   const s = randChoice(RELATION_SCENARIOS), xs = [2, 4, 6], ys = xs.map(x => x * s.factor);
-  return relationProblem(`생활 속 대응 관계를 보고 빈칸을 채워 보세요.`, relationTableHtml(s.xLabel, s.yLabel, xs, [ys[0], ys[1], numBlank(ys[2])]), textBlank(`${s.yLabel} = ${s.xLabel} \u00d7 ${s.factor}`, 180), `${s.subject} 수가 늘어나면 ${s.target} 수는 일정한 비율로 늘어납니다.`);
+  return relationProblem(`생활 속 대응 관계를 보고 빈칸을 채워 보세요.`, relationTableHtml(s.xLabel, s.yLabel, xs, [ys[0], ys[1], numBlank(ys[2])]), textBlank(`${s.yLabel} = ${s.xLabel} \u00d7 ${s.factor}`, 180));
 }
