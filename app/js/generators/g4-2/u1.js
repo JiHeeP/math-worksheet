@@ -78,6 +78,17 @@ export function genG42U1MixedAddCarry() {
   return { w1, n1, w2, n2, d };
 }
 
+/* ── (대분수) − (진분수), 분모 같은 (받아내림 가능 — 결과는 양수 보장) ── */
+export function genG42U1MixedSubFrac() {
+  const d = rand(3, 10);
+  const w = rand(1, 3);
+  const wn = rand(1, d - 1);     // 항상 대분수 형태 (자연수 형태 제외)
+  const b = rand(1, d - 1);
+  const num = w * d + wn;
+  if (num <= b) return genG42U1MixedSubFrac();
+  return htmlProblem('frac-row', `${mixedD(w, wn, d)} ${OP_MINUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(num - b, d)}`);
+}
+
 /* ── 8차시 분모 같은 (대분수)-(대분수), 받아내림 없음 ── */
 export function genG42U1MixedSubNoBorrow() {
   const d = rand(4, 10);

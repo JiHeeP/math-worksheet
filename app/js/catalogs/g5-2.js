@@ -9,7 +9,7 @@
  * 미구현: 3단원 합동과 대칭, 4단원 소수의 곱셈, 5단원 직육면체, 6단원 평균과 가능성
  */
 
-import { defineUnit, 차시, 학습지, ext } from '../catalog.js';
+import { defineUnit, 차시, 학습지, ext, unitRef } from '../catalog.js';
 
 import {
   genG52U1IneqGE, genG52U1IneqLE, genG52U1IneqGT, genG52U1IneqLT,
@@ -60,13 +60,13 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   차시('1차시 (진분수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(진분수) × (자연수)', genG52U2FracTimesInt, {
       id: 'u2_main_frac_times_int',
-      prereqs: [ext('[5-1] 약분과 통분')],
+      prereqs: [unitRef('g5-1', 'u4')],
     }),
   ]),
   차시('2차시 (대분수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(대분수) × (자연수)', genG52U2MixedTimesInt, {
       id: 'u2_main_mixed_times_int',
-      prereqs: [ext('[5-1] 분수의 덧셈과 뺄셈(3)'), ext('[4-2] 분수의 덧셈과 뺄셈(1)')],
+      prereqs: [unitRef('g5-1', 'u5'), unitRef('g4-2', 'u1')],
     }),
   ]),
   차시('3차시 (자연수) × (진분수)', { grid: 'practice', count: 15 }, [

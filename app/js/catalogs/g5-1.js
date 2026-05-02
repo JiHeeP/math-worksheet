@@ -81,7 +81,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합 계산', [
   차시('1차시 덧셈과 뺄셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('덧셈·뺄셈 혼합(순서)', genU1MainAddSubOrder, {
       id: 'u1_main_addsub_order',
-      prereqs: [ext('[3-1] 덧셈과 뺄셈(6)')],
+      prereqs: [unitRef('g3-1', 'u1')],
     }),
     학습지('덧셈·뺄셈 혼합(괄호)', genU1MainAddSubParen, {
       id: 'u1_main_addsub_paren',
@@ -95,7 +95,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합 계산', [
   차시('2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('곱셈·나눗셈 혼합(순서)', genU1MainMulDivOrder, {
       id: 'u1_main_muldiv_order',
-      prereqs: [ext('[3-2] 곱셈(5)'), ext('[3-2] 나눗셈(6)')],
+      prereqs: [unitRef('g3-2', 'u1'), unitRef('g3-2', 'u3')],
     }),
     학습지('곱셈·나눗셈 혼합(괄호)', genU1MainMulDivParen, {
       id: 'u1_main_muldiv_paren',
@@ -158,13 +158,13 @@ const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   차시('1차시 약수 이해하기', [
     학습지('약수 이해', genU2MainFactorConcept, {
       id: 'u2_main_factor', grid: 'concept', count: 10,
-      prereqs: [ext('[2-2] 곱셈구구(2)'), ext('[3-2] 나눗셈(6)')],
+      prereqs: [unitRef('g2-2', 'u2'), unitRef('g3-2', 'u3')],
     }),
   ]),
   차시('2차시 배수 이해하기', [
     학습지('배수 이해', genU2MainMultipleConcept, {
       id: 'u2_main_multiple', grid: 'concept', count: 10,
-      prereqs: [ext('[2-2] 곱셈구구(2)')],
+      prereqs: [unitRef('g2-2', 'u2')],
     }),
   ]),
   차시('3차시 공약수와 최대공약수 이해하기', [
@@ -219,7 +219,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   차시('1차시 크기가 같은 분수 알아보기', { grid: 'practice', count: 15 }, [
     학습지('크기가 같은 분수 찾기', genU4MainEquivFind, {
       id: 'u4_main_equiv_find',
-      prereqs: [ext('[3-2] 분수')],
+      prereqs: [unitRef('g3-2', 'u5')],
     }),
   ]),
   차시('2차시 크기가 같은 분수를 만드는 방법 알아보기', { grid: 'practice', count: 15 }, [
@@ -257,7 +257,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   차시('6차시 분수와 소수의 크기 비교하기', [
     학습지('분수와 소수 크기 비교', genU4MainDecCmp, {
       id: 'u4_main_dec_cmp', grid: 'concept', count: 8,
-      prereqs: [sheetRef('u4_main_cmp'), ext('[3-1] 분수와 소수')],
+      prereqs: [sheetRef('u4_main_cmp'), ext('[3-1] 6단원 분수와 소수 (미구현)')],
     }),
   ]),
 ]);
@@ -341,7 +341,7 @@ const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
   차시('2차시 1㎠ 알아보기', [
     학습지('1㎠ 이해', genU6MainUnitSquare, {
       id: 'u6_main_unit_square', grid: 'wide', count: 8,
-      prereqs: [ext('[3-1] 길이와 시간')],
+      prereqs: [unitRef('g3-1', 'u5')],
     }),
   ]),
   차시('3차시 직사각형의 넓이 구하기', [

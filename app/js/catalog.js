@@ -152,11 +152,14 @@ import * as g1_1 from './catalogs/g1-1.js';
 import * as g1_2 from './catalogs/g1-2.js';
 import * as g2_1 from './catalogs/g2-1.js';
 import * as g2_2 from './catalogs/g2-2.js';
+import * as g3_1 from './catalogs/g3-1.js';
+import * as g3_2 from './catalogs/g3-2.js';
+import * as g4_1 from './catalogs/g4-1.js';
 import * as g4_2 from './catalogs/g4-2.js';
 import * as g5_1 from './catalogs/g5-1.js';
 import * as g5_2 from './catalogs/g5-2.js';
 
-const GRADES = [g1_1, g1_2, g2_1, g2_2, g4_2, g5_1, g5_2];
+const GRADES = [g1_1, g1_2, g2_1, g2_2, g3_1, g3_2, g4_1, g4_2, g5_1, g5_2];
 // 새 학기 추가 시: import 추가하고 GRADES 배열에 학기 순서대로 push.
 
 /**
