@@ -268,43 +268,33 @@ button:active { transform: scale(0.98); }
   gap: calc(8px * var(--font-scale, 1));
 }
 
-/* 가르기 다이어그램 (1·2학년 받아올림/내림 단계 풀이) */
+/* 가르기 다이어그램 (1·2학년 받아올림/내림 단계 풀이)
+   부모 컨텍스트와 같은 글자 크기로 통일. 박스 없이 가지(branch) 만 SVG 로. */
 .split-container {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  vertical-align: top;
+  vertical-align: middle;
   line-height: 1;
+  margin: 0 calc(2px * var(--font-scale, 1));
 }
-.split-target-num {
+.split-num {
   font-size: inherit;
-  margin-bottom: 2px;
+  font-weight: 500;
+  min-width: 1.2em;
+  text-align: center;
 }
 .split-line-svg {
-  width: calc(54px * var(--font-scale, 1));
+  width: calc(40px * var(--font-scale, 1));
   height: calc(14px * var(--font-scale, 1));
+  margin: calc(2px * var(--font-scale, 1)) 0;
 }
-.bottom-boxes {
+.split-bottom {
   display: flex;
   justify-content: space-between;
-  width: calc(54px * var(--font-scale, 1));
-  margin-top: 2px;
+  width: calc(40px * var(--font-scale, 1));
 }
-.small-box {
-  width: calc(22px * var(--font-scale, 1));
-  height: calc(22px * var(--font-scale, 1));
-  border: 1.5px solid #555;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  font-size: calc(14px * var(--font-scale, 1));
-}
-.small-box-answer {
-  font-weight: 600;
-}
-/* 정답 가시성은 전역 [data-ans] 규칙으로 처리됨 */
+/* 가지 끝 두 숫자(.split-num) 의 정답 토글은 전역 [data-ans] 규칙이 처리 */
 
 .dense .horiz-box { margin-top: 8px; font-size: calc(16px * var(--font-scale, 1)); gap: 4px; }
 
@@ -577,22 +567,6 @@ button:active { transform: scale(0.98); }
   display: flex;
   align-items: center;
   position: relative;
-}
-
-.div-method-divisor {
-  min-width: calc(28px * var(--font-scale, 1));
-  text-align: right;
-  padding-right: 2px;
-}
-
-.div-method-divisor-blank {
-  display: inline-block;
-  width: calc(24px * var(--font-scale, 1));
-  height: calc(24px * var(--font-scale, 1));
-  border: 1.2px solid #666;
-  border-radius: 5px;
-  background: white;
-  vertical-align: middle;
 }
 
 .div-method-paren {

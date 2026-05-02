@@ -41,22 +41,22 @@ export function mixedBlank(w, n, d) {
 }
 
 /**
- * 가르기 다이어그램: 한 수 위에 두 부분으로 가르는 가지(branch) 와 두 작은 박스.
- *   ┌─ num ─┐
+ * 가르기 다이어그램: 한 수 위에 두 부분으로 가르는 가지(branch).
+ *      num
  *      / \
- *    [p1] [p2]
- * 1·2학년 받아올림/내림 가르기 풀이용. 박스 안 숫자는 정답 토글로 노출.
+ *    p1   p2
+ * 모든 숫자가 부모와 같은 글자 크기로 통일. 아래쪽 두 수는 정답 토글로 색이 변함.
  */
 export function splitDiagramHtml(num, part1, part2) {
   return `<span class="split-container">
-    <span class="split-target-num">${num}</span>
-    <svg class="split-line-svg" viewBox="0 0 60 16" xmlns="http://www.w3.org/2000/svg">
-      <line x1="30" y1="0" x2="12" y2="16" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
-      <line x1="30" y1="0" x2="48" y2="16" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+    <span class="split-num">${num}</span>
+    <svg class="split-line-svg" viewBox="0 0 40 14" xmlns="http://www.w3.org/2000/svg">
+      <line x1="20" y1="2" x2="6" y2="13" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="20" y1="2" x2="34" y2="13" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <span class="bottom-boxes">
-      <span class="small-box"><span class="small-box-answer" data-ans="${escapeAttr(part1)}">${part1}</span></span>
-      <span class="small-box"><span class="small-box-answer" data-ans="${escapeAttr(part2)}">${part2}</span></span>
+    <span class="split-bottom">
+      <span class="split-num" data-ans="${escapeAttr(part1)}">${part1}</span>
+      <span class="split-num" data-ans="${escapeAttr(part2)}">${part2}</span>
     </span>
   </span>`;
 }

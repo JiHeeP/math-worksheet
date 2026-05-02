@@ -375,7 +375,6 @@ function buildDivMethodHtml(a, b, mode) {
   return `<div class="div-method div-method-split">
     <div class="div-method-left">
       <div class="div-method-row">
-        <span class="div-method-divisor"><span class="div-method-divisor-blank"></span></span>
         <span class="div-method-paren">)</span>
         <span class="div-method-values"><span>${a}</span><span>${b}</span></span>
       </div>
