@@ -55,9 +55,10 @@ function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
   const items = getWorksheetsByUnit(gradeId, unitId);
   worksheetSelect.innerHTML = items.map((item) => {
-    // `from` 이 명시된 항목 (보통 선수학습) 에만 출처 학기 태그를 붙임.
-    // 본단원 항목은 현재 선택된 학기와 같으므로 태그 생략.
-    const tag = item.from ? ` (${formatGradeShort(item.from)})` : '';
+    // 본단원/선수학습 모두 일관되게 출처 학기 태그를 표시.
+    // `from` 이 명시되지 않은 본단원은 현재 학기로 fallback.
+    const sourceGrade = item.from || item.grade;
+    const tag = ` (${formatGradeShort(sourceGrade)})`;
     return `<option value="${item.id}">[${item.section}] ${item.label}${tag}</option>`;
   }).join('');
 
