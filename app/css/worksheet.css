@@ -318,11 +318,14 @@ button:active { transform: scale(0.98); }
   gap: 8px;
 }
 
-/* 문제 카드 외곽 — 인쇄 잉크 절약을 위해 테두리/배경 제거 (그리드 gap 으로 분리 유지). */
+/* 문제 카드 외곽 — 개념·관계·도형 학습지의 묶음 표시. */
 .concept-card,
 .relation-card,
 .shape-card {
   width: 100%;
+  border: 1.5px solid #d7dee8;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
   padding: 10px 10px 12px;
 }
 
@@ -452,7 +455,7 @@ button:active { transform: scale(0.98); }
 .op-txt,
 .eq-txt { font-size: calc(18px * var(--font-scale, 1)); }
 
-/* 정답 입력 자리 — 인쇄 잉크 절약을 위해 테두리 제거. min-width 만 남겨 공간 확보. */
+/* 정답 입력 자리 — 학생이 답을 쓰는 슬롯. 테두리로 시각적 표시. */
 .num-blank,
 .text-blank,
 .table-blank {
@@ -461,6 +464,9 @@ button:active { transform: scale(0.98); }
   justify-content: center;
   min-height: calc(32px * var(--font-scale, 1));
   padding: 0 calc(8px * var(--font-scale, 1));
+  border: 1.5px solid #666;
+  border-radius: 6px;
+  background: white;
   vertical-align: middle;
   font-size: calc(16px * var(--font-scale, 1));
   font-weight: 500;
@@ -470,14 +476,17 @@ button:active { transform: scale(0.98); }
 .text-blank { min-width: calc(62px * var(--font-scale, 1)); }
 .table-blank { min-width: calc(34px * var(--font-scale, 1)); padding: calc(2px * var(--font-scale, 1)) calc(8px * var(--font-scale, 1)); }
 
-/* 비교 기호(<,=,>) 등 자리 — 테두리 제거. */
+/* 비교 기호(<,=,>) 등 자리 — 학생이 기호를 쓰는 동그란 슬롯. */
 .sym-blank {
   width: calc(28px * var(--font-scale, 1));
   height: calc(28px * var(--font-scale, 1));
+  border: 1.5px solid #666;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: calc(16px * var(--font-scale, 1));
+  background: white;
 }
 
 .frac-blank {
@@ -492,6 +501,9 @@ button:active { transform: scale(0.98); }
   min-width: calc(32px * var(--font-scale, 1));
   height: calc(24px * var(--font-scale, 1));
   padding: 0 calc(8px * var(--font-scale, 1));
+  border: 1.5px solid #666;
+  border-radius: 4px;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
