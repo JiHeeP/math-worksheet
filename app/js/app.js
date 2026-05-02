@@ -2,8 +2,7 @@
 
 import {
   GRADE_META, DEFAULT_GRADE_ID,
-  catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit,
-  resolvePrereq,
+  catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit, getGradeMeta,
 } from './catalog.js';
 import { createSheet, getWorksheetLimit } from './renderers.js';
 
@@ -25,6 +24,14 @@ function populateUnitSelect(gradeId) {
     .join('');
 }
 
+function formatGradeShort(gradeId) {
+  const meta = getGradeMeta(gradeId);
+  if (meta) return meta.short;
+  // 미구현 학기 fallback: 'g4-2' → '4-2'
+  const match = /^g(\d-\d)$/.exec(gradeId);
+  return match ? match[1] : gradeId;
+}
+
 function updateSelectedMeta() {
   const item = catalogMap[document.getElementById('worksheetSelect').value];
   if (!item) return;
@@ -42,60 +49,17 @@ function updateSelectedMeta() {
   if (countInput.value) {
     countInput.value = Math.min(parseInt(countInput.value, 10) || defaultCount, limit);
   }
-  renderPrereqs(item);
-}
-
-function renderPrereqs(item) {
-  const panel = document.getElementById('prereqPanel');
-  panel.innerHTML = '';
-  if (!item.prereqs || item.prereqs.length === 0) {
-    panel.hidden = true;
-    return;
-  }
-
-  const label = document.createElement('span');
-  label.className = 'prereq-label';
-  label.textContent = '선수학습';
-  panel.appendChild(label);
-
-  for (const p of item.prereqs) {
-    const r = resolvePrereq(p, item.grade);
-    if (r.action) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'prereq-chip clickable';
-      btn.textContent = r.label;
-      btn.addEventListener('click', () => navigateToPrereq(r.action));
-      panel.appendChild(btn);
-    } else {
-      const span = document.createElement('span');
-      span.className = 'prereq-chip external';
-      span.textContent = r.label;
-      panel.appendChild(span);
-    }
-  }
-  panel.hidden = false;
-}
-
-function navigateToPrereq(action) {
-  const gradeSelect = document.getElementById('gradeSelect');
-  const unitSelect = document.getElementById('unitSelect');
-
-  if (gradeSelect.value !== action.grade) {
-    gradeSelect.value = action.grade;
-    populateUnitSelect(action.grade);
-  }
-  unitSelect.value = action.unit;
-  populateWorksheetSelect(action.grade, action.unit, action.sheet);
-  generate('replace');
 }
 
 function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
   const items = getWorksheetsByUnit(gradeId, unitId);
-  worksheetSelect.innerHTML = items.map((item) =>
-    `<option value="${item.id}">[${item.section}] ${item.label}</option>`
-  ).join('');
+  worksheetSelect.innerHTML = items.map((item) => {
+    // `from` 이 명시된 항목 (보통 선수학습) 에만 출처 학기 태그를 붙임.
+    // 본단원 항목은 현재 선택된 학기와 같으므로 태그 생략.
+    const tag = item.from ? ` (${formatGradeShort(item.from)})` : '';
+    return `<option value="${item.id}">[${item.section}] ${item.label}${tag}</option>`;
+  }).join('');
 
   const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : (items[0] && items[0].id);
   if (nextId) {

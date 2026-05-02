@@ -52,16 +52,24 @@ export function 차시(lessonRef, ...args) {
 export function ext(label) { return { kind: 'ext', label }; }
 
 /**
- * 같은 학기 안의 단원 — 클릭 시 해당 단원의 첫 학습지로 이동
- * 예: unitRef('u4')  →  [현재학기] 약분과 통분
+ * 단원 참조 — 클릭 시 해당 단원의 첫 학습지로 이동
+ *   unitRef('u4')          → 현재(호출 학기) 단원 u4
+ *   unitRef('g4-2', 'u1')  → 4-2 학기의 u1 단원 (학기 간 참조)
  */
-export function unitRef(id) { return { kind: 'unit', id }; }
+export function unitRef(gradeOrId, maybeId) {
+  if (maybeId === undefined) return { kind: 'unit', id: gradeOrId };
+  return { kind: 'unit', grade: gradeOrId, id: maybeId };
+}
 
 /**
- * 같은 학기 안의 특정 학습지 — 클릭 시 그 학습지로 이동
- * 예: sheetRef('u5_main_add')
+ * 특정 학습지 참조 — 클릭 시 그 학습지로 이동
+ *   sheetRef('u5_main_add')           → 현재 학기 학습지
+ *   sheetRef('g4-2', 'u1_main_add')   → 4-2 학기의 학습지 (학기 간 참조)
  */
-export function sheetRef(id) { return { kind: 'sheet', id }; }
+export function sheetRef(gradeOrId, maybeId) {
+  if (maybeId === undefined) return { kind: 'sheet', id: gradeOrId };
+  return { kind: 'sheet', grade: gradeOrId, id: maybeId };
+}
 
 /**
  * 개별 학습지 정의
@@ -115,6 +123,8 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const localId = overrides.id || autoId(unitId, label);
       const id = `${idPrefix}${localId}`;
       const prereqs = overrides.prereqs || null;
+      // 출처 학기: 명시되면 그 값, 아니면 본단원=현재학기 / 선수학습=null(현재학기 표시)
+      const from = overrides.from || (defaults && defaults.from) || null;
 
       entries.push({
         id,
@@ -128,6 +138,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         count,
         generator: boundGenerator,
         prereqs,
+        from,
       });
     }
   }
@@ -137,12 +148,14 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
 
 /* ── 학기 카탈로그 통합 ── */
 
+import * as g4_2 from './catalogs/g4-2.js';
 import * as g5_1 from './catalogs/g5-1.js';
+import * as g5_2 from './catalogs/g5-2.js';
 
-const GRADES = [g5_1];
+const GRADES = [g4_2, g5_1, g5_2];
 // 새 학기 추가 시:
 //   import * as g4_1 from './catalogs/g4-1.js';
-//   const GRADES = [g4_1, g5_1, ...];
+//   const GRADES = [g4_1, g4_2, g5_1, g5_2, ...];
 
 /**
  * 모든 학기의 학습지를 한 배열로 모음.
@@ -226,22 +239,24 @@ export function resolvePrereq(prereq, currentGradeId) {
     return { label: prereq.label, action: null };
   }
   if (prereq.kind === 'unit') {
-    const unitMeta = getUnitMeta(currentGradeId, prereq.id);
-    const gradeMeta = getGradeMeta(currentGradeId);
+    const grade = prereq.grade || currentGradeId;
+    const unitMeta = getUnitMeta(grade, prereq.id);
+    const gradeMeta = getGradeMeta(grade);
     if (!unitMeta || !gradeMeta) return { label: `[?] ${prereq.id}`, action: null };
     return {
       label: `[${gradeMeta.short}] ${unitMeta.name}`,
-      action: { grade: currentGradeId, unit: prereq.id },
+      action: { grade, unit: prereq.id },
     };
   }
   if (prereq.kind === 'sheet') {
-    const fullId = `${currentGradeId}_${prereq.id}`;
+    const grade = prereq.grade || currentGradeId;
+    const fullId = `${grade}_${prereq.id}`;
     const item = catalogMap[fullId];
-    const gradeMeta = getGradeMeta(currentGradeId);
+    const gradeMeta = getGradeMeta(grade);
     if (!item || !gradeMeta) return { label: `[?] ${prereq.id}`, action: null };
     return {
       label: `[${gradeMeta.short}] ${item.label}`,
-      action: { grade: currentGradeId, unit: item.unit, sheet: fullId },
+      action: { grade, unit: item.unit, sheet: fullId },
     };
   }
   return { label: '?', action: null };
