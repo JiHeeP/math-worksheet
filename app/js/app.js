@@ -41,10 +41,21 @@ function updateSelectedMeta() {
   const limit = getWorksheetLimit(item);
   const defaultCount = Math.min(item.count, limit);
   countInput.placeholder = defaultCount;
-  countInput.max = limit;
+  countInput.dataset.max = limit;
   if (countInput.value) {
     countInput.value = Math.min(parseInt(countInput.value, 10) || defaultCount, limit);
   }
+}
+
+function sanitizeProblemCountInput() {
+  const input = document.getElementById('problemCount');
+  input.value = input.value.replace(/[^\d]/g, '');
+}
+
+function handleProblemCountKeydown(event) {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  generate('replace');
 }
 
 function populateWorksheetSelect(gradeId, unitId, preferredId) {
@@ -119,6 +130,9 @@ document.getElementById('unitSelect').addEventListener('change', (event) => {
 document.getElementById('worksheetSelect').addEventListener('change', () => {
   updateSelectedMeta();
 });
+
+document.getElementById('problemCount').addEventListener('input', sanitizeProblemCountInput);
+document.getElementById('problemCount').addEventListener('keydown', handleProblemCountKeydown);
 
 document.getElementById('fontScale').addEventListener('change', () => {
   const container = document.getElementById('sheets-container');

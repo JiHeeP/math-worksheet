@@ -6,7 +6,8 @@
  * 현재 구현 단원:
  *   1단원 수의 범위와 어림하기
  *   2단원 분수의 곱셈
- * 미구현: 3단원 합동과 대칭, 4단원 소수의 곱셈, 5단원 직육면체, 6단원 평균과 가능성
+ *   4단원 소수의 곱셈
+ * 미구현: 3단원 합동과 대칭, 5단원 직육면체, 6단원 평균과 가능성
  */
 
 import { defineUnit, 차시, 학습지, ext, unitRef } from '../catalog.js';
@@ -23,6 +24,11 @@ import {
   genG52U2UnitFracTimesUnitFrac,
   genG52U2FracTimesFrac, genG52U2MixedTimesMixed,
 } from '../generators/g5-2/u2.js';
+
+import {
+  genG52U4DecimalTimesInt, genG52U4IntTimesDecimal,
+  genG52U4DecimalTimesDecimalTenths, genG52U4DecimalTimes10,
+} from '../generators/g5-2/u4.js';
 
 const GRADE_ID = 'g5-2';
 
@@ -86,6 +92,35 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   ]),
 ]);
 
+/* ── 4단원 소수의 곱셈 ── */
+
+const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
+  차시('1차시 (소수) × (자연수)', { grid: 'practice', count: 15 }, [
+    학습지('(소수) × (자연수)', genG52U4DecimalTimesInt, {
+      id: 'u4_main_decimal_times_int',
+      prereqs: [unitRef('g4-2', 'u3')],
+    }),
+  ]),
+  차시('2차시 (자연수) × (소수)', { grid: 'practice', count: 15 }, [
+    학습지('(자연수) × (소수)', genG52U4IntTimesDecimal, {
+      id: 'u4_main_int_times_decimal',
+      prereqs: [unitRef('g4-2', 'u3')],
+    }),
+  ]),
+  차시('3차시 (소수) × (소수)', { grid: 'practice', count: 15 }, [
+    학습지('(소수) × (소수)', genG52U4DecimalTimesDecimalTenths, {
+      id: 'u4_main_decimal_times_decimal',
+      prereqs: [unitRef('g4-2', 'u3')],
+    }),
+  ]),
+  차시('4차시 소수에 10, 100 곱하기', { grid: 'standard', count: 20 }, [
+    학습지('소수 × 10, 100', genG52U4DecimalTimes10, {
+      id: 'u4_main_decimal_times_10_100',
+      prereqs: [unitRef('g4-2', 'u3')],
+    }),
+  ]),
+]);
+
 /* ── 학기 메타 ── */
 
 export const meta = {
@@ -95,10 +130,11 @@ export const meta = {
   units: {
     u1: { short: '1단원', name: '수의 범위와 어림하기' },
     u2: { short: '2단원', name: '분수의 곱셈' },
+    u4: { short: '4단원', name: '소수의 곱셈' },
   },
 };
 
-export const entries = [...u1, ...u2];
+export const entries = [...u1, ...u2, ...u4];
 
 export const pdfMap = {};
 export const pdfGenerators = {};

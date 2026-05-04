@@ -32,3 +32,8 @@ export function genG12U6MakeTenSub() {
   else html = `10 − ${b} = ${numBlank(result)}`;
   return htmlProblem('horiz-box', html);
 }
+
+// 원본 index (1).html 의 "10의 보수 (가로셈 빈칸)": 한 장 안에서 덧셈/뺄셈이 섞이도록 generator 단위에서는 무작위 혼합.
+export function genG12U6MakeTenOriginal() {
+  return rand(1, 2) === 1 ? genG12U6MakeTenAdd() : genG12U6MakeTenSub();
+}

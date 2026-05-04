@@ -28,6 +28,64 @@ export function multiBlank(values) {
   return values.map(v => numBlank(v)).join(' ');
 }
 
+function repeatedHtml(count, render) {
+  return Array.from({ length: count }, (_, index) => render(index)).join('');
+}
+
+function thousandBlockHtml(index) {
+  return `<svg class="base-ten-thousand" viewBox="0 0 36 34" role="img" aria-label="천 모형 ${index + 1}">
+    <polygon class="base-ten-thousand-top" points="9,2 27,2 34,9 16,9"></polygon>
+    <polygon class="base-ten-thousand-side" points="27,2 34,9 34,27 27,20"></polygon>
+    <rect class="base-ten-thousand-front" x="2" y="9" width="25" height="25"></rect>
+    <line class="base-ten-thousand-edge" x1="2" y1="9" x2="9" y2="2"></line>
+    <line class="base-ten-thousand-edge" x1="27" y1="9" x2="34" y2="9"></line>
+    <line class="base-ten-thousand-edge" x1="27" y1="34" x2="34" y2="27"></line>
+    <line class="base-ten-thousand-grid" x1="10.3" y1="9" x2="10.3" y2="34"></line>
+    <line class="base-ten-thousand-grid" x1="18.6" y1="9" x2="18.6" y2="34"></line>
+    <line class="base-ten-thousand-grid" x1="2" y1="17.3" x2="27" y2="17.3"></line>
+    <line class="base-ten-thousand-grid" x1="2" y1="25.6" x2="27" y2="25.6"></line>
+  </svg>`;
+}
+
+export function placeValueModelHtml({ thousands = 0, hundreds = 0, tens = 0, ones = 0 }) {
+  const thousandBlocks = repeatedHtml(thousands, thousandBlockHtml);
+
+  const hundredBlocks = repeatedHtml(hundreds, (index) => (
+    `<span class="base-ten-hundred" aria-label="백 모형 ${index + 1}"></span>`
+  ));
+
+  const rods = repeatedHtml(tens, (rodIndex) => {
+    const cells = repeatedHtml(10, (cellIndex) => (
+      `<span class="base-ten-rod-cell" aria-hidden="true" data-cell="${cellIndex + 1}"></span>`
+    ));
+    return `<span class="base-ten-rod" aria-label="십 모형 ${rodIndex + 1}">${cells}</span>`;
+  });
+
+  const cubes = repeatedHtml(ones, (cubeIndex) => (
+    `<span class="base-ten-one" aria-label="낱개 ${cubeIndex + 1}"></span>`
+  ));
+
+  const groups = [
+    thousandBlocks ? `<span class="base-ten-group base-ten-thousands">${thousandBlocks}</span>` : '',
+    hundredBlocks ? `<span class="base-ten-group base-ten-hundreds">${hundredBlocks}</span>` : '',
+    rods ? `<span class="base-ten-group base-ten-rods">${rods}</span>` : '',
+    cubes ? `<span class="base-ten-group base-ten-ones">${cubes}</span>` : '',
+  ].join('');
+
+  const labelParts = [
+    thousands ? `천 모형 ${thousands}개` : '',
+    hundreds ? `백 모형 ${hundreds}개` : '',
+    tens ? `십 모형 ${tens}개` : '',
+    ones ? `낱개 ${ones}개` : '',
+  ].filter(Boolean).join(', ');
+
+  return `<span class="base-ten-model place-value-model" aria-label="${escapeAttr(labelParts)}">${groups}</span>`;
+}
+
+export function baseTenModelHtml(tens, ones) {
+  return placeValueModelHtml({ tens, ones });
+}
+
 export function fracBlank(n, d) {
   return `<span class="frac-blank">
     <span class="fb-top" data-ans="${escapeAttr(n)}">${n}</span>
@@ -56,8 +114,8 @@ export function splitDiagramHtml(num, part1, part2) {
       <line x1="30" y1="0" x2="48" y2="16" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
     <span class="bottom-boxes">
-      <span class="small-box"><span class="small-box-answer" data-ans="${escapeAttr(part1)}">${part1}</span></span>
-      <span class="small-box"><span class="small-box-answer" data-ans="${escapeAttr(part2)}">${part2}</span></span>
+      <span class="small-box" data-ans="${escapeAttr(part1)}"><span class="small-box-answer">${part1}</span></span>
+      <span class="small-box" data-ans="${escapeAttr(part2)}"><span class="small-box-answer">${part2}</span></span>
     </span>
   </span>`;
 }

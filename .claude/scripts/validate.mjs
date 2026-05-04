@@ -37,6 +37,11 @@ const PROBLEMATIC = [];
 const ALLOW = new Set(['', '없음', '<', '>', '=', 'cm', 'm', 'km', 'km²', 'cm²', 'm²']);
 
 for (const item of m.WORKSHEET_CATALOG) {
+  const unitMeta = m.getUnitMeta(item.grade, item.unit);
+  const allowsDecimal = [item.label, unitMeta && unitMeta.name]
+    .filter(Boolean)
+    .some((text) => text.includes('소수'));
+
   for (let i = 0; i < ITERATIONS; i++) {
     let p;
     try {
@@ -56,7 +61,7 @@ for (const item of m.WORKSHEET_CATALOG) {
           PROBLEMATIC.push({ id: item.id, type: 'NEG', detail: `ans="${ans}" tok="${tok}"` });
           break;
         }
-        if (/^[0-9]+\.[0-9]+$/.test(tok)) {
+        if (!allowsDecimal && /^[0-9]+\.[0-9]+$/.test(tok)) {
           PROBLEMATIC.push({ id: item.id, type: 'DEC', detail: `ans="${ans}" tok="${tok}"` });
           break;
         }

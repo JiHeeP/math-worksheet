@@ -11,6 +11,7 @@
  *   3단원 나눗셈(3) — 두 자리 ÷ 한 자리
  *   4단원 곱셈(4) — 두 자리 × 한 자리 (세로셈)
  *   5단원 길이와 시간
+ *   6단원 분수와 소수
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
@@ -22,6 +23,10 @@ import {
 } from '../generators/g5-1/u1.js';
 import { genU2PreDiv } from '../generators/g5-1/u2.js';
 import { genU6PreUnit, genU6PreLen } from '../generators/g5-1/u6.js';
+import {
+  genG31U6TenthsToDecimal, genG31U6HundredthsToDecimal,
+  genG31U6DecimalToFraction, genG31U6DecimalCompare,
+} from '../generators/g3-1/u6.js';
 
 const GRADE_ID = 'g3-1';
 
@@ -55,6 +60,17 @@ const u5 = defineUnit(GRADE_ID, 'u5', '길이와 시간', [
   ]),
 ]);
 
+const u6 = defineUnit(GRADE_ID, 'u6', '분수와 소수', [
+  차시('1차시 분수를 소수로 나타내기', { grid: 'practice', count: 15 }, [
+    학습지('분모 10인 분수 → 소수', genG31U6TenthsToDecimal, { id: 'u6_main_tenths_to_decimal' }),
+    학습지('분모 100인 분수 → 소수', genG31U6HundredthsToDecimal, { id: 'u6_main_hundredths_to_decimal' }),
+  ]),
+  차시('2차시 소수와 분수의 관계', { grid: 'practice', count: 15 }, [
+    학습지('소수 → 분수', genG31U6DecimalToFraction, { id: 'u6_main_decimal_to_frac' }),
+    학습지('소수 크기 비교', genG31U6DecimalCompare, { id: 'u6_main_decimal_compare' }),
+  ]),
+]);
+
 export const meta = {
   id: GRADE_ID,
   short: '3-1',
@@ -64,10 +80,11 @@ export const meta = {
     u3: { short: '3단원', name: '나눗셈(3)' },
     u4: { short: '4단원', name: '곱셈(4)' },
     u5: { short: '5단원', name: '길이와 시간' },
+    u6: { short: '6단원', name: '분수와 소수' },
   },
 };
 
-export const entries = [...u1, ...u3, ...u4, ...u5];
+export const entries = [...u1, ...u3, ...u4, ...u5, ...u6];
 
 /* ── PDF 매핑 (세로셈 출력 학습지 ID → PDF 제너레이터 키) ── */
 

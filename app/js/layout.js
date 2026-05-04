@@ -41,11 +41,31 @@ export const TWO_COLUMN_WORKSHEET_IDS = new Set([
   'u4_main_lcd_process',
 ]);
 
+export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
+  'u7_main_1d1d_carry_horiz_prac',
+  'u7_main_teen_borrow_horiz_prac',
+  'u7_main_2d1d_carry_horiz_prac',
+  'u7_main_1d1d_carry',
+  'u7_main_teen_borrow',
+  'u7_main_2d1d_carry',
+]);
+
 export function getHtmlLayoutConfig(item) {
   const base = GRID_LAYOUTS[item.grid];
   if (!base) return null;
+  const localId = item.id.replace(/^g\d-\d_/, '');
 
-  if (TWO_COLUMN_WORKSHEET_IDS.has(item.id)) {
+  if (SPLIT_WRITE_BOX_WORKSHEET_IDS.has(localId)) {
+    return {
+      ...base,
+      minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
+      targetCellAspect: 1.55,
+      minCellWidth: Math.max(base.minCellWidth || 0, 90),
+      minCellHeight: Math.max(base.minCellHeight || 0, 28),
+    };
+  }
+
+  if (TWO_COLUMN_WORKSHEET_IDS.has(localId)) {
     return {
       ...base,
       minCols: 2, maxCols: 2, widthPriority: 1.5,
@@ -53,7 +73,7 @@ export function getHtmlLayoutConfig(item) {
     };
   }
 
-  if (!THREE_PLUS_HORIZONTAL_IDS.has(item.id)) return base;
+  if (!THREE_PLUS_HORIZONTAL_IDS.has(localId)) return base;
   return {
     ...base,
     minCols: 2, maxCols: 2, widthPriority: 2,

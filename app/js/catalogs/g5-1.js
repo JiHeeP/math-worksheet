@@ -257,7 +257,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   차시('6차시 분수와 소수의 크기 비교하기', [
     학습지('분수와 소수 크기 비교', genU4MainDecCmp, {
       id: 'u4_main_dec_cmp', grid: 'concept', count: 8,
-      prereqs: [sheetRef('u4_main_cmp'), ext('[3-1] 6단원 분수와 소수 (미구현)')],
+      prereqs: [sheetRef('u4_main_cmp'), unitRef('g3-1', 'u6')],
     }),
   ]),
 ]);

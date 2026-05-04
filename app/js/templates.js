@@ -47,6 +47,15 @@ export function conceptProblem(question, answerHtml, note = '') {
   `);
 }
 
+export function modelCountProblem(modelHtml, answerHtml) {
+  return htmlProblem('concept-layout', `
+    <div class="concept-card model-count-card">
+      <div class="concept-question">${modelHtml}</div>
+      <div class="concept-answer">${answerHtml}</div>
+    </div>
+  `);
+}
+
 export function relationProblem(question, tableHtml, answerHtml = '', note = '') {
   return htmlProblem('relation-layout', `
     <div class="relation-card">

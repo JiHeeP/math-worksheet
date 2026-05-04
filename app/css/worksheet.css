@@ -5,6 +5,12 @@
   --paper-height: 297mm;
   --control-width: 1180px;
   --line-color: #4a4a4a;
+  --write-box-ratio: 1.85;
+  --write-box-size: 1.85em;
+  --symbol-box-size: 1.7em;
+  --frac-box-height: 1.6em;
+  --model-answer-box-height: 2.15em;
+  --model-answer-box-min-width: 3.6em;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,7 +61,8 @@ body {
 }
 
 select,
-input[type="number"] {
+input[type="number"],
+.number-input {
   padding: 9px 12px;
   border: 2px solid #d8dee9;
   border-radius: 10px;
@@ -67,7 +74,8 @@ input[type="number"] {
 #unitSelect { min-width: 250px; }
 #worksheetSelect { min-width: 420px; }
 
-input[type="number"] {
+input[type="number"],
+.number-input {
   width: 58px;
   text-align: center;
   font-size: 15px;
@@ -152,12 +160,12 @@ button:active { transform: scale(0.98); }
 }
 
 .problem-grid[data-layout-mode="spacious"] {
-  align-content: center;
+  align-content: stretch;
 }
 
 .problem-grid[data-layout-mode="spacious"] .problem-item {
-  justify-content: center;
-  padding-top: 16px;
+  justify-content: flex-start;
+  padding-top: 8px;
 }
 
 .problem-num {
@@ -281,26 +289,26 @@ button:active { transform: scale(0.98); }
   margin-bottom: 2px;
 }
 .split-line-svg {
-  width: calc(54px * var(--font-scale, 1));
-  height: calc(14px * var(--font-scale, 1));
+  width: calc(var(--write-box-size) + var(--write-box-size) + (14px * var(--font-scale, 1)));
+  height: 1em;
 }
 .bottom-boxes {
   display: flex;
   justify-content: space-between;
-  width: calc(54px * var(--font-scale, 1));
+  width: calc(var(--write-box-size) + var(--write-box-size) + (14px * var(--font-scale, 1)));
   margin-top: 2px;
 }
-/* 가지 끝 두 수의 자리 — 가르기 다이어그램 원본 PoC 스타일 (사용자 요청 유지). */
+/* 가지 끝 두 수의 자리 — 최종 정답 칸과 같은 크기의 실제 쓰기 칸. */
 .small-box {
-  width: calc(22px * var(--font-scale, 1));
-  height: calc(22px * var(--font-scale, 1));
-  border: 1.5px solid #555;
-  border-radius: 5px;
+  width: var(--write-box-size);
+  height: var(--write-box-size);
+  border: 2px solid #666;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: white;
-  font-size: calc(14px * var(--font-scale, 1));
+  font-size: calc(22px * var(--font-scale, 1));
 }
 .small-box-answer {
   font-weight: 600;
@@ -318,15 +326,16 @@ button:active { transform: scale(0.98); }
   gap: 8px;
 }
 
-/* 문제 카드 외곽 — 개념·관계·도형 학습지의 묶음 표시. */
+/* 문제 컨테이너는 배치만 담당한다. 인쇄 효율을 위해 카드형 회색 구획을 두지 않는다. */
 .concept-card,
 .relation-card,
 .shape-card {
   width: 100%;
-  border: 1.5px solid #d7dee8;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
-  padding: 10px 10px 12px;
+  border: 0 solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .concept-question,
@@ -346,6 +355,137 @@ button:active { transform: scale(0.98); }
   gap: 6px;
   flex-wrap: wrap;
   font-size: calc(16px * var(--font-scale, 1));
+}
+
+.model-count-card .concept-question,
+.base-ten-count-card .concept-question {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.model-count-card .concept-answer,
+.base-ten-count-card .concept-answer {
+  margin-top: 12px;
+}
+
+.model-count-card .num-blank,
+.base-ten-count-card .num-blank {
+  min-width: var(--model-answer-box-min-width);
+  min-height: var(--model-answer-box-height);
+  padding: 0 0.9em;
+  border: 2px solid #555;
+  border-radius: 8px;
+  font-size: calc(18px * var(--font-scale, 1));
+}
+
+.base-ten-model {
+  --base-ten-cell: calc(6.2px * var(--font-scale, 1));
+  --base-ten-one-size: calc(11px * var(--font-scale, 1));
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: calc(12px * var(--font-scale, 1));
+  min-height: calc(74px * var(--font-scale, 1));
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.base-ten-group {
+  display: inline-grid;
+  align-items: end;
+  justify-content: center;
+  gap: calc(4px * var(--font-scale, 1));
+}
+
+.base-ten-thousands {
+  display: inline-flex;
+  flex-wrap: wrap;
+  max-width: calc(199px * var(--font-scale, 1));
+  gap: calc(6px * var(--font-scale, 1));
+  padding: calc(3px * var(--font-scale, 1)) calc(4px * var(--font-scale, 1)) 0 0;
+}
+
+.base-ten-thousand {
+  width: calc(33px * var(--font-scale, 1));
+  height: calc(31px * var(--font-scale, 1));
+  display: block;
+  overflow: visible;
+}
+
+.base-ten-thousand-front,
+.base-ten-thousand-top,
+.base-ten-thousand-side {
+  stroke: #2f3640;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.base-ten-thousand-front { fill: #fff; }
+.base-ten-thousand-top { fill: #f7f8fa; }
+.base-ten-thousand-side { fill: #eceff3; }
+
+.base-ten-thousand-edge,
+.base-ten-thousand-grid {
+  stroke: #2f3640;
+  vector-effect: non-scaling-stroke;
+}
+
+.base-ten-thousand-edge { stroke-width: 1.4; }
+.base-ten-thousand-grid { stroke-width: 0.8; opacity: 0.65; }
+}
+
+.base-ten-hundreds {
+  display: inline-flex;
+  flex-wrap: wrap;
+  max-width: calc(196px * var(--font-scale, 1));
+}
+
+.base-ten-hundred {
+  width: calc(34px * var(--font-scale, 1));
+  height: calc(34px * var(--font-scale, 1));
+  border: 1.5px solid #2f3640;
+  background-image:
+    linear-gradient(#2f3640 1px, transparent 1px),
+    linear-gradient(90deg, #2f3640 1px, transparent 1px);
+  background-size: 10% 10%;
+  background-position: -1px -1px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.base-ten-rods {
+  display: inline-flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: calc(4px * var(--font-scale, 1));
+}
+
+.base-ten-rod {
+  display: inline-grid;
+  grid-template-rows: repeat(10, var(--base-ten-cell));
+  width: calc(14px * var(--font-scale, 1));
+  border: 1.5px solid #2f3640;
+  background: white;
+  box-sizing: border-box;
+}
+
+.base-ten-rod-cell:not(:last-child) {
+  border-bottom: 1px solid #2f3640;
+}
+
+.base-ten-ones {
+  grid-template-columns: repeat(3, var(--base-ten-one-size));
+  gap: calc(3px * var(--font-scale, 1));
+  align-content: end;
+}
+
+.base-ten-one {
+  width: var(--base-ten-one-size);
+  height: var(--base-ten-one-size);
+  border: 1.5px solid #2f3640;
+  background: white;
+  box-sizing: border-box;
 }
 
 .small-note {
@@ -462,7 +602,7 @@ button:active { transform: scale(0.98); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(32px * var(--font-scale, 1));
+  min-height: var(--write-box-size);
   padding: 0 calc(8px * var(--font-scale, 1));
   border: 1.5px solid #666;
   border-radius: 6px;
@@ -472,14 +612,25 @@ button:active { transform: scale(0.98); }
   font-weight: 500;
 }
 
-.num-blank { min-width: calc(40px * var(--font-scale, 1)); }
+.num-blank { min-width: var(--write-box-size); }
+.frac-step-flow .num-blank,
+.origin-equation-row .num-blank {
+  min-width: var(--write-box-size);
+  width: var(--write-box-size);
+  min-height: var(--write-box-size);
+  height: var(--write-box-size);
+  padding: 0;
+  border: 2px solid #666;
+  border-radius: 8px;
+  font-size: calc(22px * var(--font-scale, 1));
+}
 .text-blank { min-width: calc(62px * var(--font-scale, 1)); }
 .table-blank { min-width: calc(34px * var(--font-scale, 1)); padding: calc(2px * var(--font-scale, 1)) calc(8px * var(--font-scale, 1)); }
 
 /* 비교 기호(<,=,>) 등 자리 — 학생이 기호를 쓰는 동그란 슬롯. */
 .sym-blank {
-  width: calc(28px * var(--font-scale, 1));
-  height: calc(28px * var(--font-scale, 1));
+  width: var(--symbol-box-size);
+  height: var(--symbol-box-size);
   border: 1.5px solid #666;
   border-radius: 50%;
   display: inline-flex;
@@ -499,7 +650,7 @@ button:active { transform: scale(0.98); }
 .frac-blank .fb-top,
 .frac-blank .fb-bot {
   min-width: calc(32px * var(--font-scale, 1));
-  height: calc(24px * var(--font-scale, 1));
+  height: var(--frac-box-height);
   padding: 0 calc(8px * var(--font-scale, 1));
   border: 1.5px solid #666;
   border-radius: 4px;
@@ -566,7 +717,6 @@ button:active { transform: scale(0.98); }
 
 .div-method-answer-box .num-blank {
   min-width: calc(70px * var(--font-scale, 1));
-  min-height: calc(38px * var(--font-scale, 1));
   font-size: calc(18px * var(--font-scale, 1));
 }
 
@@ -655,6 +805,182 @@ button:active { transform: scale(0.98); }
 }
 
 .unit-tail { margin-left: 4px; }
+
+/* 원본 index (1).html 의 1·2학년 연습형 레이아웃 */
+.origin-horiz-practice {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.origin-equation-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(8px * var(--font-scale, 1));
+  font-size: calc(22px * var(--font-scale, 1));
+  line-height: 1;
+  margin-top: 20px;
+}
+
+.origin-text-part {
+  display: inline-flex;
+  align-items: flex-start;
+  min-height: calc(28px * var(--font-scale, 1));
+}
+
+.origin-answer-box {
+  width: var(--write-box-size);
+  height: var(--write-box-size);
+  border: 2px solid #666;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(22px * var(--font-scale, 1));
+  margin-top: -10px;
+}
+
+.origin-calc-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.origin-calc-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: calc(24px * var(--font-scale, 1));
+  letter-spacing: 2px;
+  width: calc(82px * var(--font-scale, 1));
+  padding: 5px 10px;
+  background: white;
+}
+
+.origin-calc-box.has-diagram { margin-right: 6px; }
+.origin-row { width: 100%; text-align: right; line-height: 1.4; }
+
+.origin-operator-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-bottom: 2px solid #333;
+  margin-bottom: 8px;
+}
+
+.origin-answer-row {
+  min-height: calc(30px * var(--font-scale, 1));
+  font-weight: 700;
+  text-align: right;
+  width: 100%;
+}
+
+.origin-diagram-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(var(--write-box-size) + var(--write-box-size) + (8px * var(--font-scale, 1)));
+  position: relative;
+}
+
+.origin-cherry-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8px * var(--font-scale, 1));
+}
+
+.origin-input-circle {
+  width: var(--write-box-size);
+  height: var(--write-box-size);
+  border: 2px solid #666;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(22px * var(--font-scale, 1));
+}
+
+.origin-branch-lines {
+  position: absolute;
+  left: calc(-20px * var(--font-scale, 1));
+  top: 0;
+  width: calc(28px * var(--font-scale, 1));
+  height: calc(var(--write-box-size) + var(--write-box-size) + (8px * var(--font-scale, 1)));
+  overflow: visible;
+}
+
+.origin-branch-lines line {
+  stroke: #333;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.origin-calc-layout-v2 {
+  display: grid;
+  grid-template-columns: 25px 35px 35px 5px 15px;
+  grid-template-rows: 30px 30px 30px 4px 30px;
+  margin-top: 12px;
+}
+
+.origin-cell-v2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(24px * var(--font-scale, 1));
+  font-weight: 500;
+  color: #333;
+  line-height: 1;
+}
+
+.origin-borrow-box-v2 {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid black;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+.origin-operator-v2 {
+  grid-column: 1 / 2;
+  grid-row: 3 / 4;
+  justify-content: flex-start;
+  padding-left: 5px;
+}
+
+.origin-calc-line-v2 {
+  grid-column: 1 / 4;
+  grid-row: 4 / 5;
+  background-color: black;
+  height: 2px;
+  border-radius: 1px;
+  align-self: center;
+}
+
+.origin-red-bracket-v2 {
+  grid-column: 4 / 6;
+  grid-row: 1 / 4;
+  border-top: 2px solid #ff4d4d;
+  border-right: 2px solid #ff4d4d;
+  border-bottom: 2px solid #ff4d4d;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: -5px;
+  width: 100%;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.origin-answer-row-v2,
+.origin-borrow-box-v2 {
+  font-weight: 700;
+}
 
 [data-ans] { color: transparent; }
 .answers-shown [data-ans] { color: #e74c3c; }

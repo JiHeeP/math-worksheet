@@ -3,7 +3,9 @@
 /**
  * 4학년 2학기 카탈로그
  *
- * 현재는 1단원 (분수의 덧셈과 뺄셈) 만 구현. 나머지 단원은 추후 추가.
+ * 현재 구현 단원:
+ *   1단원 분수의 덧셈과 뺄셈
+ *   3단원 소수의 덧셈과 뺄셈
  */
 
 import { defineUnit, 차시, 학습지, ext, sheetRef, unitRef } from '../catalog.js';
@@ -15,6 +17,10 @@ import {
   genG42U1MixedAddNoCarry, genG42U1MixedAddCarry,
   genG42U1MixedSubNoBorrow, genG42U1IntMinusMixed, genG42U1MixedSubBorrow,
 } from '../generators/g4-2/u1.js';
+import {
+  genG42U3DecimalAddTenths, genG42U3DecimalSubTenths,
+  genG42U3DecimalAddHundredths, genG42U3DecimalSubHundredths,
+} from '../generators/g4-2/u3.js';
 
 const GRADE_ID = 'g4-2';
 
@@ -89,6 +95,29 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 덧셈과 뺄셈', [
   ]),
 ]);
 
+const u3 = defineUnit(GRADE_ID, 'u3', '소수의 덧셈과 뺄셈', [
+  차시('1차시 소수 한 자리 수의 덧셈과 뺄셈', { grid: 'practice', count: 15 }, [
+    학습지('소수 한 자리 수의 덧셈', genG42U3DecimalAddTenths, {
+      id: 'u3_main_decimal_add_tenths',
+      prereqs: [unitRef('g3-1', 'u6')],
+    }),
+    학습지('소수 한 자리 수의 뺄셈', genG42U3DecimalSubTenths, {
+      id: 'u3_main_decimal_sub_tenths',
+      prereqs: [unitRef('g3-1', 'u6')],
+    }),
+  ]),
+  차시('2차시 소수 두 자리 수의 덧셈과 뺄셈', { grid: 'practice', count: 15 }, [
+    학습지('소수 두 자리 수의 덧셈', genG42U3DecimalAddHundredths, {
+      id: 'u3_main_decimal_add_hundredths',
+      prereqs: [unitRef('g3-1', 'u6')],
+    }),
+    학습지('소수 두 자리 수의 뺄셈', genG42U3DecimalSubHundredths, {
+      id: 'u3_main_decimal_sub_hundredths',
+      prereqs: [unitRef('g3-1', 'u6')],
+    }),
+  ]),
+]);
+
 /* ── 학기 메타 ── */
 
 export const meta = {
@@ -97,10 +126,11 @@ export const meta = {
   name: '4학년 2학기',
   units: {
     u1: { short: '1단원', name: '분수의 덧셈과 뺄셈' },
+    u3: { short: '3단원', name: '소수의 덧셈과 뺄셈' },
   },
 };
 
-export const entries = [...u1];
+export const entries = [...u1, ...u3];
 
 /* ── PDF 매핑 (없음) ── */
 
