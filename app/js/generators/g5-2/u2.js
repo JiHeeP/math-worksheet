@@ -7,7 +7,7 @@
  * 결과는 formulaResultHtml 이 약분/대분수 변환을 자동 처리.
  */
 
-import { rand } from '../../utils.js';
+import { rand, randChoice } from '../../utils.js';
 import { fracD, mixedD, formulaResultHtml } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
@@ -81,4 +81,30 @@ export function genG52U2MixedTimesMixed() {
   const num = (w1 * b1 + a1) * (w2 * b2 + a2);
   const den = b1 * b2;
   return htmlProblem('frac-row', `${mixedD(w1, a1, b1)} ${OP_TIMES} ${mixedD(w2, a2, b2)} ${EQ} ${formulaResultHtml(num, den)}`);
+}
+
+/* ── 본단원: 템플릿용 순수 데이터 제너레이터 ── */
+
+function properFracTerm(maxDen = 9) {
+  const d = rand(3, maxDen);
+  return { kind: 'frac', n: rand(1, d - 1), d };
+}
+
+function mixedTerm(maxDen = 7) {
+  const d = rand(3, maxDen);
+  return { kind: 'mixed', w: rand(1, 3), n: rand(1, d - 1), d };
+}
+
+function intTerm() {
+  return { kind: 'int', value: rand(2, 6) };
+}
+
+export function genG52U2FracMulStep() {
+  const kind = randChoice(['frac_int', 'int_frac', 'frac_frac', 'mixed_int', 'int_mixed', 'mixed_mixed']);
+  if (kind === 'frac_int') return { left: properFracTerm(), right: intTerm() };
+  if (kind === 'int_frac') return { left: intTerm(), right: properFracTerm() };
+  if (kind === 'frac_frac') return { left: properFracTerm(8), right: properFracTerm(8) };
+  if (kind === 'mixed_int') return { left: mixedTerm(), right: intTerm() };
+  if (kind === 'int_mixed') return { left: intTerm(), right: mixedTerm() };
+  return { left: mixedTerm(5), right: mixedTerm(5) };
 }

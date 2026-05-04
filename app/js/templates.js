@@ -104,6 +104,52 @@ function fracExpand(n, d, m) {
   return fracD(`${n} \u00d7 ${numBlank(m)}`, `${d} \u00d7 ${numBlank(m)}`);
 }
 
+function fracMulOperandHtml(term) {
+  if (term.kind === 'int') return term.value;
+  if (term.kind === 'mixed') return mixedD(term.w, term.n, term.d);
+  return fracD(term.n, term.d);
+}
+
+function fracMulImproper(term) {
+  if (term.kind === 'int') return { n: term.value, d: 1 };
+  if (term.kind === 'mixed') return { n: (term.w * term.d) + term.n, d: term.d };
+  return { n: term.n, d: term.d };
+}
+
+function fracMulConvertedHtml(term, improper) {
+  if (term.kind === 'mixed') return fracBlank(improper.n, improper.d);
+  return fracMulOperandHtml(term);
+}
+
+function fracMulProductHtml(left, right) {
+  if (left.d === 1) {
+    return fracD(`${numBlank(left.n)} \u00d7 ${numBlank(right.n)}`, right.d);
+  }
+  if (right.d === 1) {
+    return fracD(`${numBlank(left.n)} \u00d7 ${numBlank(right.n)}`, left.d);
+  }
+  return fracD(`${numBlank(left.n)} \u00d7 ${numBlank(right.n)}`, `${numBlank(left.d)} \u00d7 ${numBlank(right.d)}`);
+}
+
+/** 분수의 곱셈 과정: 대분수는 가분수로 바꾸고, 분자끼리/분모끼리 곱함 */
+function inlineFracMulStep(leftTerm, rightTerm) {
+  const left = fracMulImproper(leftTerm);
+  const right = fracMulImproper(rightTerm);
+  const hasMixed = leftTerm.kind === 'mixed' || rightTerm.kind === 'mixed';
+  const resultNum = left.n * right.n;
+  const resultDen = left.d * right.d;
+
+  const line1 = `${fracMulOperandHtml(leftTerm)} <span class="op-txt">×</span> ${fracMulOperandHtml(rightTerm)}`;
+  const line2 = hasMixed
+    ? `<span class="eq-txt">=</span> ${fracMulConvertedHtml(leftTerm, left)} <span class="op-txt">×</span> ${fracMulConvertedHtml(rightTerm, right)}`
+    : `<span class="eq-txt">=</span> ${fracMulProductHtml(left, right)}`;
+  const line3 = hasMixed
+    ? `<span class="eq-txt">=</span> ${fracMulProductHtml(left, right)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`
+    : `<span class="eq-txt">=</span> ${fracBlank(resultNum, resultDen)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`;
+
+  return { line1, line2, line3 };
+}
+
 /** 진분수 통분 덧셈 과정 (1줄) */
 function inlineFracAdd(n1, d1, n2, d2) {
   const common = lcm(d1, d2);
@@ -507,6 +553,12 @@ export const T = {
   sameMixedSubBorrowStep: {
     grid: 'wide', count: 8,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedSubBorrow(w1, n1, w2, n2, d)),
+  },
+
+  /** 분수의 곱셈 — 계산 과정 */
+  fracMulStep: {
+    grid: 'wide', count: 8,
+    render: ({ left, right }) => fracStepProblemMultiLine(inlineFracMulStep(left, right)),
   },
 
   /** (한 자리)+(한 자리), 받아올림 — 가르기 풀이 (한 줄) */

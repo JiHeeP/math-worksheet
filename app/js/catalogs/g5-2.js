@@ -11,6 +11,7 @@
  */
 
 import { defineUnit, 차시, 학습지, ext, unitRef } from '../catalog.js';
+import { T } from '../templates.js';
 
 import {
   genG52U1IneqGE, genG52U1IneqLE, genG52U1IneqGT, genG52U1IneqLT,
@@ -23,6 +24,7 @@ import {
   genG52U2IntTimesFrac, genG52U2IntTimesMixed,
   genG52U2UnitFracTimesUnitFrac,
   genG52U2FracTimesFrac, genG52U2MixedTimesMixed,
+  genG52U2FracMulStep,
 } from '../generators/g5-2/u2.js';
 
 import {
@@ -89,6 +91,12 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   ]),
   차시('7차시 (대분수) × (대분수)', { grid: 'practice', count: 15 }, [
     학습지('(대분수) × (대분수)', genG52U2MixedTimesMixed, { id: 'u2_main_mixed_times_mixed' }),
+  ]),
+  차시('1~7차시 분수의 곱셈 계산 과정', [
+    학습지('분수의 곱셈 계산 과정', T.fracMulStep, genG52U2FracMulStep, {
+      id: 'u2_main_frac_mul_step',
+      prereqs: [unitRef('g5-1', 'u4'), unitRef('g5-1', 'u5'), unitRef('g4-2', 'u1')],
+    }),
   ]),
 ]);
 
