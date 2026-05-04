@@ -24,7 +24,10 @@ import {
   genG52U2IntTimesFrac, genG52U2IntTimesMixed,
   genG52U2UnitFracTimesUnitFrac,
   genG52U2FracTimesFrac, genG52U2MixedTimesMixed,
-  genG52U2FracMulStep,
+  genG52U2FracTimesIntStep, genG52U2MixedTimesIntStep,
+  genG52U2IntTimesFracStep, genG52U2IntTimesMixedStep,
+  genG52U2UnitFracTimesUnitFracStep,
+  genG52U2FracTimesFracStep, genG52U2MixedTimesMixedStep,
 } from '../generators/g5-2/u2.js';
 
 import {
@@ -64,38 +67,85 @@ const u1 = defineUnit(GRADE_ID, 'u1', '수의 범위와 어림하기', [
 
 /* ── 2단원 분수의 곱셈 ── */
 
+const FRAC_MUL_PREREQS = [unitRef('g5-1', 'u5'), unitRef('g3-2', 'u1')];
+const FRAC_MUL_STEP_LAYOUT = { grid: 'wide', count: 8 };
+
 const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   차시('1차시 (진분수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(진분수) × (자연수)', genG52U2FracTimesInt, {
       id: 'u2_main_frac_times_int',
-      prereqs: [unitRef('g5-1', 'u4')],
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(진분수) × (자연수) 계산 과정', T.fracMulStep, genG52U2FracTimesIntStep, {
+      id: 'u2_main_frac_times_int_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
     }),
   ]),
   차시('2차시 (대분수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(대분수) × (자연수)', genG52U2MixedTimesInt, {
       id: 'u2_main_mixed_times_int',
-      prereqs: [unitRef('g5-1', 'u5'), unitRef('g4-2', 'u1')],
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(대분수) × (자연수) 계산 과정', T.fracMulStep, genG52U2MixedTimesIntStep, {
+      id: 'u2_main_mixed_times_int_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
     }),
   ]),
   차시('3차시 (자연수) × (진분수)', { grid: 'practice', count: 15 }, [
-    학습지('(자연수) × (진분수)', genG52U2IntTimesFrac, { id: 'u2_main_int_times_frac' }),
+    학습지('(자연수) × (진분수)', genG52U2IntTimesFrac, {
+      id: 'u2_main_int_times_frac',
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(자연수) × (진분수) 계산 과정', T.fracMulStep, genG52U2IntTimesFracStep, {
+      id: 'u2_main_int_times_frac_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
   ]),
   차시('4차시 (자연수) × (대분수)', { grid: 'practice', count: 15 }, [
-    학습지('(자연수) × (대분수)', genG52U2IntTimesMixed, { id: 'u2_main_int_times_mixed' }),
+    학습지('(자연수) × (대분수)', genG52U2IntTimesMixed, {
+      id: 'u2_main_int_times_mixed',
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(자연수) × (대분수) 계산 과정', T.fracMulStep, genG52U2IntTimesMixedStep, {
+      id: 'u2_main_int_times_mixed_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
   ]),
   차시('5차시 (단위분수) × (단위분수)', { grid: 'practice', count: 15 }, [
-    학습지('(단위분수) × (단위분수)', genG52U2UnitFracTimesUnitFrac, { id: 'u2_main_unit_times_unit' }),
+    학습지('(단위분수) × (단위분수)', genG52U2UnitFracTimesUnitFrac, {
+      id: 'u2_main_unit_times_unit',
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(단위분수) × (단위분수) 계산 과정', T.fracMulStep, genG52U2UnitFracTimesUnitFracStep, {
+      id: 'u2_main_unit_times_unit_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
   ]),
   차시('6차시 (진분수) × (진분수)', { grid: 'practice', count: 15 }, [
-    학습지('(진분수) × (진분수)', genG52U2FracTimesFrac, { id: 'u2_main_frac_times_frac' }),
+    학습지('(진분수) × (진분수)', genG52U2FracTimesFrac, {
+      id: 'u2_main_frac_times_frac',
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(진분수) × (진분수) 계산 과정', T.fracMulStep, genG52U2FracTimesFracStep, {
+      id: 'u2_main_frac_times_frac_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
   ]),
   차시('7차시 (대분수) × (대분수)', { grid: 'practice', count: 15 }, [
-    학습지('(대분수) × (대분수)', genG52U2MixedTimesMixed, { id: 'u2_main_mixed_times_mixed' }),
-  ]),
-  차시('1~7차시 분수의 곱셈 계산 과정', [
-    학습지('분수의 곱셈 계산 과정', T.fracMulStep, genG52U2FracMulStep, {
-      id: 'u2_main_frac_mul_step',
-      prereqs: [unitRef('g5-1', 'u4'), unitRef('g5-1', 'u5'), unitRef('g4-2', 'u1')],
+    학습지('(대분수) × (대분수)', genG52U2MixedTimesMixed, {
+      id: 'u2_main_mixed_times_mixed',
+      prereqs: FRAC_MUL_PREREQS,
+    }),
+    학습지('(대분수) × (대분수) 계산 과정', T.fracMulStep, genG52U2MixedTimesMixedStep, {
+      id: 'u2_main_mixed_times_mixed_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
     }),
   ]),
 ]);
