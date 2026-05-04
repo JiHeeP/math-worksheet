@@ -78,22 +78,22 @@ export function shapeProblem(svg, prompt, answerHtml, note = '') {
   `);
 }
 
-function fracStepProblem(stepsHtml) {
+function fracStepProblem(stepsHtml, itemClass = '') {
   return htmlProblem('concept-layout', `
     <div class="concept-card">
       <div class="concept-answer frac-step-flow">${stepsHtml}</div>
     </div>
-  `);
+  `, itemClass);
 }
 
-function fracStepProblemMultiLine({ line1, line2, line3 }) {
+function fracStepProblemMultiLine({ line1, line2, line3 }, itemClass = '') {
   return htmlProblem('concept-layout', `
     <div class="concept-card frac-multi-line">
       <div class="concept-answer frac-step-flow">${line1}</div>
       <div class="concept-answer frac-step-flow">${line2}</div>
       <div class="concept-answer frac-step-flow">${line3}</div>
     </div>
-  `);
+  `, itemClass);
 }
 
 /* ================================================================
@@ -558,7 +558,7 @@ export const T = {
   /** 분수의 곱셈 — 계산 과정 */
   fracMulStep: {
     grid: 'wide', count: 8,
-    render: ({ left, right }) => fracStepProblemMultiLine(inlineFracMulStep(left, right)),
+    render: ({ left, right }) => fracStepProblemMultiLine(inlineFracMulStep(left, right), 'frac-mul-step'),
   },
 
   /** (한 자리)+(한 자리), 받아올림 — 가르기 풀이 (한 줄) */

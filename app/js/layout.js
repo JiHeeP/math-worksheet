@@ -41,6 +41,20 @@ export const TWO_COLUMN_WORKSHEET_IDS = new Set([
   'u4_main_lcd_process',
 ]);
 
+export const ONE_COLUMN_WORKSHEET_IDS = new Set([
+  'u2_main_frac_times_int_step',
+  'u2_main_mixed_times_int_step',
+  'u2_main_int_times_frac_step',
+  'u2_main_int_times_mixed_step',
+  'u2_main_unit_times_unit_step',
+  'u2_main_frac_times_frac_step',
+  'u2_main_mixed_times_mixed_step',
+]);
+
+export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([
+  'u2_main_mixed_times_mixed',
+]);
+
 export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
   'u7_main_1d1d_carry_horiz_prac',
   'u7_main_teen_borrow_horiz_prac',
@@ -70,6 +84,28 @@ export function getHtmlLayoutConfig(item) {
       ...base,
       minCols: 2, maxCols: 2, widthPriority: 1.5,
       minCellWidth: Math.max(base.minCellWidth || 0, 76),
+    };
+  }
+
+  if (ONE_COLUMN_WORKSHEET_IDS.has(localId)) {
+    return {
+      ...base,
+      minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
+      targetCellAspect: 4.8,
+      minCellWidth: 120,
+      minCellHeight: 34,
+      baseGap: [6, 0],
+    };
+  }
+
+  if (FRACTION_TWO_COLUMN_WORKSHEET_IDS.has(localId)) {
+    return {
+      ...base,
+      minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
+      targetCellAspect: 1.85,
+      minCellWidth: 76,
+      minCellHeight: 24,
+      baseGap: [8, 10],
     };
   }
 

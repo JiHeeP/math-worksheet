@@ -68,7 +68,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '수의 범위와 어림하기', [
 /* ── 2단원 분수의 곱셈 ── */
 
 const FRAC_MUL_PREREQS = [unitRef('g5-1', 'u5'), unitRef('g3-2', 'u1')];
-const FRAC_MUL_STEP_LAYOUT = { grid: 'wide', count: 8 };
+const FRAC_MUL_STEP_LAYOUT = { grid: 'wide', count: 6 };
 
 const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   차시('1차시 (진분수) × (자연수)', { grid: 'practice', count: 15 }, [

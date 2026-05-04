@@ -139,6 +139,7 @@ button:active { transform: scale(0.98); }
 .problem-grid {
   display: grid;
   flex-grow: 1;
+  min-height: 0;
   gap: 12px 8px;
   align-content: stretch;
 }
@@ -274,6 +275,13 @@ button:active { transform: scale(0.98); }
 
 .frac-row {
   gap: calc(8px * var(--font-scale, 1));
+}
+
+.problem-item.frac-mul-row .frac-row,
+.problem-item.frac-mul-step .frac-step-flow,
+.problem-item.frac-mul-step .concept-answer {
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 /* 가르기 다이어그램 (원본 PoC 스타일 — 위 숫자 + 가지 SVG + 두 작은 박스) */
@@ -619,6 +627,21 @@ button:active { transform: scale(0.98); }
 
 .frac-multi-line .concept-answer {
   margin-top: 0;
+}
+
+.problem-item.frac-mul-step .frac-multi-line {
+  width: 100%;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.problem-item.frac-mul-step .concept-layout {
+  margin-top: 0;
+  gap: 0;
+}
+
+.problem-item.frac-mul-step .frac-step-flow {
+  line-height: 1.35;
 }
 
 .frac-d {
