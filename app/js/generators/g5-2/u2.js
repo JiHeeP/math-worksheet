@@ -7,7 +7,7 @@
  * 결과는 formulaResultHtml 이 약분/대분수 변환을 자동 처리.
  */
 
-import { rand, randChoice } from '../../utils.js';
+import { rand } from '../../utils.js';
 import { fracD, mixedD, formulaResultHtml } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
@@ -99,12 +99,35 @@ function intTerm() {
   return { kind: 'int', value: rand(2, 6) };
 }
 
-export function genG52U2FracMulStep() {
-  const kind = randChoice(['frac_int', 'int_frac', 'frac_frac', 'mixed_int', 'int_mixed', 'mixed_mixed']);
-  if (kind === 'frac_int') return { left: properFracTerm(), right: intTerm() };
-  if (kind === 'int_frac') return { left: intTerm(), right: properFracTerm() };
-  if (kind === 'frac_frac') return { left: properFracTerm(8), right: properFracTerm(8) };
-  if (kind === 'mixed_int') return { left: mixedTerm(), right: intTerm() };
-  if (kind === 'int_mixed') return { left: intTerm(), right: mixedTerm() };
+export function genG52U2FracTimesIntStep() {
+  return { left: properFracTerm(), right: intTerm() };
+}
+
+export function genG52U2MixedTimesIntStep() {
+  return { left: mixedTerm(), right: intTerm() };
+}
+
+export function genG52U2IntTimesFracStep() {
+  return { left: intTerm(), right: properFracTerm() };
+}
+
+export function genG52U2IntTimesMixedStep() {
+  return { left: intTerm(), right: mixedTerm() };
+}
+
+export function genG52U2UnitFracTimesUnitFracStep() {
+  let d1, d2;
+  do { d1 = rand(2, 9); d2 = rand(2, 9); } while (d1 === d2);
+  return {
+    left: { kind: 'frac', n: 1, d: d1 },
+    right: { kind: 'frac', n: 1, d: d2 },
+  };
+}
+
+export function genG52U2FracTimesFracStep() {
+  return { left: properFracTerm(8), right: properFracTerm(8) };
+}
+
+export function genG52U2MixedTimesMixedStep() {
   return { left: mixedTerm(5), right: mixedTerm(5) };
 }
