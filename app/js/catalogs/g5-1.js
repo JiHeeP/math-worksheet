@@ -62,7 +62,7 @@ const GRADE_ID = 'g5-1';
 
 /* ── 단원 정의 ── */
 
-const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합 계산', [
+const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
   선수학습({ kind: 'pdf', grid: 'standard', count: 20 }, [
     학습지('두 자리 수 덧셈', genU1PreAdd2d, { id: 'u1_pre_add_2d', from: 'g2-1' }),
     학습지('두 자리 수 뺄셈', genU1PreSub2d, { id: 'u1_pre_sub_2d', from: 'g2-1' }),
@@ -193,7 +193,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '대응 관계', [
+const u3 = defineUnit(GRADE_ID, 'u3', '규칙과 대응', [
   차시('1차시 두 양 사이의 관계 알아보기(1)', [
     학습지('두 양 사이의 관계 찾기 (1)', genU3MainRelationFind1, { id: 'u3_main_relation_find1', grid: 'concept', count: 10 }),
   ]),
@@ -395,9 +395,9 @@ export const meta = {
   short: '5-1',
   name: '5학년 1학기',
   units: {
-    u1: { short: '1단원', name: '자연수의 혼합 계산' },
+    u1: { short: '1단원', name: '자연수의 혼합계산' },
     u2: { short: '2단원', name: '약수와 배수' },
-    u3: { short: '3단원', name: '대응 관계' },
+    u3: { short: '3단원', name: '규칙과 대응' },
     u4: { short: '4단원', name: '약분과 통분' },
     u5: { short: '5단원', name: '분수의 덧셈과 뺄셈' },
     u6: { short: '6단원', name: '다각형의 둘레와 넓이' },

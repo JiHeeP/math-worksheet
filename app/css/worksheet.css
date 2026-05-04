@@ -379,6 +379,54 @@ button:active { transform: scale(0.98); }
   font-size: calc(18px * var(--font-scale, 1));
 }
 
+.group-mul-card {
+  width: 100%;
+  min-height: calc(96px * var(--font-scale, 1));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12px * var(--font-scale, 1));
+}
+
+.group-mul-picture {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(6px * var(--font-scale, 1));
+}
+
+.group-mul-set {
+  display: inline-grid;
+  grid-template-columns: repeat(var(--group-cols), calc(7px * var(--font-scale, 1)));
+  gap: calc(3px * var(--font-scale, 1));
+  padding: calc(5px * var(--font-scale, 1));
+  border: 1.5px solid #8b98a8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.group-mul-dot {
+  width: calc(7px * var(--font-scale, 1));
+  height: calc(7px * var(--font-scale, 1));
+  border-radius: 50%;
+  background: #2f3640;
+}
+
+.group-mul-answer-line {
+  min-width: calc(120px * var(--font-scale, 1));
+  min-height: calc(26px * var(--font-scale, 1));
+  border-bottom: 2px solid #555;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 calc(10px * var(--font-scale, 1));
+  font-size: calc(16px * var(--font-scale, 1));
+  line-height: 1.2;
+}
+
 .base-ten-model {
   --base-ten-cell: calc(6.2px * var(--font-scale, 1));
   --base-ten-one-size: calc(11px * var(--font-scale, 1));

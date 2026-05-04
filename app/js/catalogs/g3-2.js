@@ -7,9 +7,9 @@
  * 곱셈/나눗셈은 세로셈(PDF) 표준 출력.
  *
  * 현재 구현 단원:
- *   1단원 곱셈(5) — 두 자리 × 두 자리 (세로셈)
- *   3단원 나눗셈(6) — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
- *   5단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
+ *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈)
+ *   2단원 나눗셈 — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
+ *   4단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
@@ -27,13 +27,13 @@ import {
 
 const GRADE_ID = 'g3-2';
 
-const u1 = defineUnit(GRADE_ID, 'u1', '곱셈(5)', [
+const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
   차시('1차시 두 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 × 두 자리 (세로셈)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈(6)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈', [
   차시('1차시 두 자리 ÷ 한 자리 (세로셈)', { kind: 'html', grid: 'standard', count: 12 }, [
     학습지('두 자리 ÷ 한 자리 (세로셈)', genU1PreDiv2d1d, { id: 'u3_main_div_2d1d' }),
   ]),
@@ -68,9 +68,9 @@ export const meta = {
   short: '3-2',
   name: '3학년 2학기',
   units: {
-    u1: { short: '1단원', name: '곱셈(5)' },
-    u3: { short: '3단원', name: '나눗셈(6)' },
-    u5: { short: '5단원', name: '분수' },
+    u1: { short: '1단원', name: '곱셈' },
+    u3: { short: '2단원', name: '나눗셈' },
+    u5: { short: '4단원', name: '분수' },
   },
 };
 

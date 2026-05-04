@@ -3,12 +3,12 @@
 /**
  * 2학년 1학기 카탈로그
  *
- * 3단원 덧셈과 뺄셈(5):
+ * 3단원 덧셈과 뺄셈:
  *  - 가로셈 (받아올림/내림 단계별 학습) — 자체 generator
  *  - 세로셈 (혼합) — 5-1 선수학습용 PDF generator (add_2d, sub_2d) 재사용
  *    교과서가 2-1에서 두 자리 덧·뺄셈을 세로셈 표준으로 가르침.
  *
- * 미구현 단원: 2단원 여러 가지 도형, 4단원 길이재기, 5단원 분류하기
+ * 미구현 단원: 2단원 여러가지도형, 4단원 길이 재기, 5단원 분류하기
  */
 
 import { defineUnit, 차시, 학습지, unitRef } from '../catalog.js';
@@ -38,7 +38,7 @@ import { genU1PreAdd2d, genU1PreSub2d, PDF_GENERATORS_U1 } from '../generators/g
 
 const GRADE_ID = 'g2-1';
 
-const u1 = defineUnit(GRADE_ID, 'u1', '세 자리 수', [
+const u1 = defineUnit(GRADE_ID, 'u1', '세자리수', [
   차시('1차시 세 자리 수의 자릿값', { grid: 'concept', count: 8 }, [
     학습지('모형 보고 세 자리 수 쓰기', genG21U1ModelToNumber, { id: 'u1_main_model_to_number', grid: 'wide', count: 6 }),
     학습지('백·십·일의 자리', genG21U1HundredsTensOnes, { id: 'u1_main_place_value' }),
@@ -50,7 +50,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '세 자리 수', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '덧셈과 뺄셈(5)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '덧셈과 뺄셈', [
   차시('1~2차시 두 자리 덧셈 원본 연습형', { grid: 'practice', count: 15 }, [
     학습지('두 자리 수 + 두 자리 수(받아올림) - 연습', genG21U3Add2d2dSinglePractice, {
       id: 'u3_main_2d2d_carry_prac',
@@ -154,7 +154,7 @@ const u3 = defineUnit(GRADE_ID, 'u3', '덧셈과 뺄셈(5)', [
   ]),
 ]);
 
-const u6 = defineUnit(GRADE_ID, 'u6', '곱셈(1)', [
+const u6 = defineUnit(GRADE_ID, 'u6', '곱셈', [
   차시('1차시 여러 묶음으로 세기', { grid: 'standard', count: 20 }, [
     학습지('같은 수 여러 번 더하기', genG21U6RepeatedAdd, { id: 'u6_main_repeated_add' }),
     학습지('묶음을 곱셈식으로 나타내기', genG21U6GroupsToMul, { id: 'u6_main_groups_to_mul' }),
@@ -169,9 +169,9 @@ export const meta = {
   short: '2-1',
   name: '2학년 1학기',
   units: {
-    u1: { short: '1단원', name: '세 자리 수' },
-    u3: { short: '3단원', name: '덧셈과 뺄셈(5)' },
-    u6: { short: '6단원', name: '곱셈(1)' },
+    u1: { short: '1단원', name: '세자리수' },
+    u3: { short: '3단원', name: '덧셈과 뺄셈' },
+    u6: { short: '6단원', name: '곱셈' },
   },
 };
 

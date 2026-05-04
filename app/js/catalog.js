@@ -47,7 +47,7 @@ export function 차시(lessonRef, ...args) {
 
 /**
  * 외부(다른 학기/단원) 학습지 — 클릭 동작 없이 라벨만 표시
- * 예: ext('[4-2] 분수의 덧셈과 뺄셈(1)')
+ * 예: ext('[4-2] 분수의 덧셈과 뺄셈')
  */
 export function ext(label) { return { kind: 'ext', label }; }
 
@@ -179,7 +179,7 @@ export const catalogMap = Object.fromEntries(WORKSHEET_CATALOG.map((item) => [it
  *
  * 예:
  *   GRADE_META['g5-1'].name           // '5학년 1학기'
- *   GRADE_META['g5-1'].units.u1.name  // '자연수의 혼합 계산'
+ *   GRADE_META['g5-1'].units.u1.name  // '자연수의 혼합계산'
  */
 export const GRADE_META = Object.fromEntries(GRADES.map((g) => [g.meta.id, g.meta]));
 

@@ -5,12 +5,11 @@
  *
  * 현재 구현 단원:
  *   1단원 100까지의 수
- *   4단원 덧셈과 뺄셈(2) — 받아올림·내림 없음
- *   6단원 덧셈과 뺄셈(3) — 10이 되는 더하기
- *   7단원 덧셈과 뺄셈(4) — 받아올림·내림 있음
- *   8단원 □가 사용된 식
+ *   2단원 덧셈과 뺄셈(1) — 받아올림·내림 없음
+ *   4단원 덧셈과 뺄셈(2) — 10이 되는 더하기
+ *   6단원 덧셈과 뺄셈(3) — 받아올림·내림 있음
  *
- * 미구현: 2단원 여러 가지 모양, 3단원 모양과 시각, 5단원 규칙찾기
+ * 미구현: 3단원 여러가지 모양, 5단원 시계보기와 규칙 찾기
  */
 
 import { defineUnit, 차시, 학습지, sheetRef } from '../catalog.js';
@@ -37,10 +36,6 @@ import {
   genG12U72d1dCarryVertical, genG12U7CarryBorrowMix,
 } from '../generators/g1-2/u7.js';
 
-import {
-  genG12U8BoxAdd, genG12U8BoxSub,
-} from '../generators/g1-2/u8.js';
-
 const GRADE_ID = 'g1-2';
 
 /* ── 1단원 100까지의 수 ── */
@@ -56,9 +51,9 @@ const u1 = defineUnit(GRADE_ID, 'u1', '100까지의 수', [
   ]),
 ]);
 
-/* ── 4단원 덧셈과 뺄셈(2) — 받아올림·내림 없음 ── */
+/* ── 2단원 덧셈과 뺄셈(1) — 받아올림·내림 없음 ── */
 
-const u4 = defineUnit(GRADE_ID, 'u4', '덧셈과 뺄셈(2)', [
+const u4 = defineUnit(GRADE_ID, 'u4', '덧셈과 뺄셈(1)', [
   차시('1차시 (두 자리) ± (한 자리), 받아올림·내림 없음', { grid: 'standard', count: 20 }, [
     학습지('(두 자리) + (한 자리)', genG12U4Add2d1d, { id: 'u4_main_add_2d1d' }),
     학습지('(두 자리) − (한 자리)', genG12U4Sub2d1d, { id: 'u4_main_sub_2d1d' }),
@@ -69,9 +64,9 @@ const u4 = defineUnit(GRADE_ID, 'u4', '덧셈과 뺄셈(2)', [
   ]),
 ]);
 
-/* ── 6단원 덧셈과 뺄셈(3) — 10이 되는 더하기 ── */
+/* ── 4단원 덧셈과 뺄셈(2) — 10이 되는 더하기 ── */
 
-const u6 = defineUnit(GRADE_ID, 'u6', '덧셈과 뺄셈(3)', [
+const u6 = defineUnit(GRADE_ID, 'u6', '덧셈과 뺄셈(2)', [
   차시('1~2차시 10의 보수 원본형', { grid: 'dense', count: 36 }, [
     학습지('10의 보수 (가로셈 빈칸)', genG12U6MakeTenOriginal, { id: 'u6_main_make_ten_original' }),
   ]),
@@ -83,9 +78,9 @@ const u6 = defineUnit(GRADE_ID, 'u6', '덧셈과 뺄셈(3)', [
   ]),
 ]);
 
-/* ── 7단원 덧셈과 뺄셈(4) — 받아올림·내림 ── */
+/* ── 6단원 덧셈과 뺄셈(3) — 받아올림·내림 ── */
 
-const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(4)', [
+const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
   차시('1차시 (한 자리) + (한 자리), 받아올림 - 원본 연습형', { grid: 'practice', count: 15 }, [
     학습지('한 자리 수 + 한 자리 수(받아올림) - 가로 연습', genG12U71d1dCarryHorizPractice, { id: 'u7_main_1d1d_carry_horiz_prac' }),
     학습지('한 자리 수 + 한 자리 수(받아올림) - 연습', genG12U71d1dCarryPractice, { id: 'u7_main_1d1d_carry_prac' }),
@@ -135,17 +130,6 @@ const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(4)', [
   ]),
 ]);
 
-/* ── 8단원 □가 사용된 식 ── */
-
-const u8 = defineUnit(GRADE_ID, 'u8', '□가 사용된 식', [
-  차시('1차시 □가 들어간 덧셈', { grid: 'standard', count: 20 }, [
-    학습지('□가 들어간 덧셈', genG12U8BoxAdd, { id: 'u8_main_box_add' }),
-  ]),
-  차시('2차시 □가 들어간 뺄셈', { grid: 'standard', count: 20 }, [
-    학습지('□가 들어간 뺄셈', genG12U8BoxSub, { id: 'u8_main_box_sub' }),
-  ]),
-]);
-
 /* ── 학기 메타 ── */
 
 export const meta = {
@@ -154,14 +138,13 @@ export const meta = {
   name: '1학년 2학기',
   units: {
     u1: { short: '1단원', name: '100까지의 수' },
-    u4: { short: '4단원', name: '덧셈과 뺄셈(2)' },
-    u6: { short: '6단원', name: '덧셈과 뺄셈(3)' },
-    u7: { short: '7단원', name: '덧셈과 뺄셈(4)' },
-    u8: { short: '8단원', name: '□가 사용된 식' },
+    u4: { short: '2단원', name: '덧셈과 뺄셈(1)' },
+    u6: { short: '4단원', name: '덧셈과 뺄셈(2)' },
+    u7: { short: '6단원', name: '덧셈과 뺄셈(3)' },
   },
 };
 
-export const entries = [...u1, ...u4, ...u6, ...u7, ...u8];
+export const entries = [...u1, ...u4, ...u6, ...u7];
 
 export const pdfMap = {};
 export const pdfGenerators = {};

@@ -204,12 +204,22 @@ export function getWorksheetLimit(item) {
   return isPdfWorksheet(item) ? getPdfLimit(item) : getHtmlLimit(item);
 }
 
-export function createSheet(item, countOverride, fontScale = 1) {
+function withLayoutOverrides(config, options) {
+  if (!options || !options.maxCols) return config;
+  const maxCols = Math.max(1, Math.min(config.maxCols, options.maxCols));
+  return {
+    ...config,
+    maxCols,
+    minCols: Math.min(config.minCols || 1, maxCols),
+  };
+}
+
+export function createSheet(item, countOverride, fontScale = 1, options = {}) {
   resetSheetContext();
 
   if (isPdfWorksheet(item)) {
     const opType = getPdfOpType(item);
-    const cfg = PDF_LAYOUTS[opType];
+    const cfg = withLayoutOverrides(PDF_LAYOUTS[opType], options);
     const count = countOverride || item.count;
     const layout = resolveGridLayout(cfg, count, fontScale);
     const sheet = document.createElement('div');
@@ -238,10 +248,10 @@ export function createSheet(item, countOverride, fontScale = 1) {
   }
 
   const count = countOverride || item.count;
-  const layoutCfg = getHtmlLayoutConfig(item) || {
+  const layoutCfg = withLayoutOverrides(getHtmlLayoutConfig(item) || {
     minCols: 1, maxCols: 4, maxRows: 10, targetCellAspect: 1,
     minCellWidth: 44, minCellHeight: 28, baseGap: [12, 8],
-  };
+  }, options);
   const layout = resolveGridLayout(layoutCfg, count, fontScale);
   const sheet = document.createElement('div');
   sheet.className = 'sheet';

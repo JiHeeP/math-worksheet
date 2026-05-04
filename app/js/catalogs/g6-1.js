@@ -4,11 +4,11 @@
  * 6학년 1학기 카탈로그
  *
  * 현재 구현 단원:
- *   1단원 분수의 나눗셈(3)
- *   3단원 소수의 나눗셈(4)
+ *   1단원 분수의 나눗셈
+ *   3단원 소수의 나눗셈
  *
- * 미구현: 2단원 각기둥과 각뿔, 4단원 비와 비율, 5단원 여러 가지 그래프,
- *         6단원 직육면체의 부피와 겉넓이
+ * 미구현: 2단원 각기둥과 각뿔, 4단원 비와 비율, 5단원 여러가지 그래프,
+ *         6단원 직육면체의 겉넓이와 부피
  */
 
 import { defineUnit, 차시, 학습지, unitRef } from '../catalog.js';
@@ -23,7 +23,7 @@ import {
 
 const GRADE_ID = 'g6-1';
 
-const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈(3)', [
+const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
   차시('1차시 자연수의 나눗셈을 분수로 나타내기', { grid: 'practice', count: 15 }, [
     학습지('(자연수) ÷ (자연수)를 분수로 나타내기', genG61U1IntDivIntAsFrac, {
       id: 'u1_main_int_div_int_frac',
@@ -42,7 +42,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈(3)', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '소수의 나눗셈(4)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '소수의 나눗셈', [
   차시('1차시 (소수) ÷ (자연수)', { grid: 'practice', count: 15 }, [
     학습지('소수 한 자리 수 ÷ 자연수', genG61U3DecimalDivInt, {
       id: 'u3_main_decimal_div_int_tenths',
@@ -66,8 +66,8 @@ export const meta = {
   short: '6-1',
   name: '6학년 1학기',
   units: {
-    u1: { short: '1단원', name: '분수의 나눗셈(3)' },
-    u3: { short: '3단원', name: '소수의 나눗셈(4)' },
+    u1: { short: '1단원', name: '분수의 나눗셈' },
+    u3: { short: '3단원', name: '소수의 나눗셈' },
   },
 };
 

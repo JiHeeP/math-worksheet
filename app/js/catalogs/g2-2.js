@@ -4,10 +4,10 @@
  * 2학년 2학기 카탈로그
  *
  * 현재 구현 단원:
- *   1단원 네 자리 수
- *   2단원 곱셈구구(2) — 단별 학습지 분리 방식 (Phase 4 결정)
+ *   1단원 네 자리수
+ *   2단원 곱셈구구 — 단별 학습지 분리 방식 (Phase 4 결정)
  *
- * 미구현: 3단원 길이재기, 4단원 시각과 시간, 5단원 표와 그래프, 6단원 규칙찾기
+ * 미구현: 3단원 길이 재기, 4단원 시각과 시간, 5단원 표와 그래프, 6단원 규칙 찾기
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
@@ -22,9 +22,9 @@ import {
 
 const GRADE_ID = 'g2-2';
 
-/* ── 1단원 네 자리 수 ── */
+/* ── 1단원 네 자리수 ── */
 
-const u1 = defineUnit(GRADE_ID, 'u1', '네 자리 수', [
+const u1 = defineUnit(GRADE_ID, 'u1', '네 자리수', [
   차시('1차시 네 자리 수의 자릿값', { grid: 'concept', count: 8 }, [
     학습지('모형 보고 네 자리 수 쓰기', genG22U1ModelToNumber, { id: 'u1_main_model_to_number', grid: 'wide', count: 6 }),
     학습지('천·백·십·일의 자리', genG22U1PlaceValue, { id: 'u1_main_place_value' }),
@@ -35,9 +35,9 @@ const u1 = defineUnit(GRADE_ID, 'u1', '네 자리 수', [
   ]),
 ]);
 
-/* ── 2단원 곱셈구구(2) — 단별 학습지 ── */
+/* ── 2단원 곱셈구구 — 단별 학습지 ── */
 
-const u2 = defineUnit(GRADE_ID, 'u2', '곱셈구구(2)', [
+const u2 = defineUnit(GRADE_ID, 'u2', '곱셈구구', [
   차시('1차시 2단', { grid: 'dense', count: 36 }, [
     학습지('2단', makeGugudanGen(2), { id: 'u2_main_gugudan_2' }),
   ]),
@@ -77,8 +77,8 @@ export const meta = {
   short: '2-2',
   name: '2학년 2학기',
   units: {
-    u1: { short: '1단원', name: '네 자리 수' },
-    u2: { short: '2단원', name: '곱셈구구(2)' },
+    u1: { short: '1단원', name: '네 자리수' },
+    u2: { short: '2단원', name: '곱셈구구' },
   },
 };
 

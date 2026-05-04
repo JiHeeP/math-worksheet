@@ -4,11 +4,11 @@
  * 6학년 2학기 카탈로그
  *
  * 현재 구현 단원:
- *   1단원 분수의 나눗셈(5)
- *   3단원 소수의 나눗셈(6)
+ *   1단원 분수의 나눗셈
+ *   3단원 소수의 나눗셈
  *
  * 미구현: 2단원 공간과 입체, 4단원 비례식과 비례배분,
- *         5단원 원의 넓이, 6단원 원기둥, 원뿔, 구
+ *         5단원 원의 넓이, 6단원 원기둥,원뿔,구
  */
 
 import { defineUnit, 차시, 학습지, unitRef } from '../catalog.js';
@@ -25,7 +25,7 @@ import {
 
 const GRADE_ID = 'g6-2';
 
-const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈(5)', [
+const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
   차시('1차시 (분수) ÷ (분수)', { grid: 'practice', count: 15 }, [
     학습지('(진분수) ÷ (진분수)', genG62U1FracDivFrac, {
       id: 'u1_main_frac_div_frac',
@@ -46,7 +46,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈(5)', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '소수의 나눗셈(6)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '소수의 나눗셈', [
   차시('1차시 (소수) ÷ (소수)', { grid: 'practice', count: 15 }, [
     학습지('소수 한 자리 수로 나누기', genG62U3DecimalDivDecimalTenths, {
       id: 'u3_main_decimal_div_decimal_tenths',
@@ -70,8 +70,8 @@ export const meta = {
   short: '6-2',
   name: '6학년 2학기',
   units: {
-    u1: { short: '1단원', name: '분수의 나눗셈(5)' },
-    u3: { short: '3단원', name: '소수의 나눗셈(6)' },
+    u1: { short: '1단원', name: '분수의 나눗셈' },
+    u3: { short: '3단원', name: '소수의 나눗셈' },
   },
 };
 

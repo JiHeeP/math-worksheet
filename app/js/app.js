@@ -5,8 +5,10 @@ import {
   catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit, getGradeMeta,
 } from './catalog.js';
 import { createSheet, getWorksheetLimit } from './renderers.js';
+import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
+const fitCountCache = new Map();
 
 function populateGradeSelect() {
   const gradeSelect = document.getElementById('gradeSelect');
@@ -38,12 +40,12 @@ function updateSelectedMeta() {
   const item = catalogMap[document.getElementById('worksheetSelect').value];
   if (!item) return;
   const countInput = document.getElementById('problemCount');
-  const limit = getWorksheetLimit(item);
-  const defaultCount = Math.min(item.count, limit);
-  countInput.placeholder = defaultCount;
+  const fontScale = getCurrentFontScale();
+  const limit = getSafeWorksheetLimit(item, fontScale);
+  countInput.placeholder = limit;
   countInput.dataset.max = limit;
   if (countInput.value) {
-    countInput.value = Math.min(parseInt(countInput.value, 10) || defaultCount, limit);
+    countInput.value = Math.min(parseInt(countInput.value, 10) || limit, limit);
   }
 }
 
@@ -79,6 +81,135 @@ function currentGradeId() {
   return document.getElementById('gradeSelect').value;
 }
 
+function getCurrentFontScale() {
+  return parseFloat(document.getElementById('fontScale').value) || 1;
+}
+
+function getFitCacheKey(item, fontScale) {
+  return `${item.id}@${fontScale.toFixed(2)}`;
+}
+
+function getMeasureHost() {
+  let host = document.getElementById('fitMeasureHost');
+  if (host) return host;
+
+  host = document.createElement('div');
+  host.id = 'fitMeasureHost';
+  host.setAttribute('aria-hidden', 'true');
+  host.style.position = 'absolute';
+  host.style.left = '-10000px';
+  host.style.top = '0';
+  host.style.width = 'var(--paper-width)';
+  host.style.pointerEvents = 'none';
+  host.style.visibility = 'hidden';
+  document.body.appendChild(host);
+  return host;
+}
+
+function sheetFits(sheet) {
+  const grid = sheet.querySelector('.problem-grid');
+  const items = Array.from(sheet.querySelectorAll('.problem-item'));
+  const sheetOverflow = sheet.scrollHeight > sheet.clientHeight + 1 || sheet.scrollWidth > sheet.clientWidth + 1;
+  const gridOverflow = grid && (grid.scrollHeight > grid.clientHeight + 1 || grid.scrollWidth > grid.clientWidth + 1);
+  const sheetRect = sheet.getBoundingClientRect();
+  const itemOverflow = items.some((item) => (
+    item.scrollHeight > item.clientHeight + 1 ||
+    item.scrollWidth > item.clientWidth + 1 ||
+    item.getBoundingClientRect().bottom > sheetRect.bottom + 1 ||
+    item.getBoundingClientRect().right > sheetRect.right + 1
+  ));
+
+  return (
+    !sheetOverflow &&
+    !gridOverflow &&
+    !itemOverflow &&
+    !hasWrappedHorizontalProblem(sheet) &&
+    !hasProblemContentOverflow(sheet)
+  );
+}
+
+function hasWrappedHorizontalProblem(sheet) {
+  return Array.from(sheet.querySelectorAll('.horiz-box')).some((box) => {
+    const rect = box.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+
+    const style = getComputedStyle(box);
+    const fontSize = parseFloat(style.fontSize) || 16;
+    const oneLineLimit = Math.max(fontSize * 1.45, fontSize + 10);
+    const widthOverflow = box.scrollWidth > box.clientWidth + 1;
+    return widthOverflow || rect.height > oneLineLimit;
+  });
+}
+
+function hasProblemContentOverflow(sheet) {
+  return Array.from(sheet.querySelectorAll('.problem-item')).some((item) => {
+    const itemRect = item.getBoundingClientRect();
+    const content = Array.from(item.children).filter((child) => !child.classList.contains('problem-num'));
+
+    return content.some((child) => {
+      const rect = child.getBoundingClientRect();
+      const scrollOverflow = child.scrollWidth > child.clientWidth + 1 || child.scrollHeight > child.clientHeight + 1;
+      const outsideItem = (
+        rect.left < itemRect.left - 1 ||
+        rect.right > itemRect.right + 1 ||
+        rect.top < itemRect.top - 1 ||
+        rect.bottom > itemRect.bottom + 1
+      );
+      return scrollOverflow || outsideItem;
+    });
+  });
+}
+
+function getColumnAttempts(item, count) {
+  if (item.kind !== 'html') return [null];
+
+  const config = getHtmlLayoutConfig(item);
+  if (!config) return [null];
+
+  const attempts = [null];
+  for (let maxCols = config.maxCols - 1; maxCols >= 1; maxCols--) {
+    if (count > maxCols * config.maxRows) continue;
+    attempts.push({ maxCols });
+  }
+  return attempts;
+}
+
+function createFittedSheet(item, desiredCount, fontScale, updateCache = false) {
+  const host = getMeasureHost();
+  host.style.setProperty('--font-scale', fontScale);
+  host.style.setProperty('--pdf-scale', fontScale);
+  const hardLimit = getWorksheetLimit(item);
+  const start = Math.min(hardLimit, Math.max(1, desiredCount || hardLimit));
+
+  for (let count = start; count >= 1; count--) {
+    for (const options of getColumnAttempts(item, count)) {
+      const sheet = createSheet(item, count, fontScale, options || {});
+      host.appendChild(sheet);
+      const fits = sheetFits(sheet);
+      if (fits) {
+        if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale), count);
+        return { sheet, count };
+      }
+      sheet.remove();
+    }
+  }
+
+  const fallback = createSheet(item, 1, fontScale);
+  host.appendChild(fallback);
+  if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale), 1);
+  return { sheet: fallback, count: 1 };
+}
+
+function getSafeWorksheetLimit(item, fontScale) {
+  const key = getFitCacheKey(item, fontScale);
+  if (fitCountCache.has(key)) return fitCountCache.get(key);
+
+  const hardLimit = getWorksheetLimit(item);
+  const { sheet, count } = createFittedSheet(item, hardLimit, fontScale, true);
+  sheet.remove();
+  return count;
+}
+
 function generate(mode) {
   const container = document.getElementById('sheets-container');
   const problemCountInput = document.getElementById('problemCount');
@@ -88,15 +219,10 @@ function generate(mode) {
   if (!item) return;
 
   const customCount = parseInt(problemCountInput.value, 10);
-  const maxCount = getWorksheetLimit(item);
-  const defaultCount = Math.min(item.count, maxCount);
-  const effectiveCount = (customCount > 0) ? Math.min(maxCount, customCount) : defaultCount;
-
-  if (customCount > maxCount) {
-    problemCountInput.value = effectiveCount;
-  }
-
-  const fontScale = document.getElementById('fontScale').value;
+  const fontScale = getCurrentFontScale();
+  const maxCount = getSafeWorksheetLimit(item, fontScale);
+  const hasCustomCount = customCount > 0;
+  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item), customCount) : maxCount;
   container.style.setProperty('--font-scale', fontScale);
   container.style.setProperty('--pdf-scale', fontScale);
 
@@ -104,8 +230,17 @@ function generate(mode) {
   container.classList.remove('answers-shown');
   answerShown = false;
 
+  let fittedCount = maxCount;
   for (let i = 0; i < pageCount; i++) {
-    container.appendChild(createSheet(item, effectiveCount, parseFloat(fontScale)));
+    const fitted = createFittedSheet(item, desiredCount, fontScale, !hasCustomCount || customCount > maxCount);
+    fittedCount = Math.min(fittedCount, fitted.count);
+    container.appendChild(fitted.sheet);
+  }
+
+  if (!customCount || customCount > fittedCount) {
+    problemCountInput.value = customCount > fittedCount ? fittedCount : '';
+    problemCountInput.dataset.max = fittedCount;
+    problemCountInput.placeholder = fittedCount;
   }
 }
 
@@ -139,6 +274,7 @@ document.getElementById('fontScale').addEventListener('change', () => {
   const scale = document.getElementById('fontScale').value;
   container.style.setProperty('--font-scale', scale);
   container.style.setProperty('--pdf-scale', scale);
+  updateSelectedMeta();
 });
 
 window.generate = generate;

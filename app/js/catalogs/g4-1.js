@@ -8,7 +8,7 @@
  *
  * 현재 구현 단원:
  *   1단원 큰 수
- *   3단원 곱셈과 나눗셈(7) — 세 자리 × 두 자리, 세 자리 ÷ 두 자리
+ *   3단원 곱셈과 나눗셈 — 세 자리 × 두 자리, 세 자리 ÷ 두 자리
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
@@ -34,7 +34,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '큰 수', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '곱셈과 나눗셈(7)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '곱셈과 나눗셈', [
   차시('1차시 세 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('세 자리 × 두 자리 (세로셈)', genU1PreMul3x2, { id: 'u3_main_mul_3d2d' }),
   ]),
@@ -52,7 +52,7 @@ export const meta = {
   name: '4학년 1학기',
   units: {
     u1: { short: '1단원', name: '큰 수' },
-    u3: { short: '3단원', name: '곱셈과 나눗셈(7)' },
+    u3: { short: '3단원', name: '곱셈과 나눗셈' },
   },
 };
 

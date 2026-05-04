@@ -7,9 +7,9 @@
  * 본단원 학습지는 세로셈(PDF) 형태가 표준 — 5-1 의 선수학습 매핑과 동일.
  *
  * 현재 구현 단원:
- *   1단원 덧셈과 뺄셈(6) — 세 자리 수 덧·뺄셈 (세로셈)
- *   3단원 나눗셈(3) — 두 자리 ÷ 한 자리
- *   4단원 곱셈(4) — 두 자리 × 한 자리 (세로셈)
+ *   1단원 덧셈과 뺄셈 — 세 자리 수 덧·뺄셈 (세로셈)
+ *   3단원 나눗셈 — 두 자리 ÷ 한 자리
+ *   4단원 곱셈 — 두 자리 × 한 자리 (세로셈)
  *   5단원 길이와 시간
  *   6단원 분수와 소수
  */
@@ -30,7 +30,7 @@ import {
 
 const GRADE_ID = 'g3-1';
 
-const u1 = defineUnit(GRADE_ID, 'u1', '덧셈과 뺄셈(6)', [
+const u1 = defineUnit(GRADE_ID, 'u1', '덧셈과 뺄셈', [
   차시('1차시 세 자리 수 덧셈 (세로셈)', { kind: 'pdf', grid: 'standard', count: 15 }, [
     학습지('세 자리 수 덧셈 (세로셈)', genU1PreAdd, { id: 'u1_main_add_3d' }),
   ]),
@@ -39,13 +39,13 @@ const u1 = defineUnit(GRADE_ID, 'u1', '덧셈과 뺄셈(6)', [
   ]),
 ]);
 
-const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈(3)', [
+const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈', [
   차시('1차시 한 자리 수로 나누는 나눗셈 (몫 한 자리)', { grid: 'dense', count: 36 }, [
     학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u3_main_div_one_digit' }),
   ]),
 ]);
 
-const u4 = defineUnit(GRADE_ID, 'u4', '곱셈(4)', [
+const u4 = defineUnit(GRADE_ID, 'u4', '곱셈', [
   차시('1차시 두 자리 × 한 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 15 }, [
     학습지('두 자리 × 한 자리 (세로셈)', genU1PreMul2d1d, { id: 'u4_main_mul_2d1d' }),
   ]),
@@ -76,9 +76,9 @@ export const meta = {
   short: '3-1',
   name: '3학년 1학기',
   units: {
-    u1: { short: '1단원', name: '덧셈과 뺄셈(6)' },
-    u3: { short: '3단원', name: '나눗셈(3)' },
-    u4: { short: '4단원', name: '곱셈(4)' },
+    u1: { short: '1단원', name: '덧셈과 뺄셈' },
+    u3: { short: '3단원', name: '나눗셈' },
+    u4: { short: '4단원', name: '곱셈' },
     u5: { short: '5단원', name: '길이와 시간' },
     u6: { short: '6단원', name: '분수와 소수' },
   },
