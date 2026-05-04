@@ -65,11 +65,19 @@ export function placeValueModelHtml({ thousands = 0, hundreds = 0, tens = 0, one
     `<span class="base-ten-one" aria-label="낱개 ${cubeIndex + 1}"></span>`
   ));
 
-  const groups = [
-    thousandBlocks ? `<span class="base-ten-group base-ten-thousands">${thousandBlocks}</span>` : '',
-    hundredBlocks ? `<span class="base-ten-group base-ten-hundreds">${hundredBlocks}</span>` : '',
-    rods ? `<span class="base-ten-group base-ten-rods">${rods}</span>` : '',
-    cubes ? `<span class="base-ten-group base-ten-ones">${cubes}</span>` : '',
+  const largeGroups = [
+    thousandBlocks ? `<span class="base-ten-group base-ten-thousands" data-count="${thousands}">${thousandBlocks}</span>` : '',
+    hundredBlocks ? `<span class="base-ten-group base-ten-hundreds" data-count="${hundreds}">${hundredBlocks}</span>` : '',
+  ].join('');
+
+  const smallGroups = [
+    rods ? `<span class="base-ten-group base-ten-rods" data-count="${tens}">${rods}</span>` : '',
+    cubes ? `<span class="base-ten-group base-ten-ones" data-count="${ones}">${cubes}</span>` : '',
+  ].join('');
+
+  const rows = [
+    largeGroups ? `<span class="base-ten-row base-ten-large-row">${largeGroups}</span>` : '',
+    smallGroups ? `<span class="base-ten-row base-ten-small-row">${smallGroups}</span>` : '',
   ].join('');
 
   const labelParts = [
@@ -79,7 +87,7 @@ export function placeValueModelHtml({ thousands = 0, hundreds = 0, tens = 0, one
     ones ? `낱개 ${ones}개` : '',
   ].filter(Boolean).join(', ');
 
-  return `<span class="base-ten-model place-value-model" aria-label="${escapeAttr(labelParts)}">${groups}</span>`;
+  return `<span class="base-ten-model place-value-model" aria-label="${escapeAttr(labelParts)}">${rows}</span>`;
 }
 
 export function baseTenModelHtml(tens, ones) {
