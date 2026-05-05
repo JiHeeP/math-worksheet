@@ -5,8 +5,6 @@
  */
 
 import { rand } from '../../utils.js';
-import { numBlank } from '../../helpers.js';
-import { horizProblem } from '../../templates.js';
 
 function dec(value) {
   return Number(value.toFixed(3)).toString();
@@ -16,14 +14,14 @@ export function genG61U3DecimalDivInt() {
   const divisor = rand(2, 9);
   const q = rand(2, 99);
   const dividend = (divisor * q) / 10;
-  return horizProblem(`${dec(dividend)} ÷ ${divisor}`, numBlank(dec(q / 10)));
+  return { dvsr: String(divisor), dvnd: dec(dividend), quot: dec(q / 10), workRows: 5 };
 }
 
 export function genG61U3DecimalDivIntHundredths() {
   const divisor = rand(2, 9);
   const q = rand(2, 99);
   const dividend = (divisor * q) / 100;
-  return horizProblem(`${dec(dividend)} ÷ ${divisor}`, numBlank(dec(q / 100)));
+  return { dvsr: String(divisor), dvnd: dec(dividend), quot: dec(q / 100), workRows: 5 };
 }
 
 export function genG61U3IntDivIntDecimal() {
@@ -31,7 +29,7 @@ export function genG61U3IntDivIntDecimal() {
     const divisor = [2, 4, 5, 8][rand(0, 3)];
     const dividend = rand(divisor + 1, 99);
     if (dividend % divisor !== 0) {
-      return horizProblem(`${dividend} ÷ ${divisor}`, numBlank(dec(dividend / divisor)));
+      return { dvsr: String(divisor), dvnd: String(dividend), quot: dec(dividend / divisor), workRows: 5 };
     }
   }
 }

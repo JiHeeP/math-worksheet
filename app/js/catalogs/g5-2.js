@@ -152,29 +152,35 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
 
 /* ── 4단원 소수의 곱셈 ── */
 
+const DECIMAL_MUL_GRID_LAYOUT = { grid: 'wide', count: 8 };
+
 const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   차시('1차시 (소수) × (자연수)', { grid: 'practice', count: 15 }, [
-    학습지('(소수) × (자연수)', genG52U4DecimalTimesInt, {
+    학습지('(소수) × (자연수)', T.decimalVertical, genG52U4DecimalTimesInt, {
       id: 'u4_main_decimal_times_int',
       prereqs: [unitRef('g4-2', 'u3')],
+      ...DECIMAL_MUL_GRID_LAYOUT,
     }),
   ]),
   차시('2차시 (자연수) × (소수)', { grid: 'practice', count: 15 }, [
-    학습지('(자연수) × (소수)', genG52U4IntTimesDecimal, {
+    학습지('(자연수) × (소수)', T.decimalVertical, genG52U4IntTimesDecimal, {
       id: 'u4_main_int_times_decimal',
       prereqs: [unitRef('g4-2', 'u3')],
+      ...DECIMAL_MUL_GRID_LAYOUT,
     }),
   ]),
   차시('3차시 (소수) × (소수)', { grid: 'practice', count: 15 }, [
-    학습지('(소수) × (소수)', genG52U4DecimalTimesDecimalTenths, {
+    학습지('(소수) × (소수)', T.decimalVertical, genG52U4DecimalTimesDecimalTenths, {
       id: 'u4_main_decimal_times_decimal',
       prereqs: [unitRef('g4-2', 'u3')],
+      ...DECIMAL_MUL_GRID_LAYOUT,
     }),
   ]),
   차시('4차시 소수에 10, 100 곱하기', { grid: 'standard', count: 20 }, [
-    학습지('소수 × 10, 100', genG52U4DecimalTimes10, {
+    학습지('소수 × 10, 100', T.decimalVertical, genG52U4DecimalTimes10, {
       id: 'u4_main_decimal_times_10_100',
       prereqs: [unitRef('g4-2', 'u3')],
+      ...DECIMAL_MUL_GRID_LAYOUT,
     }),
   ]),
 ]);

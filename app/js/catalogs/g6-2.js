@@ -12,9 +12,11 @@
  */
 
 import { defineUnit, 차시, 학습지, unitRef } from '../catalog.js';
+import { T } from '../templates.js';
 
 import {
   genG62U1FracDivFrac, genG62U1IntDivFrac, genG62U1MixedDivFrac,
+  genG62U1FracDivFracStep, genG62U1IntDivFracStep, genG62U1MixedDivFracStep,
 } from '../generators/g6-2/u1.js';
 
 import {
@@ -24,6 +26,8 @@ import {
 } from '../generators/g6-2/u3.js';
 
 const GRADE_ID = 'g6-2';
+const FRAC_DIV_STEP_LAYOUT = { grid: 'wide', count: 4 };
+const DECIMAL_DIV_GRID_LAYOUT = { grid: 'wide', count: 6, defaultFontScale: 1.2 };
 
 const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
   차시('1차시 (분수) ÷ (분수)', { grid: 'practice', count: 15 }, [
@@ -31,11 +35,21 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       id: 'u1_main_frac_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],
     }),
+    학습지('(진분수) ÷ (진분수) 계산 과정', T.fracDivStep, genG62U1FracDivFracStep, {
+      id: 'u1_main_frac_div_frac_step',
+      prereqs: [unitRef('g6-1', 'u1')],
+      ...FRAC_DIV_STEP_LAYOUT,
+    }),
   ]),
   차시('2차시 (자연수) ÷ (분수)', { grid: 'practice', count: 15 }, [
     학습지('(자연수) ÷ (진분수)', genG62U1IntDivFrac, {
       id: 'u1_main_int_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],
+    }),
+    학습지('(자연수) ÷ (진분수) 계산 과정', T.fracDivStep, genG62U1IntDivFracStep, {
+      id: 'u1_main_int_div_frac_step',
+      prereqs: [unitRef('g6-1', 'u1')],
+      ...FRAC_DIV_STEP_LAYOUT,
     }),
   ]),
   차시('3차시 (대분수) ÷ (분수)', { grid: 'practice', count: 15 }, [
@@ -43,24 +57,32 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       id: 'u1_main_mixed_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],
     }),
+    학습지('(대분수) ÷ (진분수) 계산 과정', T.fracDivStep, genG62U1MixedDivFracStep, {
+      id: 'u1_main_mixed_div_frac_step',
+      prereqs: [unitRef('g6-1', 'u1')],
+      ...FRAC_DIV_STEP_LAYOUT,
+    }),
   ]),
 ]);
 
 const u3 = defineUnit(GRADE_ID, 'u3', '소수의 나눗셈', [
   차시('1차시 (소수) ÷ (소수)', { grid: 'practice', count: 15 }, [
-    학습지('소수 한 자리 수로 나누기', genG62U3DecimalDivDecimalTenths, {
+    학습지('소수 한 자리 수로 나누기', T.decimalLongDiv, genG62U3DecimalDivDecimalTenths, {
       id: 'u3_main_decimal_div_decimal_tenths',
       prereqs: [unitRef('g6-1', 'u3')],
+      ...DECIMAL_DIV_GRID_LAYOUT,
     }),
-    학습지('소수 두 자리 수로 나누기', genG62U3DecimalDivDecimalHundredths, {
+    학습지('소수 두 자리 수로 나누기', T.decimalLongDiv, genG62U3DecimalDivDecimalHundredths, {
       id: 'u3_main_decimal_div_decimal_hundredths',
       prereqs: [unitRef('g6-1', 'u3')],
+      ...DECIMAL_DIV_GRID_LAYOUT,
     }),
   ]),
   차시('2차시 소수의 나눗셈 혼합', { grid: 'practice', count: 15 }, [
-    학습지('소수의 나눗셈 혼합', genG62U3DecimalDivMix, {
+    학습지('소수의 나눗셈 혼합', T.decimalLongDiv, genG62U3DecimalDivMix, {
       id: 'u3_main_decimal_div_mix',
       prereqs: [unitRef('g6-1', 'u3')],
+      ...DECIMAL_DIV_GRID_LAYOUT,
     }),
   ]),
 ]);

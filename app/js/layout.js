@@ -42,6 +42,23 @@ export const TWO_COLUMN_WORKSHEET_IDS = new Set([
 ]);
 
 export const ONE_COLUMN_WORKSHEET_IDS = new Set([
+  'u1_main_add_ge1',
+  'u1_main_one_minus_frac',
+  'u1_main_int_minus_frac',
+  'u1_main_mixed_add_carry',
+  'u1_main_int_minus_mixed',
+  'u1_main_mixed_sub_borrow',
+  'u5_main_add',
+  'u5_main_add_ge1',
+  'u5_main_mixed_add_improper',
+  'u5_main_mixed_add_separate',
+  'u5_main_mixed_add_carry_improper',
+  'u5_main_mixed_add_carry_separate',
+  'u5_main_sub',
+  'u5_main_mixed_sub_no_borrow_improper',
+  'u5_main_mixed_sub_no_borrow_separate',
+  'u5_main_mixed_sub_borrow_improper',
+  'u5_main_mixed_sub_borrow_separate',
   'u2_main_frac_times_int_step',
   'u2_main_mixed_times_int_step',
   'u2_main_int_times_frac_step',
@@ -49,6 +66,12 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
   'u2_main_unit_times_unit_step',
   'u2_main_frac_times_frac_step',
   'u2_main_mixed_times_mixed_step',
+  'u1_main_int_div_int_frac_step',
+  'u1_main_frac_div_int_step',
+  'u1_main_mixed_div_int_step',
+  'u1_main_frac_div_frac_step',
+  'u1_main_int_div_frac_step',
+  'u1_main_mixed_div_frac_step',
 ]);
 
 export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([

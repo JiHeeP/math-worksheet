@@ -73,6 +73,7 @@ function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : (items[0] && items[0].id);
   if (nextId) {
     worksheetSelect.value = nextId;
+    applyWorksheetDefaultFontScale(catalogMap[nextId]);
     updateSelectedMeta();
   }
 }
@@ -83,6 +84,17 @@ function currentGradeId() {
 
 function getCurrentFontScale() {
   return parseFloat(document.getElementById('fontScale').value) || 1;
+}
+
+function applyWorksheetDefaultFontScale(item) {
+  if (!item || !item.defaultFontScale) return;
+  const fontScaleSelect = document.getElementById('fontScale');
+  const nextValue = String(item.defaultFontScale);
+  if (fontScaleSelect.value === nextValue) return;
+  fontScaleSelect.value = nextValue;
+  const container = document.getElementById('sheets-container');
+  container.style.setProperty('--font-scale', nextValue);
+  container.style.setProperty('--pdf-scale', nextValue);
 }
 
 function getFitCacheKey(item, fontScale) {
@@ -148,7 +160,8 @@ function hasProblemContentOverflow(sheet) {
 
     return content.some((child) => {
       const rect = child.getBoundingClientRect();
-      const scrollOverflow = child.scrollWidth > child.clientWidth + 1 || child.scrollHeight > child.clientHeight + 1;
+      const isDecimalGrid = child.matches('.decimal-vertical-grid, .decimal-longdiv-grid');
+      const scrollOverflow = !isDecimalGrid && (child.scrollWidth > child.clientWidth + 1 || child.scrollHeight > child.clientHeight + 1);
       const outsideItem = (
         rect.left < itemRect.left - 1 ||
         rect.right > itemRect.right + 1 ||
@@ -263,6 +276,7 @@ document.getElementById('unitSelect').addEventListener('change', (event) => {
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {
+  applyWorksheetDefaultFontScale(catalogMap[document.getElementById('worksheetSelect').value]);
   updateSelectedMeta();
 });
 

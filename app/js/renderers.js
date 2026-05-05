@@ -41,9 +41,107 @@ export function renderItem(problem, idx) {
     </div>`;
   }
 
+  if (problem.kind === 'decimalVertical') {
+    return renderDecimalVertical(problem, idx);
+  }
+
+  if (problem.kind === 'decimalLongDiv') {
+    return renderDecimalLongDiv(problem, idx);
+  }
+
   const layoutClass = problem.layout || 'horiz-box';
   const itemClass = problem.itemClass ? ` ${problem.itemClass}` : '';
   return `<div class="problem-item${itemClass}">${num}<div class="${layoutClass}">${problem.html}</div></div>`;
+}
+
+function decimalParts(value) {
+  const text = String(value);
+  const pointIndex = text.indexOf('.');
+  const digits = text.replace('.', '').split('');
+  return {
+    digits,
+    decimalAfter: pointIndex === -1 ? null : text.slice(0, pointIndex).length,
+  };
+}
+
+function decimalStartCol(parts, cols) {
+  return cols - parts.digits.length + 1;
+}
+
+function decimalDigitNode(digit, col, row, isAnswer = false, colOffset = 1) {
+  const safeDigit = escapeAttr(digit);
+  const answerAttr = isAnswer ? ` data-ans="${safeDigit}"` : '';
+  const answerClass = isAnswer ? ' decimal-answer-digit' : '';
+  return `<span class="decimal-grid-digit${answerClass}" style="--grid-col:${col + colOffset};--row:${row};"${answerAttr}>${safeDigit}</span>`;
+}
+
+function decimalDigitNodes(parts, startCol, row, isAnswer = false, colOffset = 1) {
+  return parts.digits
+    .map((digit, i) => decimalDigitNode(digit, startCol + i, row, isAnswer, colOffset))
+    .join('');
+}
+
+function decimalPointNode(parts, startCol, row, isAnswer = false, lineOffset = 2) {
+  if (parts.decimalAfter === null) return '';
+  const line = (startCol - 1) + parts.decimalAfter;
+  const answerClass = isAnswer ? ' decimal-answer-point' : '';
+  return `<span class="decimal-point-on-line${answerClass}" style="--grid-line:${line + lineOffset};--row:${row};"></span>`;
+}
+
+function renderDecimalVertical(problem, idx) {
+  const num1 = decimalParts(problem.num1);
+  const num2 = decimalParts(problem.num2);
+  const ans = decimalParts(problem.ans);
+  const workRows = problem.workRows ?? 2;
+  const cols = Math.max(num1.digits.length, num2.digits.length, ans.digits.length, 4);
+  const rows = workRows + 3;
+  const topStart = decimalStartCol(num1, cols);
+  const bottomStart = decimalStartCol(num2, cols);
+  const answerStart = decimalStartCol(ans, cols);
+
+  const body = [
+    '<div class="decimal-grid-surface"></div>',
+    `<span class="decimal-grid-op" style="--row:2;">${problem.op}</span>`,
+    decimalDigitNodes(num1, topStart, 1),
+    decimalPointNode(num1, topStart, 1),
+    decimalDigitNodes(num2, bottomStart, 2),
+    decimalPointNode(num2, bottomStart, 2),
+    decimalDigitNodes(ans, answerStart, rows, true),
+    decimalPointNode(ans, answerStart, rows, true),
+  ].join('');
+
+  return `<div class="problem-item decimal-grid-item"><div class="problem-num">${idx}</div><div class="decimal-vertical-grid" style="--cols:${cols};--rows:${rows};">${body}</div></div>`;
+}
+
+function renderDecimalLongDiv(problem, idx) {
+  const dvsr = problem.workDvsr ?? problem.dvsr;
+  const dvnd = problem.workDvnd ?? problem.dvnd;
+  const quot = problem.quot ?? problem.ans;
+  const divisor = decimalParts(dvsr);
+  const dividend = decimalParts(dvnd);
+  const quotient = decimalParts(quot);
+  const divisorCols = Math.max(divisor.digits.length, 1);
+  const workCols = Math.max(dividend.digits.length, quotient.digits.length, 4);
+  const workRows = problem.workRows ?? 5;
+  const rows = workRows + 2;
+  const divisorStart = decimalStartCol(divisor, divisorCols);
+  const dividendStart = divisorCols + 1;
+  const quotientStart = divisorCols + 1;
+  const totalCols = divisorCols + workCols;
+
+  const html = [
+    '<div class="decimal-longdiv-surface"></div>',
+    `<span class="decimal-longdiv-top-line" style="--start-line:${divisorCols + 1};"></span>`,
+    `<span class="decimal-longdiv-side-line" style="--side-line:${divisorCols + 1};"></span>`,
+    decimalDigitNodes(quotient, quotientStart, 1, true, 0),
+    decimalPointNode(quotient, quotientStart, 1, true, 1),
+    decimalDigitNodes(divisor, divisorStart, 2, false, 0),
+    decimalPointNode(divisor, divisorStart, 2, false, 1),
+    decimalDigitNodes(dividend, dividendStart, 2, false, 0),
+    decimalPointNode(dividend, dividendStart, 2, false, 1),
+  ].join('');
+
+  return `<div class="problem-item decimal-grid-item"><div class="problem-num">${idx}</div><div class="decimal-longdiv-grid" style="--divisor-cols:${divisorCols};--work-cols:${workCols};--start-line:${divisorCols + 1};--cols:${totalCols};--rows:${rows};">${html}</div></div>`;
 }
 
 /* ── PDF 격자 렌더링 ── */

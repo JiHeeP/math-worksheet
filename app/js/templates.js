@@ -87,11 +87,10 @@ function fracStepProblem(stepsHtml, itemClass = '') {
 }
 
 function fracStepProblemMultiLine({ line1, line2, line3 }, itemClass = '') {
+  const stepsHtml = [line1, line2, line3].filter(Boolean).join(' ');
   return htmlProblem('concept-layout', `
-    <div class="concept-card frac-multi-line">
-      <div class="concept-answer frac-step-flow">${line1}</div>
-      <div class="concept-answer frac-step-flow">${line2}</div>
-      <div class="concept-answer frac-step-flow">${line3}</div>
+    <div class="concept-card">
+      <div class="concept-answer frac-step-flow">${stepsHtml}</div>
     </div>
   `, itemClass);
 }
@@ -131,6 +130,28 @@ function fracMulProductHtml(left, right) {
   return fracD(`${numBlank(left.n)} \u00d7 ${numBlank(right.n)}`, `${numBlank(left.d)} \u00d7 ${numBlank(right.d)}`);
 }
 
+function fracDivReciprocal(term) {
+  if (term.kind === 'int') return { n: 1, d: term.value };
+  if (term.kind === 'mixed') {
+    const imp = (term.w * term.d) + term.n;
+    return { n: term.d, d: imp };
+  }
+  return { n: term.d, d: term.n };
+}
+
+function fracDivConvertedHtml(term, improper) {
+  if (term.kind === 'int') return fracBlank(term.value, 1);
+  if (term.kind === 'mixed') return fracBlank(improper.n, improper.d);
+  return fracMulOperandHtml(term);
+}
+
+function fracDivReciprocalHtml(term, reciprocal) {
+  if (term.kind === 'int' || term.kind === 'frac' || term.kind === 'mixed') {
+    return fracBlank(reciprocal.n, reciprocal.d);
+  }
+  return fracD(reciprocal.n, reciprocal.d);
+}
+
 /** 분수의 곱셈 과정: 대분수는 가분수로 바꾸고, 분자끼리/분모끼리 곱함 */
 function inlineFracMulStep(leftTerm, rightTerm) {
   const left = fracMulImproper(leftTerm);
@@ -146,6 +167,22 @@ function inlineFracMulStep(leftTerm, rightTerm) {
   const line3 = hasMixed
     ? `<span class="eq-txt">=</span> ${fracMulProductHtml(left, right)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`
     : `<span class="eq-txt">=</span> ${fracBlank(resultNum, resultDen)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`;
+
+  return { line1, line2, line3 };
+}
+
+/** 분수의 나눗셈 과정: 나누는 수의 역수를 곱함 */
+function inlineFracDivStep(leftTerm, rightTerm) {
+  const left = fracMulImproper(leftTerm);
+  const reciprocal = fracDivReciprocal(rightTerm);
+  const needsConversion = leftTerm.kind !== 'frac' || rightTerm.kind !== 'frac';
+  const resultNum = left.n * reciprocal.n;
+  const resultDen = left.d * reciprocal.d;
+
+  const line1 = `${fracMulOperandHtml(leftTerm)} <span class="op-txt">÷</span> ${fracMulOperandHtml(rightTerm)}`;
+  const convertedLeft = needsConversion ? fracDivConvertedHtml(leftTerm, left) : fracMulOperandHtml(leftTerm);
+  const line2 = `<span class="eq-txt">=</span> ${convertedLeft} <span class="op-txt">×</span> ${fracDivReciprocalHtml(rightTerm, reciprocal)}`;
+  const line3 = `<span class="eq-txt">=</span> ${fracMulProductHtml(left, reciprocal)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`;
 
   return { line1, line2, line3 };
 }
@@ -196,7 +233,7 @@ function inlineMixedAddImproper(w1, n1, d1, w2, n2, d2) {
   return s;
 }
 
-/** 대분수 덧셈 - 자연수/분수 따로 (3줄) */
+/** 대분수 덧셈 - 자연수/분수 따로 */
 function inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2) {
   const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
@@ -241,7 +278,7 @@ function inlineMixedSubImproper(w1, n1, d1, w2, n2, d2) {
   return s;
 }
 
-/** 대분수 뺄셈 - 자연수/분수 따로 (3줄) */
+/** 대분수 뺄셈 - 자연수/분수 따로 */
 function inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2) {
   const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
@@ -331,7 +368,7 @@ function inlineIntMinusMixed(w, wm, n, d) {
   return s;
 }
 
-/** 분모 같은 (대분수)+(대분수), 받아올림 있음 — 자연수·분수 따로 (3줄) */
+/** 분모 같은 (대분수)+(대분수), 받아올림 있음 — 자연수·분수 따로 */
 function inlineSameMixedAddCarry(w1, n1, w2, n2, d) {
   const fracSum = n1 + n2;
   const wholeSum = w1 + w2;
@@ -350,7 +387,7 @@ function inlineSameMixedAddCarry(w1, n1, w2, n2, d) {
   return { line1, line2, line3 };
 }
 
-/** 분모 같은 (대분수)−(대분수), 받아내림 있음 — 자연수·분수 따로 (3줄) */
+/** 분모 같은 (대분수)−(대분수), 받아내림 있음 — 자연수·분수 따로 */
 function inlineSameMixedSubBorrow(w1, n1, w2, n2, d) {
   const borrowedN1 = n1 + d;
   const fracDiff = borrowedN1 - n2;
@@ -457,6 +494,18 @@ export const T = {
     render: (data) => ({ kind: 'longdiv', dvsr: data.dvsr, dvnd: data.dvnd, quot: data.quot, rem: data.rem }),
   },
 
+  /** 소수 곱셈 세로셈 격자 */
+  decimalVertical: {
+    grid: 'wide', count: 8,
+    render: (data) => ({ kind: 'decimalVertical', ...data }),
+  },
+
+  /** 소수 나눗셈 세로셈 격자 */
+  decimalLongDiv: {
+    grid: 'wide', count: 6,
+    render: (data) => ({ kind: 'decimalLongDiv', ...data }),
+  },
+
   /** 개념 카드 (질문 + 답) */
   concept: {
     grid: 'concept', count: 10,
@@ -508,7 +557,7 @@ export const T = {
     },
   },
 
-  /** 대분수 연산 - 자연수/분수 따로 (3줄) */
+  /** 대분수 연산 - 자연수/분수 따로 */
   mixedSeparateStep: {
     grid: 'wide', count: 8,
     render: ({ w1, n1, d1, w2, n2, d2, op }) => {
@@ -543,13 +592,13 @@ export const T = {
     render: ({ w, wm, n, d }) => fracStepProblem(inlineIntMinusMixed(w, wm, n, d)),
   },
 
-  /** 분모 같은 (대분수)+(대분수), 받아올림 — 자연수·분수 따로 (3줄) */
+  /** 분모 같은 (대분수)+(대분수), 받아올림 — 자연수·분수 따로 */
   sameMixedAddCarryStep: {
     grid: 'wide', count: 8,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedAddCarry(w1, n1, w2, n2, d)),
   },
 
-  /** 분모 같은 (대분수)−(대분수), 받아내임 — 자연수·분수 따로 (3줄) */
+  /** 분모 같은 (대분수)−(대분수), 받아내임 — 자연수·분수 따로 */
   sameMixedSubBorrowStep: {
     grid: 'wide', count: 8,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedSubBorrow(w1, n1, w2, n2, d)),
@@ -559,6 +608,12 @@ export const T = {
   fracMulStep: {
     grid: 'wide', count: 8,
     render: ({ left, right }) => fracStepProblemMultiLine(inlineFracMulStep(left, right), 'frac-mul-step'),
+  },
+
+  /** 분수의 나눗셈 — 계산 과정 */
+  fracDivStep: {
+    grid: 'wide', count: 4,
+    render: ({ left, right }) => fracStepProblemMultiLine(inlineFracDivStep(left, right), 'frac-mul-step frac-div-step'),
   },
 
   /** (한 자리)+(한 자리), 받아올림 — 가르기 풀이 (한 줄) */

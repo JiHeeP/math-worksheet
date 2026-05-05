@@ -32,3 +32,33 @@ export function genG61U1IntDivIntAsFrac() {
   const b = rand(a + 1, 12);
   return htmlProblem('frac-row', `${a} ${OP_DIV} ${b} ${EQ} ${formulaResultHtml(a, b)}`);
 }
+
+/* ── 본단원: 템플릿용 순수 데이터 제너레이터 ── */
+
+function properFracTerm(maxDen = 12) {
+  const d = rand(3, maxDen);
+  return { kind: 'frac', n: rand(1, d - 1), d };
+}
+
+function mixedTerm(maxDen = 9) {
+  const d = rand(3, maxDen);
+  return { kind: 'mixed', w: rand(1, 3), n: rand(1, d - 1), d };
+}
+
+function intTerm(min = 2, max = 9) {
+  return { kind: 'int', value: rand(min, max) };
+}
+
+export function genG61U1IntDivIntAsFracStep() {
+  const left = intTerm(2, 9);
+  const right = intTerm(left.value + 1, 12);
+  return { left, right };
+}
+
+export function genG61U1FracDivIntStep() {
+  return { left: properFracTerm(), right: intTerm(2, 5) };
+}
+
+export function genG61U1MixedDivIntStep() {
+  return { left: mixedTerm(), right: intTerm(2, 5) };
+}

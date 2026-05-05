@@ -125,6 +125,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const prereqs = overrides.prereqs || null;
       // 출처 학기: 명시되면 그 값, 아니면 본단원=현재학기 / 선수학습=null(현재학기 표시)
       const from = overrides.from || (defaults && defaults.from) || null;
+      const defaultFontScale = overrides.defaultFontScale || defaults.defaultFontScale || templateDefaults.defaultFontScale || null;
 
       entries.push({
         id,
@@ -139,6 +140,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         generator: boundGenerator,
         prereqs,
         from,
+        defaultFontScale,
       });
     }
   }
