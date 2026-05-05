@@ -1,4 +1,5 @@
 ---
+name: new-worksheet
 description: 기존 학기·단원에 학습지 1개 추가. generator 함수 작성 + catalog 등록 + 회귀 테스트까지 일괄.
 ---
 
@@ -30,7 +31,7 @@ description: 기존 학기·단원에 학습지 1개 추가. generator 함수 �
 - ❌ 소수/분수 결과 안 나오나? (정수 나눗셈은 `q × d` 형태로 강제)
 - ❌ 중간 계산이 음수 안 되나?
 
-분수 계산이면 do-while 로 결과 양수 강제. CLAUDE.md "수학 결과 무결성" 절 참고.
+분수 계산이면 do-while 로 결과 양수 강제. AGENTS.md "수학 결과 무결성" 절 참고.
 
 #### Generator 형태별
 
@@ -91,5 +92,6 @@ node .claude/scripts/validate.mjs 1000
 ## 자주 헷갈리는 점
 
 - **학습지 ID 는 학기 prefix 자동 부착**: `id: 'u3_main_add'` 만 쓰면 `g{학기}_u3_main_add` 가 됨
-- **선수학습 from 매핑 기준**: 2022 개정 교육과정. 추측하지 말고 [CURRICULUM.md](../../CURRICULUM.md) 의 학기별 단원 목록 확인
+- **선수학습 from 매핑 기준**: 2022 개정 교육과정. 추측하지 말고 [CURRICULUM.md](../../../CURRICULUM.md) 의 학기별 단원 목록 확인
 - **prereqs 의 sheetRef vs unitRef**: 같은 학기 안의 다른 학습지/단원은 각각 sheetRef/unitRef. 다른 학기는 `unitRef('gX-Y', 'uN')` 로 두 인자.
+

@@ -1,5 +1,6 @@
 ---
-description: 카탈로그 정합성 종합 점검 — 깨진 prereq refs, ext→unitRef 승격 후보, 단원 라벨 중복, 선수학습 갭. .claude/scripts/audit.mjs + validate.mjs 실행.
+name: audit-catalog
+description: 카탈로그 정합성 종합 점검. 깨진 prereq refs, ext→unitRef 승격 후보, 단원 라벨 중복, 선수학습 갭을 audit.mjs와 validate.mjs로 확인한다.
 ---
 
 # /audit-catalog — 카탈로그 정합성 종합 점검
@@ -37,7 +38,7 @@ node .claude/scripts/validate.mjs 5000
 | ext 승격 후보 | N | 추후 정리 (기능엔 영향 없음) |
 | 라벨 중복 | N | 학습지 ID 또는 라벨 정정 |
 | 선수학습 미등록 | N | 정보용 (의도적일 수 있음) |
-| 자연수 위반 | N | **반드시 수정** (CLAUDE.md 규칙) |
+| 자연수 위반 | N | **반드시 수정** (AGENTS.md 규칙) |
 
 ### 4. 자동 수정 제안
 
@@ -55,3 +56,4 @@ ext → unitRef 승격 후보가 있으면 사용자에게 "지금 일괄 승격
 → "1건 깨진 refs 발견: g5-1_u4_main_dec_cmp 의 [3-1] 분수와 소수 (미구현). 학기 추가 또는 ext 라벨 갱신 필요."
 → "ext 승격 후보 3건. 지금 일괄 승격할까요?"
 ```
+

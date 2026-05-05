@@ -1,5 +1,6 @@
 ---
-description: 새 학년·학기 카탈로그 + generators 폴더 스캐폴드 생성. 사용자가 학기 ID(예 "g6-1") 와 단원 목록을 알려주면 자동으로 파일 만들고 catalog.js GRADES 배열에 등록.
+name: new-grade
+description: 새 학년·학기 카탈로그 + generators 폴더 스캐폴드 생성. 사용자가 학기 ID와 단원 목록을 알려주면 파일을 만들고 catalog.js GRADES 배열에 등록한다.
 ---
 
 # /new-grade — 새 학기 추가
@@ -11,7 +12,7 @@ description: 새 학년·학기 카탈로그 + generators 폴더 스캐폴드 �
 ## 절차
 
 ### 1. CURRICULUM.md 확인
-[CURRICULUM.md](../../CURRICULUM.md) 의 "학기별 단원 정렬" 섹션에서 해당 학기 단원 목록 확인. 사용자에게 어떤 단원부터 만들지 묻기.
+[CURRICULUM.md](../../../CURRICULUM.md) 의 "학기별 단원 정렬" 섹션에서 해당 학기 단원 목록 확인. 사용자에게 어떤 단원부터 만들지 묻기.
 
 ### 2. 폴더 생성
 ```bash
@@ -68,9 +69,9 @@ const GRADES = [..., g{학기_underscore}, ...];  // 순서 유지
 
 각 단원에 대해:
 - `app/js/generators/g{학기}/u{단원번호}.js` 작성
-- 자연수 결과 무결성 보장 (음수/0/소수 X) — CLAUDE.md "수학 결과 무결성" 절 참고
+- 자연수 결과 무결성 보장 (음수/0/소수 X) — AGENTS.md "수학 결과 무결성" 절 참고
 - 카탈로그 파일에 import 추가 + `defineUnit` 블록 작성
-- 받아올림/내림 같은 단계 풀이가 필요하면 [CLAUDE.md](../../CLAUDE.md) "분수 계산 단계 풀이" 표 참고하여 적절한 T 템플릿 사용
+- 받아올림/내림 같은 단계 풀이가 필요하면 AGENTS.md "분수 계산 단계 풀이" 표를 참고하여 적절한 T 템플릿 사용
 
 ### 6. 검증
 
@@ -87,5 +88,6 @@ node .claude/scripts/validate.mjs 1000
 ## 자주 발생하는 실수
 - ❌ catalog.js 의 GRADES 배열에 새 학기를 빼먹음 → 드롭다운에 안 나타남
 - ❌ generator 가 horizProblem 사용했는데 catalog 에서 `kind: 'pdf'` 지정 → 두 개 충돌
-- ❌ 분수 계산에서 do-while 없이 음수 결과 가능 → CLAUDE.md 무결성 규칙 어김
+- ❌ 분수 계산에서 do-while 없이 음수 결과 가능 → AGENTS.md 무결성 규칙 어김
 - ❌ unit ID 충돌은 학기 prefix 가 자동 부착되므로 학기 안에서만 유일하면 됨
+
