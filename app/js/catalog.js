@@ -149,6 +149,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const defaultFontScale = overrides.defaultFontScale || defaults.defaultFontScale || templateDefaults.defaultFontScale || null;
       const diagnosticFrom = overrides.diagnosticFrom || defaults.diagnosticFrom || null;
       const sourceIds = overrides.sourceIds || defaults.sourceIds || null;
+      const controls = overrides.controls || defaults.controls || null;
 
       entries.push({
         id,
@@ -166,6 +167,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         defaultFontScale,
         diagnosticFrom,
         sourceIds,
+        controls,
       });
     }
   }

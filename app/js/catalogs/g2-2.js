@@ -63,12 +63,12 @@ const u2 = defineUnit(GRADE_ID, 'u2', '곱셈구구', [
     학습지('9단', makeGugudanGen(9), { id: 'u2_main_gugudan_9' }),
   ]),
   차시('1~8차시 곱셈구구 혼합', { grid: 'dense', count: 36 }, [
-    학습지('곱셈구구 (기본)', genG22U2GugudanMix, { id: 'u2_main_gugudan_basic' }),
-    학습지('곱셈구구 (2~9단 혼합)', genG22U2GugudanMix, { id: 'u2_main_gugudan_mix' }),
+    학습지('곱셈구구 (기본)', genG22U2GugudanMix, { id: 'u2_main_gugudan_basic', controls: { gugudanDan: true } }),
+    학습지('곱셈구구 (2~9단 혼합)', genG22U2GugudanMix, { id: 'u2_main_gugudan_mix', controls: { gugudanDan: true } }),
   ]),
   차시('9차시 곱셈구구 빈칸형', { grid: 'standard', count: 20 }, [
-    학습지('곱셈구구 (빈칸)', genG22U2GugudanBlank, { id: 'u2_main_gugudan_blank_original' }),
-    학습지('곱셈구구 (빈칸형)', genG22U2GugudanBlank, { id: 'u2_main_gugudan_blank' }),
+    학습지('곱셈구구 (빈칸)', genG22U2GugudanBlank, { id: 'u2_main_gugudan_blank_original', controls: { gugudanDan: true } }),
+    학습지('곱셈구구 (빈칸형)', genG22U2GugudanBlank, { id: 'u2_main_gugudan_blank', controls: { gugudanDan: true } }),
   ]),
 ]);
 

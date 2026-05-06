@@ -154,7 +154,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
 const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   진단지({ id: 'u2_pre_diagnostic' }),
   선수학습({ grid: 'dense', count: 36 }, [
-    학습지('곱셈구구', genU2PreMul, { id: 'u2_pre_mul', from: 'g2-2' }),
+    학습지('곱셈구구', genU2PreMul, { id: 'u2_pre_mul', from: 'g2-2', controls: { gugudanDan: true } }),
     학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u2_pre_div', from: 'g3-1' }),
   ]),
   차시('1차시 약수 이해하기', [

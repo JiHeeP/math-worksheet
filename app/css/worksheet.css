@@ -104,6 +104,50 @@ button:active { transform: scale(0.98); }
 .btn-answer { background: #6f58c9; color: white; }
 .btn-print { background: #2d8ae2; color: white; }
 
+.dan-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 10px;
+  border: 1px solid #d5dbea;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.dan-control[hidden] { display: none; }
+
+.dan-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #45546d;
+  white-space: nowrap;
+}
+
+.dan-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dan-button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #c8d1e3;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #263242;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dan-button.is-active {
+  border-color: #2d8ae2;
+  background: #2d8ae2;
+  color: #ffffff;
+}
+
 .sheet {
   width: var(--paper-width);
   height: var(--paper-height);

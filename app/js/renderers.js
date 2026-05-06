@@ -368,8 +368,9 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
   grid.className = `problem-grid ${item.grid}`;
   applyGridLayout(grid, layout);
 
+  const generatorContext = options.generatorContext || {};
   for (let i = 1; i <= count; i++) {
-    const problem = generateWithUnique(item.generator);
+    const problem = generateWithUnique(() => item.generator(generatorContext));
     grid.insertAdjacentHTML('beforeend', renderItem(problem, i));
   }
 

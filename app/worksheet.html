@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>초등 수학 연습지 만들기</title>
-  <link rel="stylesheet" href="css/worksheet.css?v=20260506-diagnostic">
+  <link rel="stylesheet" href="css/worksheet.css?v=20260507-gugudan-dan">
 </head>
 <body>
 
@@ -64,6 +64,20 @@
     정답 보기
   </button>
 
+  <div class="dan-control" id="gugudanDanControl" hidden aria-label="곱셈구구 단 선택">
+    <span class="dan-label">단</span>
+    <div class="dan-buttons">
+      <button type="button" class="dan-button" data-dan="2" aria-pressed="true">2</button>
+      <button type="button" class="dan-button" data-dan="3" aria-pressed="false">3</button>
+      <button type="button" class="dan-button" data-dan="4" aria-pressed="false">4</button>
+      <button type="button" class="dan-button" data-dan="5" aria-pressed="false">5</button>
+      <button type="button" class="dan-button" data-dan="6" aria-pressed="false">6</button>
+      <button type="button" class="dan-button" data-dan="7" aria-pressed="false">7</button>
+      <button type="button" class="dan-button" data-dan="8" aria-pressed="false">8</button>
+      <button type="button" class="dan-button" data-dan="9" aria-pressed="false">9</button>
+    </div>
+  </div>
+
   <button class="btn-print" onclick="window.print()">
     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2M7 9h10V4H7v5zm10 8H7v5h10v-5z"/></svg>
     인쇄
@@ -73,6 +87,6 @@
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20260506-diagnostic"></script>
+<script type="module" src="js/app.js?v=20260507-gugudan-dan"></script>
 </body>
 </html>

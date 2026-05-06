@@ -4,8 +4,13 @@ import { rand, randChoice, gcd, lcm, factorsOf, multiplesOf } from '../../utils.
 import { numBlank, multiBlank } from '../../helpers.js';
 import { horizProblem, conceptProblem } from '../../templates.js';
 
-export function genU2PreMul() {
-  const a = rand(2, 9), b = rand(1, 9);
+function resolveGugudanDan(context = {}) {
+  const dan = Number(context.gugudanDan);
+  return dan >= 2 && dan <= 9 ? dan : rand(2, 9);
+}
+
+export function genU2PreMul(context = {}) {
+  const a = resolveGugudanDan(context), b = rand(1, 9);
   return horizProblem(`${a} \u00d7 ${b}`, numBlank(a * b));
 }
 

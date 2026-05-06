@@ -8,6 +8,7 @@ import { createDiagnosticSheets, createSheet, getWorksheetLimit } from './render
 import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
+let selectedGugudanDan = 2;
 const fitCountCache = new Map();
 
 function populateGradeSelect() {
@@ -41,12 +42,34 @@ function updateSelectedMeta() {
   if (!item) return;
   const countInput = document.getElementById('problemCount');
   const fontScale = getCurrentFontScale();
-  const limit = getSafeWorksheetLimit(item, fontScale);
+  const generatorContext = getCurrentGeneratorContext(item);
+  const limit = getSafeWorksheetLimit(item, fontScale, generatorContext);
   countInput.placeholder = limit;
   countInput.dataset.max = limit;
   if (countInput.value) {
     countInput.value = Math.min(parseInt(countInput.value, 10) || limit, limit);
   }
+}
+
+function isGugudanDanControlled(item) {
+  return Boolean(item && item.controls && item.controls.gugudanDan);
+}
+
+function getCurrentGeneratorContext(item) {
+  return isGugudanDanControlled(item) ? { gugudanDan: selectedGugudanDan } : {};
+}
+
+function updateGugudanDanControl(item) {
+  const control = document.getElementById('gugudanDanControl');
+  if (!control) return;
+
+  const enabled = isGugudanDanControlled(item);
+  control.hidden = !enabled;
+  control.querySelectorAll('.dan-button').forEach((button) => {
+    const active = Number(button.dataset.dan) === selectedGugudanDan;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 
 function sanitizeProblemCountInput() {
@@ -72,8 +95,10 @@ function populateWorksheetSelect(gradeId, unitId, preferredId) {
 
   const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : (items[0] && items[0].id);
   if (nextId) {
+    const item = catalogMap[nextId];
     worksheetSelect.value = nextId;
-    applyWorksheetDefaultFontScale(catalogMap[nextId]);
+    applyWorksheetDefaultFontScale(item);
+    updateGugudanDanControl(item);
     updateSelectedMeta();
   }
 }
@@ -97,8 +122,11 @@ function applyWorksheetDefaultFontScale(item) {
   container.style.setProperty('--pdf-scale', nextValue);
 }
 
-function getFitCacheKey(item, fontScale) {
-  return `${item.id}@${fontScale.toFixed(2)}`;
+function getFitCacheKey(item, fontScale, generatorContext = {}) {
+  const contextKey = isGugudanDanControlled(item)
+    ? `@dan-${generatorContext.gugudanDan || selectedGugudanDan}`
+    : '';
+  return `${item.id}@${fontScale.toFixed(2)}${contextKey}`;
 }
 
 function getMeasureHost() {
@@ -147,7 +175,11 @@ function hasWrappedHorizontalProblem(sheet) {
 
     const style = getComputedStyle(box);
     const fontSize = parseFloat(style.fontSize) || 16;
-    const oneLineLimit = Math.max(fontSize * 1.45, fontSize + 10);
+    const childHeights = Array.from(box.children)
+      .map((child) => child.getBoundingClientRect().height)
+      .filter(Boolean);
+    const tallestChild = Math.max(0, ...childHeights);
+    const oneLineLimit = Math.max(fontSize * 1.55, fontSize + 12, tallestChild + 3);
     const widthOverflow = box.scrollWidth > box.clientWidth + 1;
     return widthOverflow || rect.height > oneLineLimit;
   });
@@ -187,7 +219,7 @@ function getColumnAttempts(item, count) {
   return attempts;
 }
 
-function createFittedSheet(item, desiredCount, fontScale, updateCache = false) {
+function createFittedSheet(item, desiredCount, fontScale, updateCache = false, generatorContext = {}) {
   const host = getMeasureHost();
   host.style.setProperty('--font-scale', fontScale);
   host.style.setProperty('--pdf-scale', fontScale);
@@ -196,31 +228,34 @@ function createFittedSheet(item, desiredCount, fontScale, updateCache = false) {
 
   for (let count = start; count >= 1; count--) {
     for (const options of getColumnAttempts(item, count)) {
-      const sheet = createSheet(item, count, fontScale, options || {});
+      const sheet = createSheet(item, count, fontScale, {
+        ...(options || {}),
+        generatorContext,
+      });
       host.appendChild(sheet);
       const fits = sheetFits(sheet);
       if (fits) {
-        if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale), count);
+        if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale, generatorContext), count);
         return { sheet, count };
       }
       sheet.remove();
     }
   }
 
-  const fallback = createSheet(item, 1, fontScale);
+  const fallback = createSheet(item, 1, fontScale, { generatorContext });
   host.appendChild(fallback);
-  if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale), 1);
+  if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale, generatorContext), 1);
   return { sheet: fallback, count: 1 };
 }
 
-function getSafeWorksheetLimit(item, fontScale) {
+function getSafeWorksheetLimit(item, fontScale, generatorContext = {}) {
   if (item.kind === 'diagnostic') return getWorksheetLimit(item);
 
-  const key = getFitCacheKey(item, fontScale);
+  const key = getFitCacheKey(item, fontScale, generatorContext);
   if (fitCountCache.has(key)) return fitCountCache.get(key);
 
   const hardLimit = getWorksheetLimit(item);
-  const { sheet, count } = createFittedSheet(item, hardLimit, fontScale, true);
+  const { sheet, count } = createFittedSheet(item, hardLimit, fontScale, true, generatorContext);
   sheet.remove();
   return count;
 }
@@ -235,6 +270,7 @@ function generate(mode) {
 
   const customCount = parseInt(problemCountInput.value, 10);
   const fontScale = getCurrentFontScale();
+  const generatorContext = getCurrentGeneratorContext(item);
   container.style.setProperty('--font-scale', fontScale);
   container.style.setProperty('--pdf-scale', fontScale);
 
@@ -253,12 +289,18 @@ function generate(mode) {
     return;
   }
 
-  const maxCount = getSafeWorksheetLimit(item, fontScale);
+  const maxCount = getSafeWorksheetLimit(item, fontScale, generatorContext);
   const hasCustomCount = customCount > 0;
   const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item), customCount) : maxCount;
   let fittedCount = maxCount;
   for (let i = 0; i < pageCount; i++) {
-    const fitted = createFittedSheet(item, desiredCount, fontScale, !hasCustomCount || customCount > maxCount);
+    const fitted = createFittedSheet(
+      item,
+      desiredCount,
+      fontScale,
+      !hasCustomCount || customCount > maxCount,
+      generatorContext,
+    );
     fittedCount = Math.min(fittedCount, fitted.count);
     container.appendChild(fitted.sheet);
   }
@@ -289,12 +331,25 @@ document.getElementById('unitSelect').addEventListener('change', (event) => {
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {
-  applyWorksheetDefaultFontScale(catalogMap[document.getElementById('worksheetSelect').value]);
+  const item = catalogMap[document.getElementById('worksheetSelect').value];
+  applyWorksheetDefaultFontScale(item);
+  updateGugudanDanControl(item);
   updateSelectedMeta();
 });
 
 document.getElementById('problemCount').addEventListener('input', sanitizeProblemCountInput);
 document.getElementById('problemCount').addEventListener('keydown', handleProblemCountKeydown);
+
+document.getElementById('gugudanDanControl').addEventListener('click', (event) => {
+  const button = event.target.closest('.dan-button');
+  if (!button) return;
+
+  selectedGugudanDan = Number(button.dataset.dan) || selectedGugudanDan;
+  const item = catalogMap[document.getElementById('worksheetSelect').value];
+  updateGugudanDanControl(item);
+  updateSelectedMeta();
+  if (isGugudanDanControlled(item)) generate('replace');
+});
 
 document.getElementById('fontScale').addEventListener('change', () => {
   const container = document.getElementById('sheets-container');
