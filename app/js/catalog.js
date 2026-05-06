@@ -34,6 +34,27 @@ export function 선수학습(defaults, items) {
 }
 
 /**
+ * 선수학습 진단지 그룹
+ *
+ * 같은 단원 안의 선수학습 학습지를 source로 자동 연결한다.
+ */
+export function 진단지(overrides = {}) {
+  const { label = '선수학습 진단지', ...opts } = overrides;
+  return {
+    section: '진단지',
+    lessonRef: '선수학습 진단',
+    defaults: { kind: 'diagnostic', grid: 'diagnostic', count: 0, defaultFontScale: 0.8 },
+    items: [
+      학습지(label, null, {
+        ...opts,
+        kind: 'diagnostic',
+        diagnosticFrom: '선수학습',
+      }),
+    ],
+  };
+}
+
+/**
  * 차시(본단원) 그룹
  */
 export function 차시(lessonRef, ...args) {
@@ -126,6 +147,8 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       // 출처 학기: 명시되면 그 값, 아니면 본단원=현재학기 / 선수학습=null(현재학기 표시)
       const from = overrides.from || (defaults && defaults.from) || null;
       const defaultFontScale = overrides.defaultFontScale || defaults.defaultFontScale || templateDefaults.defaultFontScale || null;
+      const diagnosticFrom = overrides.diagnosticFrom || defaults.diagnosticFrom || null;
+      const sourceIds = overrides.sourceIds || defaults.sourceIds || null;
 
       entries.push({
         id,
@@ -141,8 +164,21 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         prereqs,
         from,
         defaultFontScale,
+        diagnosticFrom,
+        sourceIds,
       });
     }
+  }
+
+  for (const entry of entries) {
+    if (entry.kind !== 'diagnostic' || !entry.diagnosticFrom || entry.sourceIds) continue;
+    const sources = entries.filter((candidate) => (
+      candidate.unit === entry.unit &&
+      candidate.section === entry.diagnosticFrom &&
+      candidate.id !== entry.id
+    ));
+    entry.sourceIds = sources.map((source) => source.id);
+    entry.count = entry.sourceIds.length * 4;
   }
 
   return entries;

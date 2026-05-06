@@ -7,7 +7,7 @@ import {
 } from './layout.js';
 import {
   PDF_WORKSHEET_MAP, catalogMap,
-  isPdfWorksheet, getPdfOpType, buildSheetTitle, PDF_GENERATORS,
+  isPdfWorksheet, getPdfOpType, buildSheetTitle, getGradeMeta, PDF_GENERATORS,
 } from './catalog.js';
 
 /* ── HTML 문제 렌더링 ── */
@@ -299,6 +299,7 @@ function getHtmlLimit(item) {
 }
 
 export function getWorksheetLimit(item) {
+  if (item.kind === 'diagnostic') return (item.sourceIds || []).length * 4;
   return isPdfWorksheet(item) ? getPdfLimit(item) : getHtmlLimit(item);
 }
 
@@ -374,4 +375,137 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
 
   sheet.appendChild(grid);
   return sheet;
+}
+
+/* ── 선수학습 진단지 렌더링 ── */
+
+const DIAGNOSTIC_PROBLEMS_PER_SOURCE = 4;
+const DIAGNOSTIC_SOURCES_PER_COLUMN = 6;
+const DIAGNOSTIC_SOURCES_PER_PAGE = DIAGNOSTIC_SOURCES_PER_COLUMN * 2;
+
+function formatGradeShort(gradeId) {
+  const meta = getGradeMeta(gradeId);
+  if (meta) return meta.short;
+  const match = /^g(\d-\d)$/.exec(gradeId);
+  return match ? match[1] : gradeId;
+}
+
+function diagnosticSourceTitle(source) {
+  const tag = source.from ? ` (${formatGradeShort(source.from)})` : '';
+  return `${source.label}${tag}`;
+}
+
+function diagnosticAnswer(value) {
+  return `<span class="diagnostic-answer" data-ans="${escapeAttr(value)}">${escapeAttr(value)}</span>`;
+}
+
+function renderDiagnosticExpression(problem, idx, expression, answer) {
+  return `<div class="diagnostic-problem">
+    <span class="diagnostic-problem-num">${idx}</span>
+    <span class="diagnostic-expression">${expression} = ${diagnosticAnswer(answer)}</span>
+  </div>`;
+}
+
+function renderDiagnosticProblem(problem, idx) {
+  if (problem && Number.isFinite(problem.num1) && Number.isFinite(problem.num2)) {
+    return renderDiagnosticExpression(problem, idx, `${problem.num1} ${problem.op} ${problem.num2}`, problem.ans);
+  }
+
+  if (problem && (problem.kind === 'longdiv' || (Number.isFinite(problem.dvsr) && Number.isFinite(problem.dvnd)))) {
+    const answer = problem.rem > 0 ? `${problem.quot} \u2026 ${problem.rem}` : problem.quot;
+    return renderDiagnosticExpression(problem, idx, `${problem.dvnd} \u00f7 ${problem.dvsr}`, answer);
+  }
+
+  if (problem && problem.kind === 'html') {
+    const layoutClass = problem.layout || 'horiz-box';
+    const itemClass = problem.itemClass ? ` ${problem.itemClass}` : '';
+    return `<div class="diagnostic-problem${itemClass}">
+      <span class="diagnostic-problem-num">${idx}</span>
+      <span class="diagnostic-html ${layoutClass}">${problem.html}</span>
+    </div>`;
+  }
+
+  return `<div class="diagnostic-problem">${renderItem(problem, idx)}</div>`;
+}
+
+function generateDiagnosticProblem(source) {
+  const generator = isPdfWorksheet(source) ? PDF_GENERATORS[getPdfOpType(source)] : source.generator;
+  return generateWithUnique(generator);
+}
+
+function renderDiagnosticBlock(source, startIndex) {
+  let problemIndex = startIndex;
+  const problems = [];
+  for (let i = 0; i < DIAGNOSTIC_PROBLEMS_PER_SOURCE; i++) {
+    problems.push(renderDiagnosticProblem(generateDiagnosticProblem(source), problemIndex));
+    problemIndex++;
+  }
+
+  return {
+    html: `<section class="diagnostic-block">
+      <h2 class="diagnostic-block-title">${diagnosticSourceTitle(source)}</h2>
+      <div class="diagnostic-problems">${problems.join('')}</div>
+    </section>`,
+    nextIndex: problemIndex,
+  };
+}
+
+function appendDiagnosticColumn(container, sources, problemIndex) {
+  let nextIndex = problemIndex;
+  for (const source of sources) {
+    const rendered = renderDiagnosticBlock(source, nextIndex);
+    container.insertAdjacentHTML('beforeend', rendered.html);
+    nextIndex = rendered.nextIndex;
+  }
+  return nextIndex;
+}
+
+export function createDiagnosticSheets(item, fontScale = 1) {
+  resetSheetContext();
+
+  const sources = (item.sourceIds || [])
+    .map((id) => catalogMap[id])
+    .filter(Boolean);
+  const sheets = [];
+  let problemIndex = 1;
+  const pageCount = Math.max(1, Math.ceil(sources.length / DIAGNOSTIC_SOURCES_PER_PAGE));
+
+  for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+    const pageSources = sources.slice(
+      pageIndex * DIAGNOSTIC_SOURCES_PER_PAGE,
+      (pageIndex + 1) * DIAGNOSTIC_SOURCES_PER_PAGE
+    );
+    const leftSources = pageSources.slice(0, DIAGNOSTIC_SOURCES_PER_COLUMN);
+    const rightSources = pageSources.slice(DIAGNOSTIC_SOURCES_PER_COLUMN);
+
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet diagnostic-sheet';
+    sheet.style.setProperty('--font-scale', fontScale);
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'sheet-title diagnostic-title';
+    const title = buildSheetTitle(item);
+    const main = document.createElement('div');
+    main.className = 'sheet-title-main';
+    main.textContent = pageCount > 1 ? `${title.main} (${pageIndex + 1}/${pageCount})` : title.main;
+    titleWrap.appendChild(main);
+    sheet.appendChild(titleWrap);
+
+    const columns = document.createElement('div');
+    columns.className = 'diagnostic-columns';
+    const left = document.createElement('div');
+    left.className = 'diagnostic-column';
+    const right = document.createElement('div');
+    right.className = 'diagnostic-column';
+
+    problemIndex = appendDiagnosticColumn(left, leftSources, problemIndex);
+    problemIndex = appendDiagnosticColumn(right, rightSources, problemIndex);
+
+    columns.appendChild(left);
+    columns.appendChild(right);
+    sheet.appendChild(columns);
+    sheets.push(sheet);
+  }
+
+  return sheets;
 }

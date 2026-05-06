@@ -37,6 +37,8 @@ const PROBLEMATIC = [];
 const ALLOW = new Set(['', '없음', '<', '>', '=', 'cm', 'm', 'km', 'km²', 'cm²', 'm²']);
 
 for (const item of m.WORKSHEET_CATALOG) {
+  if (item.kind === 'diagnostic') continue;
+
   const unitMeta = m.getUnitMeta(item.grade, item.unit);
   const allowsDecimal = [item.label, unitMeta && unitMeta.name]
     .filter(Boolean)
