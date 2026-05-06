@@ -8,7 +8,7 @@
  * 가져와 defineUnit 으로 묶어주면 됩니다.
  */
 
-import { defineUnit, 선수학습, 차시, 학습지, ext, unitRef, sheetRef } from '../catalog.js';
+import { defineUnit, 진단지, 선수학습, 차시, 학습지, ext, unitRef, sheetRef } from '../catalog.js';
 import { T } from '../templates.js';
 
 import {
@@ -63,6 +63,7 @@ const GRADE_ID = 'g5-1';
 /* ── 단원 정의 ── */
 
 const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
+  진단지({ id: 'u1_pre_diagnostic' }),
   선수학습({ kind: 'pdf', grid: 'standard', count: 20 }, [
     학습지('두 자리 수 덧셈', genU1PreAdd2d, { id: 'u1_pre_add_2d', from: 'g2-1' }),
     학습지('두 자리 수 뺄셈', genU1PreSub2d, { id: 'u1_pre_sub_2d', from: 'g2-1' }),
@@ -151,6 +152,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
 ]);
 
 const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
+  진단지({ id: 'u2_pre_diagnostic' }),
   선수학습({ grid: 'dense', count: 36 }, [
     학습지('곱셈구구', genU2PreMul, { id: 'u2_pre_mul', from: 'g2-2' }),
     학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u2_pre_div', from: 'g3-1' }),
@@ -212,6 +214,7 @@ const u3 = defineUnit(GRADE_ID, 'u3', '규칙과 대응', [
 ]);
 
 const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
+  진단지({ id: 'u4_pre_diagnostic' }),
   선수학습({ grid: 'practice', count: 15, from: 'g3-2' }, [
     학습지('분모 같은 분수 크기 비교', genU4PreCmp, { id: 'u4_pre_cmp' }),
     학습지('가분수 → 대분수 변환', genU4PreConv, { id: 'u4_pre_conv' }),
@@ -263,6 +266,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
 ]);
 
 const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
+  진단지({ id: 'u5_pre_diagnostic' }),
   선수학습({ grid: 'practice', count: 15 }, [
     학습지('분모 같은 분수의 덧셈', genU5PreAdd, { id: 'u5_pre_add', from: 'g4-2' }),
     학습지('분모 같은 분수의 덧셈 (합이 1 이상)', genU5PreAddGe1, { id: 'u5_pre_add_ge1', from: 'g4-2' }),
@@ -328,6 +332,7 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
 ]);
 
 const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
+  진단지({ id: 'u6_pre_diagnostic' }),
   선수학습({ grid: 'standard', count: 20, from: 'g3-1' }, [
     학습지('단위 변환 (cm, m, km)', genU6PreUnit, { id: 'u6_pre_unit' }),
     학습지('길이의 합과 차', genU6PreLen, { id: 'u6_pre_len' }),

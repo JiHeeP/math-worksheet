@@ -4,7 +4,7 @@ import {
   GRADE_META, DEFAULT_GRADE_ID,
   catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit, getGradeMeta,
 } from './catalog.js';
-import { createSheet, getWorksheetLimit } from './renderers.js';
+import { createDiagnosticSheets, createSheet, getWorksheetLimit } from './renderers.js';
 import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
@@ -214,6 +214,8 @@ function createFittedSheet(item, desiredCount, fontScale, updateCache = false) {
 }
 
 function getSafeWorksheetLimit(item, fontScale) {
+  if (item.kind === 'diagnostic') return getWorksheetLimit(item);
+
   const key = getFitCacheKey(item, fontScale);
   if (fitCountCache.has(key)) return fitCountCache.get(key);
 
@@ -233,9 +235,6 @@ function generate(mode) {
 
   const customCount = parseInt(problemCountInput.value, 10);
   const fontScale = getCurrentFontScale();
-  const maxCount = getSafeWorksheetLimit(item, fontScale);
-  const hasCustomCount = customCount > 0;
-  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item), customCount) : maxCount;
   container.style.setProperty('--font-scale', fontScale);
   container.style.setProperty('--pdf-scale', fontScale);
 
@@ -243,6 +242,20 @@ function generate(mode) {
   container.classList.remove('answers-shown');
   answerShown = false;
 
+  if (item.kind === 'diagnostic') {
+    const totalCount = getWorksheetLimit(item);
+    for (let i = 0; i < pageCount; i++) {
+      createDiagnosticSheets(item, fontScale).forEach((sheet) => container.appendChild(sheet));
+    }
+    problemCountInput.value = '';
+    problemCountInput.dataset.max = totalCount;
+    problemCountInput.placeholder = totalCount;
+    return;
+  }
+
+  const maxCount = getSafeWorksheetLimit(item, fontScale);
+  const hasCustomCount = customCount > 0;
+  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item), customCount) : maxCount;
   let fittedCount = maxCount;
   for (let i = 0; i < pageCount; i++) {
     const fitted = createFittedSheet(item, desiredCount, fontScale, !hasCustomCount || customCount > maxCount);

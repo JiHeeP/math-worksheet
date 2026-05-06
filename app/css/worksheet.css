@@ -1230,6 +1230,153 @@ button:active { transform: scale(0.98); }
   color: #e74c3c;
 }
 
+/* 선수학습 진단지: A4 2단 압축 배치 */
+.diagnostic-sheet {
+  padding: 14mm 16mm 15mm;
+}
+
+.diagnostic-title {
+  margin-bottom: 8px;
+  padding-bottom: 7px;
+}
+
+.diagnostic-columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 10mm;
+}
+
+.diagnostic-column {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.diagnostic-block {
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid #d4dae3;
+  padding-top: 3px;
+}
+
+.diagnostic-block:first-child {
+  border-top-color: #2f3640;
+}
+
+.diagnostic-block-title {
+  margin: 0 0 2px;
+  font-size: calc(8.2px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 1.25;
+  color: #273142;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.diagnostic-problems {
+  display: grid;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.diagnostic-problem {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: calc(10.4px * var(--font-scale, 1));
+  line-height: 1.2;
+  color: #1f2937;
+  overflow: hidden;
+}
+
+.diagnostic-problem-num {
+  flex: 0 0 auto;
+  min-width: 14px;
+  height: 14px;
+  border: 1px solid #7b8493;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(7.5px * var(--font-scale, 1));
+  line-height: 1;
+  color: #4b5563;
+  background: #fff;
+}
+
+.diagnostic-expression,
+.diagnostic-html {
+  min-width: 0;
+  flex: 1;
+}
+
+.diagnostic-answer {
+  display: inline-block;
+  min-width: 28px;
+  border-bottom: 1.4px solid #4b5563;
+  text-align: center;
+  font-weight: 700;
+}
+
+.diagnostic-html.horiz-box,
+.diagnostic-html.frac-row,
+.diagnostic-html.concept-layout,
+.diagnostic-html.relation-layout,
+.diagnostic-html.shape-layout {
+  width: auto;
+  margin-top: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.diagnostic-html.horiz-box,
+.diagnostic-html.frac-row {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 3px;
+  font-size: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.diagnostic-html .num-blank,
+.diagnostic-html .text-blank,
+.diagnostic-html .sym-blank,
+.diagnostic-html .frac-blank {
+  transform: scale(0.82);
+  transform-origin: center;
+}
+
+.diagnostic-html .concept-card,
+.diagnostic-html .relation-card,
+.diagnostic-html .shape-card {
+  font-size: inherit;
+  line-height: 1.2;
+}
+
+.diagnostic-html .concept-answer,
+.diagnostic-html .shape-answer {
+  margin-top: 0;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 3px;
+  font-size: inherit;
+  white-space: nowrap;
+}
+
+.diagnostic-html .concept-question,
+.diagnostic-html .relation-question,
+.diagnostic-html .shape-question,
+.diagnostic-html .small-note {
+  display: none;
+}
+
 @media print {
   @page { size: A4; margin: 0; }
 
