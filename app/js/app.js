@@ -9,7 +9,9 @@ import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
 let selectedGugudanDan = 2;
+let selectedSectionFilter = '전체';
 const fitCountCache = new Map();
+const SECTION_FILTERS = ['전체', '진단지', '선수학습', '본단원'];
 
 function populateGradeSelect() {
   const gradeSelect = document.getElementById('gradeSelect');
@@ -83,9 +85,43 @@ function handleProblemCountKeydown(event) {
   generate('replace');
 }
 
+function getCurrentUnitId() {
+  return document.getElementById('unitSelect').value;
+}
+
+function getSectionFilteredItems(items) {
+  if (selectedSectionFilter === '전체') return items;
+  return items.filter((item) => item.section === selectedSectionFilter);
+}
+
+function ensureSectionFilterAvailable(items) {
+  if (selectedSectionFilter === '전체') return;
+  if (items.some((item) => item.section === selectedSectionFilter)) return;
+  selectedSectionFilter = '전체';
+}
+
+function updateSectionFilterControl(items) {
+  const control = document.getElementById('sectionFilter');
+  if (!control) return;
+
+  const available = new Set(items.map((item) => item.section));
+  control.querySelectorAll('.stage-filter-button').forEach((button) => {
+    const section = button.dataset.sectionFilter;
+    const disabled = section !== '전체' && !available.has(section);
+    const active = section === selectedSectionFilter;
+    button.disabled = disabled;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
 function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
-  const items = getWorksheetsByUnit(gradeId, unitId);
+  const allItems = getWorksheetsByUnit(gradeId, unitId);
+  ensureSectionFilterAvailable(allItems);
+  updateSectionFilterControl(allItems);
+
+  const items = getSectionFilteredItems(allItems);
   worksheetSelect.innerHTML = items.map((item) => {
     // `from` 이 명시된 항목 (선수학습) 만 출처 태그 표시.
     // 본단원은 현재 학기와 같아서 태그 생략 (사용자 결정 2026-05-02).
@@ -328,6 +364,17 @@ document.getElementById('gradeSelect').addEventListener('change', (event) => {
 
 document.getElementById('unitSelect').addEventListener('change', (event) => {
   populateWorksheetSelect(currentGradeId(), event.target.value);
+});
+
+document.getElementById('sectionFilter').addEventListener('click', (event) => {
+  const button = event.target.closest('.stage-filter-button');
+  if (!button || button.disabled) return;
+
+  const nextFilter = button.dataset.sectionFilter;
+  if (!SECTION_FILTERS.includes(nextFilter)) return;
+  selectedSectionFilter = nextFilter;
+  populateWorksheetSelect(currentGradeId(), getCurrentUnitId());
+  generate('replace');
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {

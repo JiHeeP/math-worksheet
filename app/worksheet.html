@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>초등 수학 연습지 만들기</title>
-  <link rel="stylesheet" href="css/worksheet.css?v=20260507-gugudan-dan">
+  <link rel="stylesheet" href="css/worksheet.css?v=20260507-stage-filter">
 </head>
 <body>
 
@@ -26,6 +26,16 @@
     <div class="input-group">
       <label for="worksheetSelect">연습지</label>
       <select id="worksheetSelect"></select>
+    </div>
+
+    <div class="input-group stage-filter-group" aria-label="학습 단계 필터">
+      <span class="stage-filter-label">학습 단계</span>
+      <div class="stage-filter" id="sectionFilter" role="group" aria-label="학습 단계">
+        <button type="button" class="stage-filter-button is-active" data-section-filter="전체" aria-pressed="true">전체</button>
+        <button type="button" class="stage-filter-button" data-section-filter="진단지" aria-pressed="false">진단지</button>
+        <button type="button" class="stage-filter-button" data-section-filter="선수학습" aria-pressed="false">선수학습</button>
+        <button type="button" class="stage-filter-button" data-section-filter="본단원" aria-pressed="false">본단원</button>
+      </div>
     </div>
   </div>
 
@@ -87,6 +97,6 @@
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20260507-gugudan-dan"></script>
+<script type="module" src="js/app.js?v=20260507-stage-filter"></script>
 </body>
 </html>
