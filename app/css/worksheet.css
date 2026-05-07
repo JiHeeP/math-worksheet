@@ -232,6 +232,13 @@ button:disabled:active { transform: none; }
   text-overflow: ellipsis;
 }
 
+.sheet-title-detail {
+  font-size: 11px;
+  font-weight: 500;
+  color: #596579;
+  line-height: 1.25;
+}
+
 .problem-grid {
   display: grid;
   flex-grow: 1;

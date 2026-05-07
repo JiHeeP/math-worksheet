@@ -313,6 +313,34 @@ function withLayoutOverrides(config, options) {
   };
 }
 
+function formatSheetContext(generatorContext = {}) {
+  const dans = Array.isArray(generatorContext.gugudanDans)
+    ? generatorContext.gugudanDans.filter((value) => Number.isInteger(value) && value >= 2 && value <= 9)
+    : [];
+  if (!dans.length) return '';
+  return `선택 단: ${dans.map((dan) => `${dan}단`).join(', ')}`;
+}
+
+function appendSheetTitle(sheet, item, options = {}) {
+  const titleWrap = document.createElement('div');
+  titleWrap.className = 'sheet-title';
+  const title = buildSheetTitle(item);
+  const main = document.createElement('div');
+  main.className = 'sheet-title-main';
+  main.textContent = title.main;
+  titleWrap.appendChild(main);
+
+  const contextText = formatSheetContext(options.generatorContext);
+  if (contextText) {
+    const detail = document.createElement('div');
+    detail.className = 'sheet-title-detail';
+    detail.textContent = contextText;
+    titleWrap.appendChild(detail);
+  }
+
+  sheet.appendChild(titleWrap);
+}
+
 export function createSheet(item, countOverride, fontScale = 1, options = {}) {
   resetSheetContext();
 
@@ -323,15 +351,7 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
     const layout = resolveGridLayout(cfg, count, fontScale);
     const sheet = document.createElement('div');
     sheet.className = 'sheet';
-
-    const titleWrap = document.createElement('div');
-    titleWrap.className = 'sheet-title';
-    const title = buildSheetTitle(item);
-    const main = document.createElement('div');
-    main.className = 'sheet-title-main';
-    main.textContent = title.main;
-    titleWrap.appendChild(main);
-    sheet.appendChild(titleWrap);
+    appendSheetTitle(sheet, item, options);
 
     const grid = document.createElement('div');
     grid.className = 'problem-grid';
@@ -354,15 +374,7 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
   const layout = resolveGridLayout(layoutCfg, count, fontScale);
   const sheet = document.createElement('div');
   sheet.className = 'sheet';
-
-  const titleWrap = document.createElement('div');
-  titleWrap.className = 'sheet-title';
-  const title = buildSheetTitle(item);
-  const main = document.createElement('div');
-  main.className = 'sheet-title-main';
-  main.textContent = title.main;
-  titleWrap.appendChild(main);
-  sheet.appendChild(titleWrap);
+  appendSheetTitle(sheet, item, options);
 
   const grid = document.createElement('div');
   grid.className = `problem-grid ${item.grid}`;
