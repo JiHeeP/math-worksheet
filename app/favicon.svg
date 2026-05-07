@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#2364aa"/>
+  <path d="M17 12h30a5 5 0 0 1 5 5v34a5 5 0 0 1-5 5H17a5 5 0 0 1-5-5V17a5 5 0 0 1 5-5Z" fill="#fff"/>
+  <path d="M20 20h24M20 44h24" stroke="#9bb7d8" stroke-width="3" stroke-linecap="round"/>
+  <text x="32" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#2364aa">수</text>
+</svg>
