@@ -8,8 +8,8 @@ import { createDiagnosticSheets, createSheet, getWorksheetLimit } from './render
 import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
-let selectedGugudanDan = 2;
-let selectedSectionFilter = '전체';
+let selectedGugudanDans = [2];
+let selectedSectionFilter = '본단원';
 const fitCountCache = new Map();
 const SECTION_FILTERS = ['전체', '진단지', '선수학습', '본단원'];
 
@@ -58,7 +58,7 @@ function isGugudanDanControlled(item) {
 }
 
 function getCurrentGeneratorContext(item) {
-  return isGugudanDanControlled(item) ? { gugudanDan: selectedGugudanDan } : {};
+  return isGugudanDanControlled(item) ? { gugudanDans: selectedGugudanDans.slice() } : {};
 }
 
 function updateGugudanDanControl(item) {
@@ -68,7 +68,7 @@ function updateGugudanDanControl(item) {
   const enabled = isGugudanDanControlled(item);
   control.hidden = !enabled;
   control.querySelectorAll('.dan-button').forEach((button) => {
-    const active = Number(button.dataset.dan) === selectedGugudanDan;
+    const active = selectedGugudanDans.includes(Number(button.dataset.dan));
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
@@ -160,7 +160,7 @@ function applyWorksheetDefaultFontScale(item) {
 
 function getFitCacheKey(item, fontScale, generatorContext = {}) {
   const contextKey = isGugudanDanControlled(item)
-    ? `@dan-${generatorContext.gugudanDan || selectedGugudanDan}`
+    ? `@dan-${(generatorContext.gugudanDans || selectedGugudanDans).join('-')}`
     : '';
   return `${item.id}@${fontScale.toFixed(2)}${contextKey}`;
 }
@@ -391,7 +391,16 @@ document.getElementById('gugudanDanControl').addEventListener('click', (event) =
   const button = event.target.closest('.dan-button');
   if (!button) return;
 
-  selectedGugudanDan = Number(button.dataset.dan) || selectedGugudanDan;
+  const dan = Number(button.dataset.dan);
+  if (!Number.isInteger(dan) || dan < 2 || dan > 9) return;
+
+  if (selectedGugudanDans.includes(dan)) {
+    if (selectedGugudanDans.length === 1) return;
+    selectedGugudanDans = selectedGugudanDans.filter((value) => value !== dan);
+  } else {
+    selectedGugudanDans = [...selectedGugudanDans, dan].sort((a, b) => a - b);
+  }
+
   const item = catalogMap[document.getElementById('worksheetSelect').value];
   updateGugudanDanControl(item);
   updateSelectedMeta();

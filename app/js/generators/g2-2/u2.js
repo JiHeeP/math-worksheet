@@ -3,8 +3,7 @@
 /**
  * 2학년 2학기 2단원 — 곱셈구구
  *
- * 단별 학습지 분리 방식 (모달 X). 2~9단 8개 + 혼합 + 빈칸형 = 10개 학습지.
- * 카탈로그에서 makeGugudanGen(dan) 팩토리로 단별 generator 생성.
+ * 선택한 단 목록 안에서 곱셈구구 문제를 무작위로 만든다.
  */
 
 import { rand } from '../../utils.js';
@@ -12,19 +11,13 @@ import { numBlank } from '../../helpers.js';
 import { horizProblem, htmlProblem } from '../../templates.js';
 
 function resolveGugudanDan(context = {}) {
+  const dans = Array.isArray(context.gugudanDans)
+    ? context.gugudanDans.filter((value) => Number.isInteger(value) && value >= 2 && value <= 9)
+    : [];
+  if (dans.length) return dans[rand(0, dans.length - 1)];
+
   const dan = Number(context.gugudanDan);
   return dan >= 2 && dan <= 9 ? dan : rand(2, 9);
-}
-
-/**
- * 단을 매개변수로 받는 곱셈구구 generator 팩토리.
- * 카탈로그에서: 학습지('2단', makeGugudanGen(2), { id: '...' })
- */
-export function makeGugudanGen(dan) {
-  return function genGugudanFixed() {
-    const m = rand(1, 9);
-    return horizProblem(`${dan} × ${m}`, numBlank(dan * m));
-  };
 }
 
 // 2~9단 무작위 혼합. 컨트롤이 연결된 학습지는 선택 단으로 고정된다.
