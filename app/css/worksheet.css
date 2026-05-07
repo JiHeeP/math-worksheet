@@ -1370,8 +1370,8 @@ button:disabled:active { transform: none; }
 }
 
 .diagnostic-block-title {
-  margin: 0 0 2px;
-  font-size: calc(8.2px * var(--font-scale, 1));
+  margin: 0 0 4px;
+  font-size: calc(9.4px * var(--font-scale, 1));
   font-weight: 700;
   line-height: 1.25;
   color: #273142;
@@ -1382,8 +1382,9 @@ button:disabled:active { transform: none; }
 
 .diagnostic-problems {
   display: grid;
-  grid-template-rows: repeat(4, minmax(0, 1fr));
-  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 3px 8px;
 }
 
 .diagnostic-problem {
@@ -1391,23 +1392,23 @@ button:disabled:active { transform: none; }
   min-height: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: calc(10.4px * var(--font-scale, 1));
-  line-height: 1.2;
+  gap: 5px;
+  font-size: calc(11.8px * var(--font-scale, 1));
+  line-height: 1.25;
   color: #1f2937;
   overflow: hidden;
 }
 
 .diagnostic-problem-num {
   flex: 0 0 auto;
-  min-width: 14px;
-  height: 14px;
+  min-width: 16px;
+  height: 16px;
   border: 1px solid #7b8493;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(7.5px * var(--font-scale, 1));
+  font-size: calc(8.5px * var(--font-scale, 1));
   line-height: 1;
   color: #4b5563;
   background: #fff;
@@ -1421,7 +1422,7 @@ button:disabled:active { transform: none; }
 
 .diagnostic-answer {
   display: inline-block;
-  min-width: 28px;
+  min-width: 32px;
   border-bottom: 1.4px solid #4b5563;
   text-align: center;
   font-weight: 700;
@@ -1452,7 +1453,7 @@ button:disabled:active { transform: none; }
 .diagnostic-html .text-blank,
 .diagnostic-html .sym-blank,
 .diagnostic-html .frac-blank {
-  transform: scale(0.82);
+  transform: scale(0.9);
   transform-origin: center;
 }
 
