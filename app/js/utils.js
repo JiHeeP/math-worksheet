@@ -45,6 +45,36 @@ export function multiplesOf(n, count) {
   return Array.from({ length: count }, (_, idx) => n * (idx + 1));
 }
 
+/* ── 숫자 난이도 단계 ── */
+
+// 자연수 단계: 피연산자 정수 범위 [lo, hi]
+export function numberRangeForStage(stage) {
+  if (stage === 1) return [1, 20];
+  if (stage === 3) return [50, 99];
+  return [20, 50];
+}
+
+// 진분수 / 분수 곱셈·나눗셈 / 단일 분수 단계: 분모 범위
+export function properFracLimitsForStage(stage) {
+  if (stage === 1) return { dMin: 2, dMax: 10 };
+  if (stage === 3) return { dMin: 6, dMax: 14 };
+  return { dMin: 4, dMax: 12 };
+}
+
+// 분모 다른 분수(통분), 약분 단계: 분모 범위
+export function lcdFracLimitsForStage(stage) {
+  if (stage === 1) return { dMin: 2, dMax: 8 };
+  if (stage === 3) return { dMin: 10, dMax: 50 };
+  return { dMin: 6, dMax: 20 };
+}
+
+// 대분수 자연수부 단계
+export function mixedWholeForStage(stage) {
+  if (stage === 1) return { wMin: 1, wMax: 3 };
+  if (stage === 3) return { wMin: 3, wMax: 6 };
+  return { wMin: 2, wMax: 5 };
+}
+
 /* -- sheet-scoped context: 한 장 안에서 중복 방지 -- */
 
 const sheetContext = { usedNumbers: new Set() };

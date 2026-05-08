@@ -9,6 +9,8 @@ import { getHtmlLayoutConfig } from './layout.js';
 
 let answerShown = false;
 let selectedGugudanDans = [2];
+let selectedNumberStage = 2;
+let selectedFractionStage = 2;
 let selectedSectionFilter = '본단원';
 const fitCountCache = new Map();
 const SECTION_FILTERS = ['전체', '진단지', '선수학습', '본단원'];
@@ -57,8 +59,34 @@ function isGugudanDanControlled(item) {
   return Boolean(item && item.controls && item.controls.gugudanDan);
 }
 
+function getNumberStageControl(item) {
+  return item && item.controls && item.controls.numberDifficulty;
+}
+
+function getFractionStageControl(item) {
+  return item && item.controls && item.controls.fractionDifficulty;
+}
+
+function clampStageToAllowed(stage, allowedStages) {
+  if (!Array.isArray(allowedStages) || allowedStages.length === 0) return stage;
+  if (allowedStages.includes(stage)) return stage;
+  // 가장 가까운 허용 단계로 보정
+  return allowedStages.reduce((best, s) => (Math.abs(s - stage) < Math.abs(best - stage) ? s : best));
+}
+
 function getCurrentGeneratorContext(item) {
-  return isGugudanDanControlled(item) ? { gugudanDans: selectedGugudanDans.slice() } : {};
+  if (isGugudanDanControlled(item)) return { gugudanDans: selectedGugudanDans.slice() };
+  const numCtl = getNumberStageControl(item);
+  if (numCtl) {
+    const allowed = numCtl.stages || [1, 2, 3];
+    return { numberStage: clampStageToAllowed(selectedNumberStage, allowed) };
+  }
+  const fracCtl = getFractionStageControl(item);
+  if (fracCtl) {
+    const allowed = fracCtl.stages || [1, 2, 3];
+    return { fractionStage: clampStageToAllowed(selectedFractionStage, allowed) };
+  }
+  return {};
 }
 
 function updateGugudanDanControl(item) {
@@ -72,6 +100,41 @@ function updateGugudanDanControl(item) {
     button.classList.toggle('is-active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
+}
+
+function updateStageControl(controlId, datasetKey, item, getControlMeta, currentStage) {
+  const control = document.getElementById(controlId);
+  if (!control) return;
+
+  const meta = getControlMeta(item);
+  control.hidden = !meta;
+  if (!meta) return;
+
+  const allowed = meta.stages || [1, 2, 3];
+  const effectiveStage = clampStageToAllowed(currentStage, allowed);
+  control.querySelectorAll('.dan-button').forEach((button) => {
+    const stage = Number(button.dataset[datasetKey]);
+    const isAllowed = allowed.includes(stage);
+    button.disabled = !isAllowed;
+    button.classList.toggle('is-disabled', !isAllowed);
+    const active = isAllowed && stage === effectiveStage;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function updateNumberStageControl(item) {
+  updateStageControl('numberStageControl', 'numberStage', item, getNumberStageControl, selectedNumberStage);
+}
+
+function updateFractionStageControl(item) {
+  updateStageControl('fractionStageControl', 'fractionStage', item, getFractionStageControl, selectedFractionStage);
+}
+
+function updateAllStageControls(item) {
+  updateGugudanDanControl(item);
+  updateNumberStageControl(item);
+  updateFractionStageControl(item);
 }
 
 function sanitizeProblemCountInput() {
@@ -134,7 +197,7 @@ function populateWorksheetSelect(gradeId, unitId, preferredId) {
     const item = catalogMap[nextId];
     worksheetSelect.value = nextId;
     applyWorksheetDefaultFontScale(item);
-    updateGugudanDanControl(item);
+    updateAllStageControls(item);
     updateSelectedMeta();
   }
 }
@@ -159,9 +222,14 @@ function applyWorksheetDefaultFontScale(item) {
 }
 
 function getFitCacheKey(item, fontScale, generatorContext = {}) {
-  const contextKey = isGugudanDanControlled(item)
-    ? `@dan-${(generatorContext.gugudanDans || selectedGugudanDans).join('-')}`
-    : '';
+  let contextKey = '';
+  if (isGugudanDanControlled(item)) {
+    contextKey = `@dan-${(generatorContext.gugudanDans || selectedGugudanDans).join('-')}`;
+  } else if (getNumberStageControl(item)) {
+    contextKey = `@nstage-${generatorContext.numberStage ?? selectedNumberStage}`;
+  } else if (getFractionStageControl(item)) {
+    contextKey = `@fstage-${generatorContext.fractionStage ?? selectedFractionStage}`;
+  }
   return `${item.id}@${fontScale.toFixed(2)}${contextKey}`;
 }
 
@@ -380,7 +448,7 @@ document.getElementById('sectionFilter').addEventListener('click', (event) => {
 document.getElementById('worksheetSelect').addEventListener('change', () => {
   const item = catalogMap[document.getElementById('worksheetSelect').value];
   applyWorksheetDefaultFontScale(item);
-  updateGugudanDanControl(item);
+  updateAllStageControls(item);
   updateSelectedMeta();
 });
 
@@ -402,9 +470,47 @@ document.getElementById('gugudanDanControl').addEventListener('click', (event) =
   }
 
   const item = catalogMap[document.getElementById('worksheetSelect').value];
-  updateGugudanDanControl(item);
+  updateAllStageControls(item);
   updateSelectedMeta();
   if (isGugudanDanControlled(item)) generate('replace');
+});
+
+document.getElementById('numberStageControl').addEventListener('click', (event) => {
+  const button = event.target.closest('.dan-button');
+  if (!button || button.disabled) return;
+
+  const stage = Number(button.dataset.numberStage);
+  if (![1, 2, 3].includes(stage)) return;
+
+  const item = catalogMap[document.getElementById('worksheetSelect').value];
+  const meta = getNumberStageControl(item);
+  if (!meta) return;
+  const allowed = meta.stages || [1, 2, 3];
+  if (!allowed.includes(stage)) return;
+
+  selectedNumberStage = stage;
+  updateAllStageControls(item);
+  updateSelectedMeta();
+  generate('replace');
+});
+
+document.getElementById('fractionStageControl').addEventListener('click', (event) => {
+  const button = event.target.closest('.dan-button');
+  if (!button || button.disabled) return;
+
+  const stage = Number(button.dataset.fractionStage);
+  if (![1, 2, 3].includes(stage)) return;
+
+  const item = catalogMap[document.getElementById('worksheetSelect').value];
+  const meta = getFractionStageControl(item);
+  if (!meta) return;
+  const allowed = meta.stages || [1, 2, 3];
+  if (!allowed.includes(stage)) return;
+
+  selectedFractionStage = stage;
+  updateAllStageControls(item);
+  updateSelectedMeta();
+  generate('replace');
 });
 
 document.getElementById('fontScale').addEventListener('change', () => {

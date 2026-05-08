@@ -1,6 +1,6 @@
 'use strict';
 
-import { rand, randChoice, gcd, lcm } from '../../utils.js';
+import { rand, randChoice, gcd, lcm, lcdFracLimitsForStage } from '../../utils.js';
 import { fracD, mixedD, numBlank, symBlank, fracBlank, mixedBlank } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
@@ -31,38 +31,64 @@ export function genU4MainEquivMake() {
   return htmlProblem('frac-row', `${fracD(num, den)} <span class="eq-txt">=</span> <span class="frac-blank"><span class="fb-top">${num * m}</span><span class="fb-line"></span><span class="fb-bot" data-ans="${den * m}">${den * m}</span></span>`);
 }
 
-export function genU4MainRedProcess() {
-  let n, d, g;
-  do { g = rand(2, 6); n = rand(1, 7); d = rand(n + 1, 9); } while (gcd(n, d) > 1);
+// \uc57d\ubd84 \u2014 \ub2e8\uacc4\uc5d0 \ub530\ub77c \uacb0\uacfc \ubd84\ubaa8 d \uc758 \uc0c1\ud55c\uc774 \ucee4\uc9d0. g (\uacf5\uc57d\uc218) \ub294 d \uc640 \ube44\ub840\ud574 \uc120\ud0dd.
+function pickReduceParams(ctx) {
+  const { dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  let n, d, g, tries = 0;
+  do {
+    const dCap = Math.max(3, Math.min(9, Math.floor(dMax / 2)));
+    n = rand(1, dCap - 1);
+    d = rand(n + 1, dCap);
+    const gMaxByDmax = Math.max(2, Math.floor(dMax / d));
+    g = rand(2, Math.max(2, Math.min(6, gMaxByDmax)));
+    tries++;
+  } while (gcd(n, d) > 1 && tries < 50);
+  return { n, d, g };
+}
+
+export function genU4MainRedProcess(ctx = {}) {
+  const { n, d, g } = pickReduceParams(ctx);
   const num = n * g, den = d * g;
   return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(num, den)} <span class="eq-txt">=</span> ${fracD(`${num} \u00f7 ${numBlank(g)}`, `${den} \u00f7 ${numBlank(g)}`)} <span class="eq-txt">=</span> ${fracBlank(n, d)}</div></div>`);
 }
 
-export function genU4MainRed() {
-  let n, d, g;
-  do { g = rand(2, 6); n = rand(1, 7); d = rand(n + 1, 9); } while (gcd(n, d) > 1);
+export function genU4MainRed(ctx = {}) {
+  const { n, d, g } = pickReduceParams(ctx);
   return htmlProblem('frac-row', `${fracD(n * g, d * g)} <span class="eq-txt">=</span> ${fracBlank(n, d)}`);
 }
 
-export function genU4MainLcdProcess() {
-  let d1, d2;
-  do { d1 = rand(2, 6); d2 = rand(2, 6); } while (d1 === d2);
+function pickLcdPair(ctx) {
+  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  let d1, d2, tries = 0;
+  do {
+    d1 = rand(dMin, dMax); d2 = rand(dMin, dMax);
+    tries++;
+  } while (d1 === d2 && tries < 100);
+  if (d1 === d2) d2 = d1 + 1;
+  return { d1, d2 };
+}
+
+export function genU4MainLcdProcess(ctx = {}) {
+  const { d1, d2 } = pickLcdPair(ctx);
   const n1 = rand(1, d1 - 1), n2 = rand(1, d2 - 1), common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
   return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracD(`${n1} \u00d7 ${numBlank(m1)}`, `${d1} \u00d7 ${numBlank(m1)}`)} <span class="eq-txt">=</span> ${fracBlank(n1 * m1, common)}</div><div class="concept-answer">${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracD(`${n2} \u00d7 ${numBlank(m2)}`, `${d2} \u00d7 ${numBlank(m2)}`)} <span class="eq-txt">=</span> ${fracBlank(n2 * m2, common)}</div></div>`);
 }
 
-export function genU4MainLcd() {
-  let d1, d2;
-  do { d1 = rand(2, 6); d2 = rand(2, 6); } while (d1 === d2);
+export function genU4MainLcd(ctx = {}) {
+  const { d1, d2 } = pickLcdPair(ctx);
   const n1 = rand(1, d1 - 1), n2 = rand(1, d2 - 1), common = lcm(d1, d2);
   return htmlProblem('frac-row', `${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracBlank(n1 * (common / d1), common)} <span class="op-txt">,</span> ${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(n2 * (common / d2), common)}`);
 }
 
-export function genU4MainCmp() {
-  let d1, d2;
-  do { d1 = rand(2, 8); d2 = rand(2, 8); } while (d1 === d2);
-  const n1 = rand(1, d1 - 1), n2 = rand(1, d2 - 1), common = lcm(d1, d2);
+export function genU4MainCmp(ctx = {}) {
+  const { d1, d2 } = pickLcdPair(ctx);
+  let n1, n2, tries2 = 0;
+  do {
+    n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
+    tries2++;
+  } while (n1 / d1 === n2 / d2 && tries2 < 30);
+  const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2, cn1 = n1 * m1, cn2 = n2 * m2;
   return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(n1, d1)} ${symBlank(n1 / d1 > n2 / d2 ? '>' : '<')} ${fracD(n2, d2)}</div><div class="lcd-process-row"><span class="lcd-label">통분</span>${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracBlank(cn1, common)}<span class="op-txt">,</span>${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(cn2, common)}</div></div>`);
 }
