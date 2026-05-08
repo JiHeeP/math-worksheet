@@ -89,6 +89,24 @@
     </div>
   </div>
 
+  <div class="dan-control" id="numberStageControl" hidden aria-label="자연수 난이도 단계 선택">
+    <span class="dan-label">난이도</span>
+    <div class="dan-buttons">
+      <button type="button" class="dan-button" data-number-stage="1" aria-pressed="false">1단계</button>
+      <button type="button" class="dan-button is-active" data-number-stage="2" aria-pressed="true">2단계</button>
+      <button type="button" class="dan-button" data-number-stage="3" aria-pressed="false">3단계</button>
+    </div>
+  </div>
+
+  <div class="dan-control" id="fractionStageControl" hidden aria-label="분수 난이도 단계 선택">
+    <span class="dan-label">난이도</span>
+    <div class="dan-buttons">
+      <button type="button" class="dan-button" data-fraction-stage="1" aria-pressed="false">1단계</button>
+      <button type="button" class="dan-button is-active" data-fraction-stage="2" aria-pressed="true">2단계</button>
+      <button type="button" class="dan-button" data-fraction-stage="3" aria-pressed="false">3단계</button>
+    </div>
+  </div>
+
   <button class="btn-print" onclick="window.print()">
     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2M7 9h10V4H7v5zm10 8H7v5h10v-5z"/></svg>
     인쇄
@@ -98,6 +116,6 @@
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20260507-stage-filter"></script>
+<script type="module" src="js/app.js?v=20260508-difficulty-stage"></script>
 </body>
 </html>

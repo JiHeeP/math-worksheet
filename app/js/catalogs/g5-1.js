@@ -83,20 +83,24 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
     학습지('덧셈·뺄셈 혼합(순서)', genU1MainAddSubOrder, {
       id: 'u1_main_addsub_order',
       prereqs: [unitRef('g3-1', 'u1')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('덧셈·뺄셈 혼합(괄호)', genU1MainAddSubParen, {
       id: 'u1_main_addsub_paren',
       prereqs: [sheetRef('u1_main_addsub_order')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('덧셈·뺄셈 혼합(괄호, 순서)', genU1MainAddSubParenOrder, {
       id: 'u1_main_addsub_mix',
       prereqs: [sheetRef('u1_main_addsub_paren')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
   ]),
   차시('2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('곱셈·나눗셈 혼합(순서)', genU1MainMulDivOrder, {
       id: 'u1_main_muldiv_order',
       prereqs: [unitRef('g3-2', 'u1'), unitRef('g3-2', 'u3')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('곱셈·나눗셈 혼합(괄호)', genU1MainMulDivParen, {
       id: 'u1_main_muldiv_paren',
@@ -139,14 +143,17 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
     학습지('사칙 혼합(순서)', genU1MainMixOrder, {
       id: 'u1_main_mix_order',
       prereqs: [sheetRef('u1_main_addsubmul'), sheetRef('u1_main_addsubdiv')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('사칙 혼합(괄호)', genU1MainMixParen, {
       id: 'u1_main_mix_paren',
       prereqs: [sheetRef('u1_main_mix_order')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('사칙 혼합(괄호, 순서)', genU1MainMix, {
       id: 'u1_main_mix',
       prereqs: [sheetRef('u1_main_mix_paren')],
+      controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
   ]),
 ]);
@@ -231,7 +238,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
       prereqs: [sheetRef('u4_main_equiv_find')],
     }),
   ]),
-  차시('3차시 약분 알아보기', [
+  차시('3차시 약분 알아보기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('약분 (과정 연습)', genU4MainRedProcess, {
       id: 'u4_main_red_process', grid: 'concept', count: 8,
       prereqs: [sheetRef('u4_main_equiv_make'), unitRef('u2')],
@@ -241,7 +248,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
       prereqs: [sheetRef('u4_main_red_process')],
     }),
   ]),
-  차시('4차시 통분 알아보기', [
+  차시('4차시 통분 알아보기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('통분 (과정 연습)', genU4MainLcdProcess, {
       id: 'u4_main_lcd_process', grid: 'concept', count: 8,
       prereqs: [sheetRef('u4_main_red'), unitRef('u2')],
@@ -251,7 +258,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
       prereqs: [sheetRef('u4_main_lcd_process')],
     }),
   ]),
-  차시('5차시 분수의 크기 비교하기', [
+  차시('5차시 분수의 크기 비교하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분수 크기 비교', genU4MainCmp, {
       id: 'u4_main_cmp', grid: 'concept', count: 8,
       prereqs: [sheetRef('u4_main_lcd')],
@@ -275,7 +282,7 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
     학습지('대분수 → 가분수 (과정 연습)', genU5PreMixedToImproperProcess, { id: 'u5_pre_mixed_to_improper_process', grid: 'concept', count: 8, from: 'g3-2' }),
     학습지('대분수 → 가분수', genU5PreMixedToImproper, { id: 'u5_pre_mixed_to_improper', from: 'g3-2' }),
   ]),
-  차시('1~2차시 (진분수)+(진분수) 계산하기', [
+  차시('1~2차시 (진분수)+(진분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 다른 진분수의 덧셈 (합이 1 미만)', T.fracLcdStep, genFracAddLt1, {
       id: 'u5_main_add',
       prereqs: [unitRef('u4'), unitRef('g4-2', 'u1')],
@@ -285,7 +292,7 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
       prereqs: [sheetRef('u5_main_add')],
     }),
   ]),
-  차시('3차시 (대분수)+(대분수) 계산하기', [
+  차시('3차시 (대분수)+(대분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('대분수 덧셈 (가분수 변환)', T.mixedImproperStep, genMixedAddNoCarry, {
       id: 'u5_main_mixed_add_improper',
       prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1')],
@@ -303,13 +310,13 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
       prereqs: [sheetRef('u5_main_mixed_add_separate')],
     }),
   ]),
-  차시('4차시 (진분수)-(진분수) 계산하기', [
+  차시('4차시 (진분수)-(진분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 다른 진분수의 뺄셈', T.fracLcdStep, genFracSub, {
       id: 'u5_main_sub',
       prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1')],
     }),
   ]),
-  차시('5차시 (대분수)-(대분수) 계산하기(1)', [
+  차시('5차시 (대분수)-(대분수) 계산하기(1)', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('대분수 뺄셈 - 받아내림 없음 (가분수 변환)', T.mixedImproperStep, genMixedSubNoBorrow, {
       id: 'u5_main_mixed_sub_no_borrow_improper',
       prereqs: [sheetRef('u5_main_sub'), unitRef('g4-2', 'u1')],
@@ -319,7 +326,7 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
       prereqs: [sheetRef('u5_main_sub'), unitRef('g4-2', 'u1')],
     }),
   ]),
-  차시('6차시 (대분수)-(대분수) 계산하기(2)', [
+  차시('6차시 (대분수)-(대분수) 계산하기(2)', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('대분수 뺄셈 - 받아내림 있음 (가분수 변환)', T.mixedImproperStep, genMixedSubBorrow, {
       id: 'u5_main_mixed_sub_borrow_improper',
       prereqs: [sheetRef('u5_main_mixed_sub_no_borrow_improper')],

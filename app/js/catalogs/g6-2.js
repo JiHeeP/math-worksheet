@@ -30,7 +30,7 @@ const FRAC_DIV_STEP_LAYOUT = { grid: 'wide', count: 4 };
 const DECIMAL_DIV_GRID_LAYOUT = { grid: 'wide', count: 6, defaultFontScale: 1.2 };
 
 const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
-  차시('1차시 (분수) ÷ (분수)', { grid: 'practice', count: 15 }, [
+  차시('1차시 (분수) ÷ (분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(진분수) ÷ (진분수)', genG62U1FracDivFrac, {
       id: 'u1_main_frac_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],
@@ -41,7 +41,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       ...FRAC_DIV_STEP_LAYOUT,
     }),
   ]),
-  차시('2차시 (자연수) ÷ (분수)', { grid: 'practice', count: 15 }, [
+  차시('2차시 (자연수) ÷ (분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(자연수) ÷ (진분수)', genG62U1IntDivFrac, {
       id: 'u1_main_int_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],
@@ -52,7 +52,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       ...FRAC_DIV_STEP_LAYOUT,
     }),
   ]),
-  차시('3차시 (대분수) ÷ (분수)', { grid: 'practice', count: 15 }, [
+  차시('3차시 (대분수) ÷ (분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(대분수) ÷ (진분수)', genG62U1MixedDivFrac, {
       id: 'u1_main_mixed_div_frac',
       prereqs: [unitRef('g6-1', 'u1')],

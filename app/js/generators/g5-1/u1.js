@@ -1,6 +1,6 @@
 'use strict';
 
-import { rand } from '../../utils.js';
+import { rand, numberRangeForStage } from '../../utils.js';
 import { numBlank } from '../../helpers.js';
 import { horizProblem } from '../../templates.js';
 
@@ -81,37 +81,82 @@ export function genDiv3d1() {
 
 /* ── 본단원 ── */
 
-export function genU1MainAddSubOrder() {
+export function genU1MainAddSubOrder(ctx = {}) {
+  const [lo, hi] = numberRangeForStage(ctx.numberStage || 2);
+  const minOp = Math.max(1, lo);
   const type = rand(1, 4);
-  if (type === 1) { const a = rand(20, 80), b = rand(20, 80), c = rand(10, Math.min(a + b - 1, 99)); return horizProblem(`${a} + ${b} \u2212 ${c}`, numBlank(a + b - c)); }
-  if (type === 2) { const a = rand(30, 90), b = rand(10, a - 1), c = rand(10, 80); return horizProblem(`${a} \u2212 ${b} + ${c}`, numBlank(a - b + c)); }
-  if (type === 3) { const a = rand(20, 60), b = rand(10, 40), c = rand(10, 40), d = rand(10, Math.min(a + b + c - 1, 50)); return horizProblem(`${a} + ${b} + ${c} \u2212 ${d}`, numBlank(a + b + c - d)); }
-  // a \u2212 b \u2212 c: a > b + c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
-  const b = rand(10, 30), c = rand(10, 30), a = rand(b + c + 1, 99);
+  if (type === 1) {
+    const a = rand(minOp, hi);
+    const b = rand(minOp, hi);
+    const c = rand(minOp, Math.min(a + b - 1, hi));
+    return horizProblem(`${a} + ${b} \u2212 ${c}`, numBlank(a + b - c));
+  }
+  if (type === 2) {
+    const a = rand(Math.max(minOp + 1, 2), hi);
+    const b = rand(minOp, a - 1);
+    const c = rand(minOp, hi);
+    return horizProblem(`${a} \u2212 ${b} + ${c}`, numBlank(a - b + c));
+  }
+  if (type === 3) {
+    const a = rand(minOp, hi);
+    const b = rand(minOp, hi);
+    const c = rand(minOp, hi);
+    const d = rand(minOp, Math.min(a + b + c - 1, hi));
+    return horizProblem(`${a} + ${b} + ${c} \u2212 ${d}`, numBlank(a + b + c - d));
+  }
+  // a \u2212 b \u2212 c: a > b + c
+  let b, c, tries = 0;
+  do {
+    b = rand(minOp, Math.max(minOp, Math.floor(hi / 2)));
+    c = rand(minOp, Math.max(minOp, Math.floor(hi / 2)));
+    tries++;
+  } while (b + c + 1 > hi && tries < 30);
+  if (b + c + 1 > hi) return genU1MainAddSubOrder(ctx);
+  const a = rand(b + c + 1, hi);
   return horizProblem(`${a} \u2212 ${b} \u2212 ${c}`, numBlank(a - b - c));
 }
 
-export function genU1MainAddSubParen() {
+export function genU1MainAddSubParen(ctx = {}) {
+  const [lo, hi] = numberRangeForStage(ctx.numberStage || 2);
+  const minOp = Math.max(1, lo);
   const type = rand(1, 3);
   if (type === 1) {
-    // a \u2212 (b + c): a > b + c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
-    const b = rand(10, 40), c = rand(10, 40), a = rand(b + c + 1, 99);
+    // a \u2212 (b + c): a > b + c
+    let b, c, tries = 0;
+    do {
+      b = rand(minOp, Math.max(minOp, Math.floor(hi / 2)));
+      c = rand(minOp, Math.max(minOp, Math.floor(hi / 2)));
+      tries++;
+    } while (b + c + 1 > hi && tries < 30);
+    if (b + c + 1 > hi) return genU1MainAddSubParen(ctx);
+    const a = rand(b + c + 1, hi);
     return horizProblem(`${a} \u2212 (${b} + ${c})`, numBlank(a - (b + c)));
   }
-  if (type === 2) { const a = rand(20, 60), c = rand(10, 40), b = rand(c + 1, c + 40); return horizProblem(`${a} + (${b} \u2212 ${c})`, numBlank(a + (b - c))); }
-  // a \u2212 (b \u2212 c): a > b \u2212 c \ubcf4\uc7a5 (\uacb0\uacfc \u2265 1)
-  const b = rand(20, 60), c = rand(10, b - 1), innerDiff = b - c;
-  const a = rand(innerDiff + 1, innerDiff + 50);
+  if (type === 2) {
+    const a = rand(minOp, hi);
+    const c = rand(minOp, Math.max(minOp, Math.floor(hi / 2)));
+    const b = rand(c + 1, hi);
+    return horizProblem(`${a} + (${b} \u2212 ${c})`, numBlank(a + (b - c)));
+  }
+  // a \u2212 (b \u2212 c)
+  const b = rand(Math.max(minOp + 1, 2), hi);
+  const c = rand(minOp, b - 1);
+  const innerDiff = b - c;
+  const a = rand(innerDiff + 1, hi);
   return horizProblem(`${a} \u2212 (${b} \u2212 ${c})`, numBlank(a - innerDiff));
 }
 
-export function genU1MainAddSubParenOrder() { return rand(1, 2) === 1 ? genU1MainAddSubOrder() : genU1MainAddSubParen(); }
+export function genU1MainAddSubParenOrder(ctx = {}) { return rand(1, 2) === 1 ? genU1MainAddSubOrder(ctx) : genU1MainAddSubParen(ctx); }
 
-export function genU1MainMulDivOrder() {
+export function genU1MainMulDivOrder(ctx = {}) {
+  // \uacf1\uc148\u00b7\ub098\ub217\uc148\uc740 \ub2e8\uc218\uac00 [2, 9] \ub85c \uc881\uc74c. stage \ub294 \uccab \ud53c\uc2b9\uc218 a (\ub610\ub294 \uc2dd\uc758 \ud569) \uc5d0 \uc801\uc6a9.
+  const [lo, hi] = numberRangeForStage(ctx.numberStage || 2);
+  const aMax = Math.max(2, Math.min(hi, 9));
+  const aMin = Math.max(2, Math.min(lo, aMax));
   const type = rand(1, 3);
-  if (type === 1) { const a = rand(2, 9), c = rand(2, 8), k = rand(2, 6), b = c * k; return horizProblem(`${a} \u00d7 ${b} \u00f7 ${c}`, numBlank(a * k)); }
-  if (type === 2) { const d = rand(2, 9), q = rand(2, 9), c = rand(2, 9); return horizProblem(`${q * d} \u00f7 ${d} \u00d7 ${c}`, numBlank(q * c)); }
-  const a = rand(2, 6), b = rand(2, 6), c = rand(2, 8), k = rand(2, 5), d = c * k; return horizProblem(`${a} \u00d7 ${b} \u00d7 ${d} \u00f7 ${c}`, numBlank(a * b * k));
+  if (type === 1) { const a = rand(aMin, aMax), c = rand(2, 8), k = rand(2, 6), b = c * k; return horizProblem(`${a} \u00d7 ${b} \u00f7 ${c}`, numBlank(a * k)); }
+  if (type === 2) { const d = rand(2, 9), q = rand(aMin, aMax), c = rand(2, 9); return horizProblem(`${q * d} \u00f7 ${d} \u00d7 ${c}`, numBlank(q * c)); }
+  const a = rand(2, Math.min(aMax, 6)), b = rand(2, 6), c = rand(2, 8), k = rand(2, 5), d = c * k; return horizProblem(`${a} \u00d7 ${b} \u00d7 ${d} \u00f7 ${c}`, numBlank(a * b * k));
 }
 
 export function genU1MainMulDivParen() {
@@ -159,29 +204,53 @@ export function genU1MainAddSubDivParen() {
 
 export function genU1MainAddSubDiv() { return rand(1, 2) === 1 ? genU1MainAddSubDivOrder() : genU1MainAddSubDivParen(); }
 
-export function genU1MainMixOrder() {
+export function genU1MainMixOrder(ctx = {}) {
+  const [lo, hi] = numberRangeForStage(ctx.numberStage || 2);
+  const minOp = Math.max(1, lo);
   const type = rand(1, 3);
-  if (type === 1) { const a = rand(20, 60), b = rand(2, 9), c = rand(2, 6), d = rand(2, 8), q = rand(2, 8); return horizProblem(`${a} + ${b} \u00d7 ${c} \u2212 ${q * d} \u00f7 ${d}`, numBlank(a + (b * c) - q)); }
-  if (type === 2) { const b = rand(2, 5), c = rand(2, 5), d = rand(2, 8), q = rand(2, 6), a = rand(b * c + 1, b * c + 30); return horizProblem(`${a} \u2212 ${b} \u00d7 ${c} + ${q * d} \u00f7 ${d}`, numBlank(a - (b * c) + q)); }
-  const a = rand(2, 9), b = rand(2, 9), c = rand(2, 8), k = rand(2, 5), d = rand(1, Math.max(1, a * b + k - 1));
+  if (type === 1) {
+    const a = rand(minOp, hi), b = rand(2, 9), c = rand(2, 6), d = rand(2, 8);
+    const qMax = Math.min(8, a + b * c - 1);
+    if (qMax < 2) return genU1MainMixOrder(ctx);
+    const q = rand(2, qMax);
+    return horizProblem(`${a} + ${b} \u00d7 ${c} \u2212 ${q * d} \u00f7 ${d}`, numBlank(a + (b * c) - q));
+  }
+  if (type === 2) {
+    const b = rand(2, 5), c = rand(2, 5), d = rand(2, 8), q = rand(2, 6);
+    const aLo = Math.max(minOp, b * c + 1);
+    const aHi = Math.max(aLo, hi);
+    const a = rand(aLo, aHi);
+    return horizProblem(`${a} \u2212 ${b} \u00d7 ${c} + ${q * d} \u00f7 ${d}`, numBlank(a - (b * c) + q));
+  }
+  const a = rand(2, 9), b = rand(2, 9), c = rand(2, 8), k = rand(2, 5);
+  const dMax = Math.max(1, Math.min(hi, a * b + k - 1));
+  const d = rand(1, dMax);
   return horizProblem(`${a} \u00d7 ${b} + ${k * c} \u00f7 ${c} \u2212 ${d}`, numBlank(a * b + k - d));
 }
 
-export function genU1MainMixParen() {
+export function genU1MainMixParen(ctx = {}) {
+  const [lo, hi] = numberRangeForStage(ctx.numberStage || 2);
+  const minOp = Math.max(1, lo);
+  const halfHi = Math.max(minOp, Math.floor(hi / 2));
   const type = rand(1, 3);
-  if (type === 1) { const a = rand(6, 20), b = rand(5, 18), c = rand(2, 5), d = rand(2, 7), q = rand(2, 6); return horizProblem(`(${a} + ${b}) \u00d7 ${c} \u2212 ${q * d} \u00f7 ${d}`, numBlank((a + b) * c - q)); }
+  if (type === 1) {
+    const a = rand(minOp, halfHi), b = rand(minOp, halfHi), c = rand(2, 5), d = rand(2, 7);
+    const qMax = Math.min(6, (a + b) * c - 1);
+    if (qMax < 2) return genU1MainMixParen(ctx);
+    const q = rand(2, qMax);
+    return horizProblem(`(${a} + ${b}) \u00d7 ${c} \u2212 ${q * d} \u00f7 ${d}`, numBlank((a + b) * c - q));
+  }
   if (type === 2) {
-    // a \u00d7 b \u2212 (c \u2212 q*d \u00f7 d): \uc548\ucabd c \u2212 q \u2265 1, \ubc14\uae65 a*b \u2212 (c \u2212 q) \u2265 1 \ubcf4\uc7a5
     const a = rand(2, 6), b = rand(2, 6), ab = a * b;
     const d = rand(2, 8), q = rand(2, 6);
-    const c = rand(q + 1, q + ab - 1); // c \u2212 q \u2208 [1, ab \u2212 1]
+    const c = rand(q + 1, q + ab - 1);
     return horizProblem(`${a} \u00d7 ${b} \u2212 (${c} \u2212 ${q * d} \u00f7 ${d})`, numBlank(ab - (c - q)));
   }
-  const a = rand(10, 30), b = rand(10, 20), c = rand(2, 5), d = rand(2, 7), q = rand(2, 6);
+  const a = rand(minOp, halfHi), b = rand(minOp, halfHi), c = rand(2, 5), d = rand(2, 7), q = rand(2, 6);
   return horizProblem(`(${a} + ${b}) \u00d7 ${c} + ${q * d} \u00f7 ${d}`, numBlank((a + b) * c + q));
 }
 
-export function genU1MainMix() { return rand(1, 2) === 1 ? genU1MainMixOrder() : genU1MainMixParen(); }
+export function genU1MainMix(ctx = {}) { return rand(1, 2) === 1 ? genU1MainMixOrder(ctx) : genU1MainMixParen(ctx); }
 
 /* ── PDF 제너레이터 ── */
 

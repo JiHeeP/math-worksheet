@@ -200,6 +200,12 @@ button:disabled:active { transform: none; }
   color: #ffffff;
 }
 
+.dan-button.is-disabled,
+.dan-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .sheet {
   width: var(--paper-width);
   height: var(--paper-height);

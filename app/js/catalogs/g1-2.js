@@ -59,8 +59,8 @@ const u4 = defineUnit(GRADE_ID, 'u4', '덧셈과 뺄셈(1)', [
     학습지('(두 자리) − (한 자리)', genG12U4Sub2d1d, { id: 'u4_main_sub_2d1d' }),
   ]),
   차시('2차시 (두 자리) ± (두 자리), 받아올림·내림 없음', { grid: 'standard', count: 20 }, [
-    학습지('(두 자리) + (두 자리)', genG12U4Add2d2d, { id: 'u4_main_add_2d2d' }),
-    학습지('(두 자리) − (두 자리)', genG12U4Sub2d2d, { id: 'u4_main_sub_2d2d' }),
+    학습지('(두 자리) + (두 자리)', genG12U4Add2d2d, { id: 'u4_main_add_2d2d', controls: { numberDifficulty: { stages: [1, 2] } } }),
+    학습지('(두 자리) − (두 자리)', genG12U4Sub2d2d, { id: 'u4_main_sub_2d2d', controls: { numberDifficulty: { stages: [1, 2] } } }),
   ]),
 ]);
 
