@@ -68,6 +68,22 @@ export function lcdFracLimitsForStage(stage) {
   return { dMin: 6, dMax: 20 };
 }
 
+export function relatedDenominatorPair(dMin, dMax) {
+  for (let tries = 0; tries < 200; tries++) {
+    const d1 = rand(dMin, dMax);
+    const d2 = rand(dMin, dMax);
+    if (d1 !== d2 && gcd(d1, d2) > 1) return { d1, d2 };
+  }
+
+  for (let d1 = dMin; d1 <= dMax; d1++) {
+    for (let d2 = dMin; d2 <= dMax; d2++) {
+      if (d1 !== d2 && gcd(d1, d2) > 1) return { d1, d2 };
+    }
+  }
+
+  return { d1: dMin, d2: dMin + 1 };
+}
+
 // 대분수 자연수부 단계
 export function mixedWholeForStage(stage) {
   if (stage === 1) return { wMin: 1, wMax: 3 };

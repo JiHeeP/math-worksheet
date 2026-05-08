@@ -1,6 +1,6 @@
 'use strict';
 
-import { rand, randChoice, gcd, lcm, lcdFracLimitsForStage } from '../../utils.js';
+import { rand, randChoice, gcd, lcm, lcdFracLimitsForStage, relatedDenominatorPair } from '../../utils.js';
 import { fracD, mixedD, numBlank, symBlank, fracBlank, mixedBlank } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
@@ -59,13 +59,7 @@ export function genU4MainRed(ctx = {}) {
 
 function pickLcdPair(ctx) {
   const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
-  let d1, d2, tries = 0;
-  do {
-    d1 = rand(dMin, dMax); d2 = rand(dMin, dMax);
-    tries++;
-  } while (d1 === d2 && tries < 100);
-  if (d1 === d2) d2 = d1 + 1;
-  return { d1, d2 };
+  return relatedDenominatorPair(dMin, dMax);
 }
 
 export function genU4MainLcdProcess(ctx = {}) {
