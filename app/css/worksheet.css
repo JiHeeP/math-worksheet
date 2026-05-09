@@ -363,15 +363,19 @@ button:disabled:active { transform: none; }
 .relation-layout,
 .shape-layout {
   width: 100%;
-  text-align: center;
   margin-top: 14px;
+}
+
+.horiz-box,
+.frac-row {
+  text-align: left;
 }
 
 .horiz-box,
 .frac-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: calc(5px * var(--font-scale, 1));
   padding: 0 3px;
@@ -1017,13 +1021,13 @@ button:disabled:active { transform: none; }
 .origin-horiz-practice {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .origin-equation-row {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   gap: calc(8px * var(--font-scale, 1));
   font-size: calc(22px * var(--font-scale, 1));
   line-height: 1;
