@@ -377,11 +377,6 @@ button:disabled:active { transform: none; }
   padding: 0 3px;
 }
 
-.problem-item.frac-addsub-row .frac-row {
-  text-align: left;
-  justify-content: flex-start;
-}
-
 .horiz-box {
   font-size: calc(20px * var(--font-scale, 1));
   line-height: 1.35;
@@ -755,6 +750,17 @@ button:disabled:active { transform: none; }
 .problem-item.mixed-separate-step .concept-layout {
   margin-top: 0;
   gap: 0;
+  align-items: stretch;
+}
+
+.problem-item.mixed-separate-step .frac-step-rows {
+  align-items: flex-start;
+  text-align: left;
+  padding-left: 26px;
+}
+
+.problem-item.mixed-separate-step .frac-step-row {
+  justify-content: flex-start;
 }
 
 .problem-item.frac-mul-step .concept-layout {

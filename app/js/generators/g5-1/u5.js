@@ -4,8 +4,6 @@ import { rand, lcm, lcdFracLimitsForStage, mixedWholeForStage, relatedDenominato
 import { fracD, mixedD, numBlank, fracBlank, mixedBlank, formulaResultHtml } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
-const FRAC_ADDSUB_ROW = 'frac-addsub-row';
-
 function calcStageLimits(ctx) {
   const stage = ctx.fractionStage || 2;
   if (stage === 1) return { ...lcdFracLimitsForStage(stage), commonMax: 24, convertedMax: 240 };
@@ -35,26 +33,26 @@ function pickCalcDenominators(ctx) {
 
 export function genU5PreAdd() {
   const d = rand(5, 12), a = rand(1, Math.floor(d / 2)), b = rand(1, d - a - 1);
-  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`);
 }
 
 export function genU5PreAddGe1() {
   const d = rand(3, 10);
   let a, b;
   do { a = rand(1, d - 1); b = rand(1, d - 1); } while (a + b < d);
-  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">+</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a + b, d)}`);
 }
 
 export function genU5PreSub() {
   const d = rand(5, 12), b = rand(1, d - 2), a = rand(b + 1, d - 1);
-  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">\u2212</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a - b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${fracD(a, d)} <span class="op-txt">\u2212</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(a - b, d)}`);
 }
 
 export function genU5PreMixedSub() {
   const d = rand(3, 10), w = rand(1, 3), wn = rand(0, d - 1), b = rand(1, d - 1);
   const totalNum = w * d + wn;
   if (totalNum <= b) return genU5PreMixedSub();
-  return htmlProblem('frac-row', `${wn === 0 ? w : mixedD(w, wn, d)} <span class="op-txt">\u2212</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(totalNum - b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${wn === 0 ? w : mixedD(w, wn, d)} <span class="op-txt">\u2212</span> ${fracD(b, d)} <span class="eq-txt">=</span> ${formulaResultHtml(totalNum - b, d)}`);
 }
 
 export function genU5PreMixedToImproperProcess() {

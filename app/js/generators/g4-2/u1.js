@@ -16,7 +16,6 @@ import { htmlProblem } from '../../templates.js';
 const OP_PLUS = '<span class="op-txt">+</span>';
 const OP_MINUS = '<span class="op-txt">−</span>';
 const EQ = '<span class="eq-txt">=</span>';
-const FRAC_ADDSUB_ROW = 'frac-addsub-row';
 
 // 4학년 학습지: 진분수 단계 [1, 2] 만 사용 (3단계 부담).
 // 모든 분수가 같은 분모이므로 properFracLimitsForStage 적용.
@@ -30,7 +29,7 @@ export function genG42U1AddLt1(ctx = {}) {
   const d = pickD(ctx, 5);
   const a = rand(1, Math.max(1, Math.floor(d / 2)));
   const b = rand(1, Math.max(1, d - a - 1));
-  return htmlProblem('frac-row', `${fracD(a, d)} ${OP_PLUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(a + b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${fracD(a, d)} ${OP_PLUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(a + b, d)}`);
 }
 
 /* ── 2차시 (진분수)+(진분수), 합이 1 이상 (단계 풀이) ── */
@@ -47,7 +46,7 @@ export function genG42U1Sub(ctx = {}) {
   const d = pickD(ctx, 5);
   const b = rand(1, d - 2);
   const a = rand(b + 1, d - 1);
-  return htmlProblem('frac-row', `${fracD(a, d)} ${OP_MINUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(a - b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${fracD(a, d)} ${OP_MINUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(a - b, d)}`);
 }
 
 /* ── 4차시 1 - (진분수) (단계 풀이) ── */
@@ -76,7 +75,7 @@ export function genG42U1MixedAddNoCarry(ctx = {}) {
     n1 = rand(1, d - 2); n2 = rand(1, Math.max(1, d - 1 - n1));
     tries++;
   } while (n1 + n2 >= d && tries < 50);
-  return htmlProblem('frac-row', `${mixedD(w1, n1, d)} ${OP_PLUS} ${mixedD(w2, n2, d)} ${EQ} ${formulaResultHtml((w1 + w2) * d + (n1 + n2), d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${mixedD(w1, n1, d)} ${OP_PLUS} ${mixedD(w2, n2, d)} ${EQ} ${formulaResultHtml((w1 + w2) * d + (n1 + n2), d)}`);
 }
 
 /* ── 7차시 분모 같은 (대분수)+(대분수), 받아올림 있음 (단계 풀이) ── */
@@ -101,7 +100,7 @@ export function genG42U1MixedSubFrac(ctx = {}) {
   const b = rand(1, d - 1);
   const num = w * d + wn;
   if (num <= b) return genG42U1MixedSubFrac(ctx);
-  return htmlProblem('frac-row', `${mixedD(w, wn, d)} ${OP_MINUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(num - b, d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${mixedD(w, wn, d)} ${OP_MINUS} ${fracD(b, d)} ${EQ} ${formulaResultHtml(num - b, d)}`);
 }
 
 /* ── 8차시 분모 같은 (대분수)-(대분수), 받아내림 없음 ── */
@@ -114,7 +113,7 @@ export function genG42U1MixedSubNoBorrow(ctx = {}) {
     n2 = rand(1, d - 2); n1 = rand(n2 + 1, d - 1);
     tries++;
   } while ((n1 <= n2 || w1 <= w2) && tries < 50);
-  return htmlProblem('frac-row', `${mixedD(w1, n1, d)} ${OP_MINUS} ${mixedD(w2, n2, d)} ${EQ} ${formulaResultHtml((w1 - w2) * d + (n1 - n2), d)}`, FRAC_ADDSUB_ROW);
+  return htmlProblem('frac-row', `${mixedD(w1, n1, d)} ${OP_MINUS} ${mixedD(w2, n2, d)} ${EQ} ${formulaResultHtml((w1 - w2) * d + (n1 - n2), d)}`);
 }
 
 /* ── 9차시 (자연수) - (대분수) (단계 풀이) ── */
