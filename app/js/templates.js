@@ -264,8 +264,8 @@ function inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2) {
   const wholeSum = w1 + w2;
 
   const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">+</span> ${mixedD(w2, n2, d2)}`;
-  const line2 = `<span class="eq-txt">=</span> (${numBlank(w1)} + ${numBlank(w2)}) + (${fracD(n1, d1)} <span class="op-txt">+</span> ${fracD(n2, d2)})`;
-  const line3 = `<span class="eq-txt">=</span> (${numBlank(w1)} + ${numBlank(w2)}) + (${fracExpand(n1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(n2, d2, m2)})`;
+  const line2 = `<span class="eq-txt">=</span> (${w1} + ${w2}) + (${fracD(n1, d1)} <span class="op-txt">+</span> ${fracD(n2, d2)})`;
+  const line3 = `<span class="eq-txt">=</span> ${numBlank(wholeSum)} + (${fracExpand(n1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(n2, d2, m2)})`;
 
   let line4 = `<span class="eq-txt">=</span> ${numBlank(wholeSum)} + ${fracWithBlankDen(fracSum, common)}`;
   if (fracSum >= common) {
@@ -308,8 +308,8 @@ function inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2) {
   const cn1 = n1 * m1, cn2 = n2 * m2;
 
   const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">\u2212</span> ${mixedD(w2, n2, d2)}`;
-  const line2 = `<span class="eq-txt">=</span> (${numBlank(w1)} \u2212 ${numBlank(w2)}) + (${fracD(n1, d1)} <span class="op-txt">\u2212</span> ${fracD(n2, d2)})`;
-  const line3 = `<span class="eq-txt">=</span> (${numBlank(w1)} \u2212 ${numBlank(w2)}) + (${fracExpand(n1, d1, m1)} <span class="op-txt">\u2212</span> ${fracExpand(n2, d2, m2)})`;
+  const line2 = `<span class="eq-txt">=</span> (${w1} \u2212 ${w2}) + (${fracD(n1, d1)} <span class="op-txt">\u2212</span> ${fracD(n2, d2)})`;
+  const line3 = `<span class="eq-txt">=</span> ${numBlank(w1 - w2)} + (${fracExpand(n1, d1, m1)} <span class="op-txt">\u2212</span> ${fracExpand(n2, d2, m2)})`;
   let line4, line5;
 
   if (cn1 >= cn2) {
@@ -330,7 +330,7 @@ function inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2) {
     const borrowedN1 = cn1 + common;
     const fracDiff = borrowedN1 - cn2;
     const wholeDiff = w1 - w2 - 1;
-    line4 = `<span class="eq-txt">=</span> (${numBlank(w1 - 1)} \u2212 ${numBlank(w2)}) + (${fracWithBlankDen(borrowedN1, common)} <span class="op-txt">\u2212</span> ${fracWithBlankDen(cn2, common)})`;
+    line4 = `<span class="eq-txt">=</span> ${numBlank(wholeDiff)} + (${fracWithBlankDen(borrowedN1, common)} <span class="op-txt">\u2212</span> ${fracWithBlankDen(cn2, common)})`;
     line5 = `<span class="eq-txt">=</span> ${numBlank(wholeDiff)} + ${fracWithBlankDen(fracDiff, common)}`;
     if (fracDiff === 0) {
       line5 += ` <span class="eq-txt">=</span> ${numBlank(wholeDiff)}`;
