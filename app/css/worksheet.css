@@ -748,6 +748,8 @@ button:disabled:active { transform: none; }
 }
 
 .problem-item.mixed-separate-step .concept-layout {
+  --write-box-size: calc(22px * var(--font-scale, 1));
+  --frac-box-height: calc(20px * var(--font-scale, 1));
   margin-top: 0;
   gap: 0;
   align-items: stretch;
@@ -756,11 +758,49 @@ button:disabled:active { transform: none; }
 .problem-item.mixed-separate-step .frac-step-rows {
   align-items: flex-start;
   text-align: left;
-  padding-left: 26px;
+  padding-left: 24px;
+  gap: calc(1px * var(--font-scale, 1));
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.05;
 }
 
 .problem-item.mixed-separate-step .frac-step-row {
   justify-content: flex-start;
+  gap: calc(2px * var(--font-scale, 1));
+}
+
+.problem-item.mixed-separate-step .frac-d,
+.problem-item.mixed-separate-step .mixed-d .whole,
+.problem-item.mixed-separate-step .op-txt,
+.problem-item.mixed-separate-step .eq-txt {
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.problem-item.mixed-separate-step .frac-d .ft,
+.problem-item.mixed-separate-step .frac-d .fb {
+  min-width: 16px;
+  padding: 0 4px;
+}
+
+.problem-item.mixed-separate-step .frac-step-rows .num-blank {
+  border-width: 1.5px;
+  border-radius: 6px;
+  font-size: calc(15px * var(--font-scale, 1));
+}
+
+.problem-item.mixed-separate-step .frac-blank {
+  font-size: calc(15px * var(--font-scale, 1));
+}
+
+.problem-item.mixed-separate-step .frac-blank .fb-top,
+.problem-item.mixed-separate-step .frac-blank .fb-bot {
+  border-width: 1.5px;
+  border-radius: 6px;
+}
+
+.problem-item.mixed-separate-step .frac-blank .fb-line {
+  height: 1.5px;
+  margin: calc(1px * var(--font-scale, 1)) 0;
 }
 
 .problem-item.frac-mul-step .concept-layout {
