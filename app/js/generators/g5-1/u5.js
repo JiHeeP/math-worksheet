@@ -4,6 +4,31 @@ import { rand, lcm, lcdFracLimitsForStage, mixedWholeForStage, relatedDenominato
 import { fracD, mixedD, numBlank, fracBlank, mixedBlank, formulaResultHtml } from '../../helpers.js';
 import { htmlProblem } from '../../templates.js';
 
+function calcStageLimits(ctx) {
+  const stage = ctx.fractionStage || 2;
+  if (stage === 1) return { ...lcdFracLimitsForStage(stage), commonMax: 24, convertedMax: 240 };
+  if (stage === 3) return { ...lcdFracLimitsForStage(stage), commonMax: 240, convertedMax: 1800 };
+  return { ...lcdFracLimitsForStage(stage), commonMax: 120, convertedMax: 900 };
+}
+
+function pickCalcDenominators(ctx) {
+  const { dMin, dMax, commonMax } = calcStageLimits(ctx);
+  let d1, d2, common;
+  for (let tries = 0; tries < 200; tries++) {
+    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    common = lcm(d1, d2);
+    if (common <= commonMax) return { d1, d2, common };
+  }
+  for (let a = dMin; a <= dMax; a++) {
+    for (let b = dMin; b <= dMax; b++) {
+      const c = lcm(a, b);
+      if (a !== b && c < a * b && c <= commonMax) return { d1: a, d2: b, common: c };
+    }
+  }
+  ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+  return { d1, d2, common: lcm(d1, d2) };
+}
+
 /* ── 선수학습: 분모 같은 분수 (직접 렌더링) ── */
 
 export function genU5PreAdd() {
@@ -43,12 +68,10 @@ export function genU5PreMixedToImproper() {
 /* ── 본단원: 템플릿용 순수 데이터 제너레이터 ── */
 
 export function genFracAddLt1(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, total, common, tries = 0;
   do {
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
-    common = lcm(d1, d2);
     total = (n1 * (common / d1)) + (n2 * (common / d2));
     tries++;
   } while (total >= common && tries < 200);
@@ -56,12 +79,10 @@ export function genFracAddLt1(ctx = {}) {
 }
 
 export function genFracAddGe1(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, total, common, tries = 0;
   do {
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
-    common = lcm(d1, d2);
     total = (n1 * (common / d1)) + (n2 * (common / d2));
     tries++;
   } while (total < common && tries < 200);
@@ -69,12 +90,10 @@ export function genFracAddGe1(ctx = {}) {
 }
 
 export function genFracSub(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, diff, common, tries = 0;
   do {
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
-    common = lcm(d1, d2);
     diff = (n1 * (common / d1)) - (n2 * (common / d2));
     tries++;
   } while (diff <= 0 && tries < 200);
@@ -82,41 +101,44 @@ export function genFracSub(ctx = {}) {
 }
 
 export function genMixedAddNoCarry(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  const { convertedMax } = calcStageLimits(ctx);
   const { wMin, wMax } = mixedWholeForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, common, tries = 0;
   do {
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
-    common = lcm(d1, d2);
     tries++;
   } while (n1 * (common / d1) + n2 * (common / d2) >= common && tries < 200);
   const w1 = rand(wMin, wMax), w2 = rand(wMin, wMax);
+  if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
+    return genMixedAddNoCarry(ctx);
+  }
   return { w1, n1, d1, w2, n2, d2, op: '+' };
 }
 
 export function genMixedAddCarry(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  const { convertedMax } = calcStageLimits(ctx);
   const { wMin, wMax } = mixedWholeForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, common, tries = 0;
   do {
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
-    common = lcm(d1, d2);
     tries++;
   } while (n1 * (common / d1) + n2 * (common / d2) < common && tries < 200);
   const w1 = rand(wMin, wMax), w2 = rand(wMin, wMax);
+  if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
+    return genMixedAddCarry(ctx);
+  }
   return { w1, n1, d1, w2, n2, d2, op: '+' };
 }
 
 export function genMixedSubNoBorrow(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  const { convertedMax } = calcStageLimits(ctx);
   const { wMin, wMax } = mixedWholeForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, common, tries = 0;
   while (tries < 200) {
     tries++;
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
-    common = lcm(d1, d2);
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n2 = rand(1, d2 - 1);
     const n2c = n2 * (common / d2);
     if (n2c >= common - 1) continue;
@@ -127,17 +149,19 @@ export function genMixedSubNoBorrow(ctx = {}) {
     break;
   }
   const w2 = rand(wMin, wMax), w1 = w2 + rand(1, 3);
+  if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
+    return genMixedSubNoBorrow(ctx);
+  }
   return { w1, n1, d1, w2, n2, d2, op: '-' };
 }
 
 export function genMixedSubBorrow(ctx = {}) {
-  const { dMin, dMax } = lcdFracLimitsForStage(ctx.fractionStage || 2);
+  const { convertedMax } = calcStageLimits(ctx);
   const { wMin, wMax } = mixedWholeForStage(ctx.fractionStage || 2);
   let d1, d2, n1, n2, common, tries = 0;
   while (tries < 200) {
     tries++;
-    ({ d1, d2 } = relatedDenominatorPair(dMin, dMax));
-    common = lcm(d1, d2);
+    ({ d1, d2, common } = pickCalcDenominators(ctx));
     n2 = rand(1, d2 - 1);
     const n2c = n2 * (common / d2);
     if (n2c <= 1) continue;
@@ -148,5 +172,8 @@ export function genMixedSubBorrow(ctx = {}) {
     break;
   }
   const w2 = rand(wMin, wMax), w1 = w2 + rand(1, 3);
+  if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
+    return genMixedSubBorrow(ctx);
+  }
   return { w1, n1, d1, w2, n2, d2, op: '-' };
 }

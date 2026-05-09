@@ -728,6 +728,30 @@ button:disabled:active { transform: none; }
   line-height: 1.6;
 }
 
+.frac-step-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(3px * var(--font-scale, 1));
+  font-size: calc(14px * var(--font-scale, 1));
+  line-height: 1.25;
+}
+
+.frac-step-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: calc(4px * var(--font-scale, 1));
+  max-width: 100%;
+}
+
+.problem-item.mixed-separate-step .concept-layout {
+  margin-top: 0;
+  gap: 0;
+}
+
 .problem-item.frac-mul-step .concept-layout {
   margin-top: 0;
   gap: 0;
@@ -793,6 +817,7 @@ button:disabled:active { transform: none; }
 
 .num-blank { min-width: var(--write-box-size); }
 .frac-step-flow .num-blank,
+.frac-step-rows .num-blank,
 .origin-equation-row .num-blank {
   min-width: var(--write-box-size);
   width: var(--write-box-size);

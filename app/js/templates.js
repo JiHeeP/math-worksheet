@@ -98,6 +98,21 @@ function fracStepProblemMultiLine(lines, itemClass = '') {
   `, itemClass);
 }
 
+function fracStepProblemRows(lines, itemClass = '') {
+  const orderedLines = Array.isArray(lines)
+    ? lines
+    : ['line1', 'line2', 'line3', 'line4', 'line5', 'line6'].map((key) => lines[key]);
+  const rowsHtml = orderedLines
+    .filter(Boolean)
+    .map((line) => `<div class="frac-step-row">${line}</div>`)
+    .join('');
+  return htmlProblem('concept-layout', `
+    <div class="concept-card">
+      <div class="concept-answer frac-step-rows">${rowsHtml}</div>
+    </div>
+  `, itemClass);
+}
+
 /* ================================================================
    중간 레벨: 풀이 과정 조립기 (step composers)
    ================================================================ */
@@ -548,7 +563,7 @@ export const T = {
 
   /** 분수 통분 연산 - 진분수 (1줄 풀이) */
   fracLcdStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ n1, d1, n2, d2, op }) => {
       const steps = op === '+' ? inlineFracAdd(n1, d1, n2, d2) : inlineFracSub(n1, d1, n2, d2);
       return fracStepProblem(steps);
@@ -557,7 +572,7 @@ export const T = {
 
   /** 대분수 연산 - 가분수 변환 방식 (1줄) */
   mixedImproperStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ w1, n1, d1, w2, n2, d2, op }) => {
       const lines = op === '+'
         ? inlineMixedAddImproper(w1, n1, d1, w2, n2, d2)
@@ -568,48 +583,48 @@ export const T = {
 
   /** 대분수 연산 - 자연수/분수 따로 */
   mixedSeparateStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 4,
     render: ({ w1, n1, d1, w2, n2, d2, op }) => {
       const lines = op === '+'
         ? inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2)
         : inlineMixedSubSeparate(w1, n1, d1, w2, n2, d2);
-      return fracStepProblemMultiLine(lines);
+      return fracStepProblemRows(lines, 'mixed-separate-step');
     },
   },
 
   /** 분모 같은 (진분수)+(진분수), 합 ≥ 1 — 가분수→대분수 변환 단계 */
   sameFracAddGe1Step: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ a, b, d }) => fracStepProblem(inlineSameFracAddGe1(a, b, d)),
   },
 
   /** 1 − (진분수) — 1 = d/d 변환 단계 */
   oneMinusFracStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ n, d }) => fracStepProblem(inline1MinusFrac(n, d)),
   },
 
   /** (자연수) − (진분수) — 자연수 받아내림 단계 */
   intMinusFracStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ w, n, d }) => fracStepProblem(inlineIntMinusFrac(w, n, d)),
   },
 
   /** (자연수) − (대분수) — 자연수 받아내림 단계 */
   intMinusMixedStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ w, wm, n, d }) => fracStepProblem(inlineIntMinusMixed(w, wm, n, d)),
   },
 
   /** 분모 같은 (대분수)+(대분수), 받아올림 — 자연수·분수 따로 */
   sameMixedAddCarryStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedAddCarry(w1, n1, w2, n2, d)),
   },
 
   /** 분모 같은 (대분수)−(대분수), 받아내임 — 자연수·분수 따로 */
   sameMixedSubBorrowStep: {
-    grid: 'wide', count: 8,
+    grid: 'wide', count: 6,
     render: ({ w1, n1, w2, n2, d }) => fracStepProblemMultiLine(inlineSameMixedSubBorrow(w1, n1, w2, n2, d)),
   },
 

@@ -51,14 +51,10 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
   'u5_main_add',
   'u5_main_add_ge1',
   'u5_main_mixed_add_improper',
-  'u5_main_mixed_add_separate',
   'u5_main_mixed_add_carry_improper',
-  'u5_main_mixed_add_carry_separate',
   'u5_main_sub',
   'u5_main_mixed_sub_no_borrow_improper',
-  'u5_main_mixed_sub_no_borrow_separate',
   'u5_main_mixed_sub_borrow_improper',
-  'u5_main_mixed_sub_borrow_separate',
   'u2_main_frac_times_int_step',
   'u2_main_mixed_times_int_step',
   'u2_main_int_times_frac_step',
@@ -76,6 +72,13 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
 
 export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([
   'u2_main_mixed_times_mixed',
+]);
+
+export const MULTI_ROW_MIXED_SEPARATE_IDS = new Set([
+  'u5_main_mixed_add_separate',
+  'u5_main_mixed_add_carry_separate',
+  'u5_main_mixed_sub_no_borrow_separate',
+  'u5_main_mixed_sub_borrow_separate',
 ]);
 
 export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
@@ -107,6 +110,17 @@ export function getHtmlLayoutConfig(item) {
       ...base,
       minCols: 2, maxCols: 2, widthPriority: 1.5,
       minCellWidth: Math.max(base.minCellWidth || 0, 76),
+    };
+  }
+
+  if (MULTI_ROW_MIXED_SEPARATE_IDS.has(localId)) {
+    return {
+      ...base,
+      minCols: 2, maxCols: 2, maxRows: 2, widthPriority: 1,
+      targetCellAspect: 0.72,
+      minCellWidth: 76,
+      minCellHeight: 118,
+      baseGap: [8, 8],
     };
   }
 
