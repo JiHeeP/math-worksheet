@@ -20,7 +20,7 @@ import {
   genDiv3d1,
   PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
-import { genU4PreCmp, genU4PreConv } from '../generators/g5-1/u4.js';
+import { genU4PreCmp, genU4PreConv, genU4PreImproperToMixedProcess } from '../generators/g5-1/u4.js';
 import {
   genU5PreMixedToImproperProcess, genU5PreMixedToImproper,
 } from '../generators/g5-1/u5.js';
@@ -52,13 +52,16 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수', [
   차시('1차시 분모가 같은 분수의 크기 비교', { grid: 'practice', count: 15 }, [
     학습지('분모 같은 분수 크기 비교', genU4PreCmp, { id: 'u5_main_frac_cmp' }),
   ]),
-  차시('2차시 가분수 → 대분수 변환 (과정 연습)', { grid: 'concept', count: 8 }, [
-    학습지('가분수 → 대분수 (과정 연습)', genU5PreMixedToImproperProcess, { id: 'u5_main_improper_process' }),
+  차시('2차시 대분수 → 가분수 변환 (과정 연습)', { grid: 'concept', count: 8 }, [
+    학습지('대분수 → 가분수 (과정 연습)', genU5PreMixedToImproperProcess, { id: 'u5_main_mixed_to_improper_process' }),
   ]),
-  차시('3차시 가분수 → 대분수 변환', { grid: 'practice', count: 15 }, [
+  차시('3차시 가분수 → 대분수 변환 (과정 연습)', { grid: 'concept', count: 8 }, [
+    학습지('가분수 → 대분수 (과정 연습)', genU4PreImproperToMixedProcess, { id: 'u5_main_improper_to_mixed_process' }),
+  ]),
+  차시('4차시 가분수 → 대분수 변환', { grid: 'practice', count: 15 }, [
     학습지('가분수 → 대분수 변환', genU4PreConv, { id: 'u5_main_improper_to_mixed' }),
   ]),
-  차시('4차시 대분수 → 가분수 변환', { grid: 'practice', count: 15 }, [
+  차시('5차시 대분수 → 가분수 변환', { grid: 'practice', count: 15 }, [
     학습지('대분수 → 가분수', genU5PreMixedToImproper, { id: 'u5_main_mixed_to_improper' }),
   ]),
 ]);

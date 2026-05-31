@@ -16,6 +16,12 @@ export function genU4PreConv() {
   return htmlProblem('frac-row', `${fracD((whole * den) + rem, den)} <span class="eq-txt">=</span> ${mixedBlank(whole, rem, den)}`);
 }
 
+export function genU4PreImproperToMixedProcess() {
+  const den = rand(2, 7), whole = rand(1, 3), rem = rand(1, den - 1);
+  const improper = (whole * den) + rem;
+  return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(improper, den)} <span class="eq-txt">=</span> ${numBlank(improper)} \u00f7 ${numBlank(den)} <span class="eq-txt">=</span> ${numBlank(whole)} \u2026 ${numBlank(rem)} <span class="eq-txt">=</span> ${mixedBlank(whole, rem, den)}</div></div>`);
+}
+
 export function genU4MainEquivFind() {
   const den = rand(2, 8), num = rand(1, den - 1), multiplier = rand(2, 4);
   const g = gcd(Math.abs(num), Math.abs(den));
