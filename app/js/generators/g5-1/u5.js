@@ -86,7 +86,7 @@ export function genFracAddGe1(ctx = {}) {
     total = (n1 * (common / d1)) + (n2 * (common / d2));
     tries++;
   } while (total < common && tries < 200);
-  return { n1, d1, n2, d2, op: '+' };
+  return { n1, d1, n2, d2, op: '+', showImproperResultStep: true };
 }
 
 export function genFracSub(ctx = {}) {
@@ -113,7 +113,7 @@ export function genMixedAddNoCarry(ctx = {}) {
   if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
     return genMixedAddNoCarry(ctx);
   }
-  return { w1, n1, d1, w2, n2, d2, op: '+' };
+  return { w1, n1, d1, w2, n2, d2, op: '+', showImproperResultStep: true };
 }
 
 export function genMixedAddCarry(ctx = {}) {
@@ -129,7 +129,7 @@ export function genMixedAddCarry(ctx = {}) {
   if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
     return genMixedAddCarry(ctx);
   }
-  return { w1, n1, d1, w2, n2, d2, op: '+' };
+  return { w1, n1, d1, w2, n2, d2, op: '+', showImproperResultStep: true };
 }
 
 export function genMixedSubNoBorrow(ctx = {}) {
@@ -152,7 +152,7 @@ export function genMixedSubNoBorrow(ctx = {}) {
   if ((w1 * d1 + n1) * (common / d1) > convertedMax || (w2 * d2 + n2) * (common / d2) > convertedMax) {
     return genMixedSubNoBorrow(ctx);
   }
-  return { w1, n1, d1, w2, n2, d2, op: '-' };
+  return { w1, n1, d1, w2, n2, d2, op: '-', showImproperResultStep: true };
 }
 
 export function genMixedSubBorrow(ctx = {}) {

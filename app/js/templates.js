@@ -210,7 +210,7 @@ function inlineFracDivStep(leftTerm, rightTerm) {
 }
 
 /** 진분수 통분 덧셈 과정 (1줄) */
-function inlineFracAdd(n1, d1, n2, d2) {
+function inlineFracAdd(n1, d1, n2, d2, showImproperResultStep = false) {
   const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
   const cn1 = n1 * m1, cn2 = n2 * m2;
@@ -219,6 +219,9 @@ function inlineFracAdd(n1, d1, n2, d2) {
   if (m1 !== 1 || m2 !== 1) {
     s += ` <span class="eq-txt">=</span> ${fracExpand(n1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(n2, d2, m2)}`;
     s += ` <span class="eq-txt">=</span> ${fracWithBlankDen(cn1, common)} <span class="op-txt">+</span> ${fracWithBlankDen(cn2, common)}`;
+  }
+  if (showImproperResultStep && total >= common) {
+    s += ` <span class="eq-txt">=</span> ${fracBlank(total, common)}`;
   }
   s += ` <span class="eq-txt">=</span> ${formulaResultHtml(total, common)}`;
   return s;
@@ -240,19 +243,24 @@ function inlineFracSub(n1, d1, n2, d2) {
 }
 
 /** 대분수 덧셈 - 가분수 변환 방식 */
-function inlineMixedAddImproper(w1, n1, d1, w2, n2, d2) {
+function inlineMixedAddImproper(w1, n1, d1, w2, n2, d2, showImproperResultStep = false) {
   const imp1 = w1 * d1 + n1, imp2 = w2 * d2 + n2;
   const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
   const cn1 = imp1 * m1, cn2 = imp2 * m2;
   const total = cn1 + cn2;
-  return {
+  const lines = {
     line1: `${mixedD(w1, n1, d1)} <span class="op-txt">+</span> ${mixedD(w2, n2, d2)}`,
     line2: `<span class="eq-txt">=</span> ${fracD(numBlank(imp1), d1)} <span class="op-txt">+</span> ${fracD(numBlank(imp2), d2)}`,
     line3: `<span class="eq-txt">=</span> ${fracExpand(imp1, d1, m1)} <span class="op-txt">+</span> ${fracExpand(imp2, d2, m2)}`,
     line4: `<span class="eq-txt">=</span> ${fracWithBlankDen(cn1, common)} <span class="op-txt">+</span> ${fracWithBlankDen(cn2, common)}`,
     line5: `<span class="eq-txt">=</span> ${formulaResultHtml(total, common)}`,
   };
+  if (showImproperResultStep) {
+    lines.line5 = `<span class="eq-txt">=</span> ${fracBlank(total, common)}`;
+    lines.line6 = `<span class="eq-txt">=</span> ${formulaResultHtml(total, common)}`;
+  }
+  return lines;
 }
 
 /** 대분수 덧셈 - 자연수/분수 따로 */
@@ -286,19 +294,24 @@ function inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2) {
 }
 
 /** 대분수 뺄셈 - 가분수 변환 방식 */
-function inlineMixedSubImproper(w1, n1, d1, w2, n2, d2) {
+function inlineMixedSubImproper(w1, n1, d1, w2, n2, d2, showImproperResultStep = false) {
   const imp1 = w1 * d1 + n1, imp2 = w2 * d2 + n2;
   const common = lcm(d1, d2);
   const m1 = common / d1, m2 = common / d2;
   const cn1 = imp1 * m1, cn2 = imp2 * m2;
   const diff = cn1 - cn2;
-  return {
+  const lines = {
     line1: `${mixedD(w1, n1, d1)} <span class="op-txt">\u2212</span> ${mixedD(w2, n2, d2)}`,
     line2: `<span class="eq-txt">=</span> ${fracD(numBlank(imp1), d1)} <span class="op-txt">\u2212</span> ${fracD(numBlank(imp2), d2)}`,
     line3: `<span class="eq-txt">=</span> ${fracExpand(imp1, d1, m1)} <span class="op-txt">\u2212</span> ${fracExpand(imp2, d2, m2)}`,
     line4: `<span class="eq-txt">=</span> ${fracWithBlankDen(cn1, common)} <span class="op-txt">\u2212</span> ${fracWithBlankDen(cn2, common)}`,
     line5: `<span class="eq-txt">=</span> ${formulaResultHtml(diff, common)}`,
   };
+  if (showImproperResultStep) {
+    lines.line5 = `<span class="eq-txt">=</span> ${fracBlank(diff, common)}`;
+    lines.line6 = `<span class="eq-txt">=</span> ${formulaResultHtml(diff, common)}`;
+  }
+  return lines;
 }
 
 /** 대분수 뺄셈 - 자연수/분수 따로 */
@@ -564,8 +577,10 @@ export const T = {
   /** 분수 통분 연산 - 진분수 (1줄 풀이) */
   fracLcdStep: {
     grid: 'wide', count: 6,
-    render: ({ n1, d1, n2, d2, op }) => {
-      const steps = op === '+' ? inlineFracAdd(n1, d1, n2, d2) : inlineFracSub(n1, d1, n2, d2);
+    render: ({ n1, d1, n2, d2, op, showImproperResultStep }) => {
+      const steps = op === '+'
+        ? inlineFracAdd(n1, d1, n2, d2, showImproperResultStep)
+        : inlineFracSub(n1, d1, n2, d2);
       return fracStepProblem(steps);
     },
   },
@@ -573,10 +588,10 @@ export const T = {
   /** 대분수 연산 - 가분수 변환 방식 (1줄) */
   mixedImproperStep: {
     grid: 'wide', count: 6,
-    render: ({ w1, n1, d1, w2, n2, d2, op }) => {
+    render: ({ w1, n1, d1, w2, n2, d2, op, showImproperResultStep }) => {
       const lines = op === '+'
-        ? inlineMixedAddImproper(w1, n1, d1, w2, n2, d2)
-        : inlineMixedSubImproper(w1, n1, d1, w2, n2, d2);
+        ? inlineMixedAddImproper(w1, n1, d1, w2, n2, d2, showImproperResultStep)
+        : inlineMixedSubImproper(w1, n1, d1, w2, n2, d2, showImproperResultStep);
       return fracStepProblemMultiLine(lines);
     },
   },
