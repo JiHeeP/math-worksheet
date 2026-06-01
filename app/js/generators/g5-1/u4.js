@@ -19,7 +19,7 @@ export function genU4PreConv() {
 export function genU4PreImproperToMixedProcess() {
   const den = rand(2, 7), whole = rand(1, 3), rem = rand(1, den - 1);
   const improper = (whole * den) + rem;
-  return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(improper, den)} <span class="eq-txt">=</span> ${numBlank(improper)} \u00f7 ${numBlank(den)} <span class="eq-txt">=</span> ${numBlank(whole)} \u2026 ${numBlank(rem)} <span class="eq-txt">=</span> ${mixedBlank(whole, rem, den)}</div></div>`);
+  return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(improper, den)} <span class="eq-txt">=</span> ${mixedBlank(whole, rem, den)}</div><div class="lcd-process-row">${numBlank(improper)} \u00f7 ${numBlank(den)} <span class="eq-txt">=</span> ${numBlank(whole)} \u2026 ${numBlank(rem)}</div></div>`);
 }
 
 export function genU4MainEquivFind() {
