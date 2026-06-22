@@ -274,7 +274,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
 
 const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
   진단지({ id: 'u5_pre_diagnostic' }),
-  선수학습({ grid: 'practice', count: 15 }, [
+  선수학습({ grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 같은 분수의 덧셈', genU5PreAdd, { id: 'u5_pre_add', from: 'g4-2' }),
     학습지('분모 같은 분수의 덧셈 (합이 1 이상)', genU5PreAddGe1, { id: 'u5_pre_add_ge1', from: 'g4-2' }),
     학습지('분모 같은 분수의 뺄셈', genU5PreSub, { id: 'u5_pre_sub', from: 'g4-2' }),

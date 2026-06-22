@@ -705,7 +705,7 @@ export const T = {
  */
 export function bindTemplate(template, generator) {
   if (!template) return generator; // 템플릿 없으면 제너레이터 직접 사용
-  const bound = () => template.render(generator());
+  const bound = (ctx = {}) => template.render(generator(ctx));
   bound._template = template;
   bound._generator = generator;
   return bound;
