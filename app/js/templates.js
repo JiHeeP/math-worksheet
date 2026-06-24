@@ -598,7 +598,7 @@ export const T = {
 
   /** 대분수 연산 - 자연수/분수 따로 */
   mixedSeparateStep: {
-    grid: 'wide', count: 4,
+    grid: 'wide', count: 6,
     render: ({ w1, n1, d1, w2, n2, d2, op }) => {
       const lines = op === '+'
         ? inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2)

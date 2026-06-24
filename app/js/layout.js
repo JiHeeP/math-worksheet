@@ -116,10 +116,10 @@ export function getHtmlLayoutConfig(item) {
   if (MULTI_ROW_MIXED_SEPARATE_IDS.has(localId)) {
     return {
       ...base,
-      minCols: 2, maxCols: 2, maxRows: 2, widthPriority: 1,
-      targetCellAspect: 0.72,
+      minCols: 2, maxCols: 2, maxRows: 3, widthPriority: 1,
+      targetCellAspect: 1.08,
       minCellWidth: 76,
-      minCellHeight: 118,
+      minCellHeight: 72,
       baseGap: [8, 8],
     };
   }
