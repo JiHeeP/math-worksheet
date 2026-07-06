@@ -193,6 +193,14 @@ export function rectangleSvg(w, h) {
   `);
 }
 
+export function perimeterParallelogramSvg(base, side) {
+  return svgShell(`
+    <polygon class="outline" points="36,78 122,78 102,28 16,28"></polygon>
+    <text x="44" y="95">${base}cm</text>
+    <text x="13" y="57">${side}cm</text>
+  `);
+}
+
 export function triangleSvg(base, height) {
   return svgShell(`
     <polygon class="outline" points="24,78 124,78 58,22"></polygon>
@@ -228,6 +236,13 @@ export function rhombusSvg(d1, d2) {
     <line class="guide" x1="78" y1="18" x2="78" y2="86"></line>
     <text x="42" y="47">대각선 ${d1}cm</text>
     <text x="84" y="34">대각선 ${d2}cm</text>
+  `);
+}
+
+export function perimeterRhombusSvg(side) {
+  return svgShell(`
+    <polygon class="outline" points="78,18 122,52 78,86 34,52"></polygon>
+    <text x="98" y="41">${side}cm</text>
   `);
 }
 

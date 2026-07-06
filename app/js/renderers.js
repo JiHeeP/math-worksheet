@@ -382,7 +382,7 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
 
   const generatorContext = options.generatorContext || {};
   for (let i = 1; i <= count; i++) {
-    const problem = generateWithUnique(() => item.generator(generatorContext));
+    const problem = generateWithUnique(() => item.generator(generatorContext, i));
     grid.insertAdjacentHTML('beforeend', renderItem(problem, i));
   }
 

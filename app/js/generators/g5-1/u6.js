@@ -1,7 +1,7 @@
 'use strict';
 
 import { rand, randChoice } from '../../utils.js';
-import { numBlank, perimeterTriangleSvg, rectangleSvg, triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg, unitGridSvg } from '../../helpers.js';
+import { numBlank, rectangleSvg, triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg, unitGridSvg, perimeterParallelogramSvg, perimeterRhombusSvg } from '../../helpers.js';
 import { horizProblem, shapeProblem } from '../../templates.js';
 
 export function genU6PreUnit() {
@@ -19,13 +19,18 @@ export function genU6PreLen() {
   return horizProblem(`${big} cm \u2212 ${small} cm`, numBlank(big - small, 'cm'));
 }
 
-export function genU6MainPerimeter() {
-  if (rand(1, 2) === 1) {
-    const a = rand(4, 9), b = rand(4, 9), c = rand(4, 9);
-    return shapeProblem(perimeterTriangleSvg(a, b, c), '', numBlank(a + b + c, 'cm'));
+export function genU6MainPerimeter(_context = {}, problemIndex = 1) {
+  const shapeIndex = (Math.max(1, Number(problemIndex) || 1) - 1) % 3;
+  if (shapeIndex === 0) {
+    const base = rand(5, 12), side = rand(3, 9);
+    return shapeProblem(perimeterParallelogramSvg(base, side), '', numBlank((base + side) * 2, 'cm'));
   }
-  const w = rand(4, 12), h = rand(3, 9);
-  return shapeProblem(rectangleSvg(w, h), '', numBlank((w * 2) + (h * 2), 'cm'));
+  if (shapeIndex === 1) {
+    const w = rand(4, 12), h = rand(3, 9);
+    return shapeProblem(rectangleSvg(w, h), '', numBlank((w + h) * 2, 'cm'));
+  }
+  const side = rand(4, 10);
+  return shapeProblem(perimeterRhombusSvg(side), '', numBlank(side * 4, 'cm'));
 }
 
 export function genU6MainUnitSquare() {
