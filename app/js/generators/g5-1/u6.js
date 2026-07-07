@@ -1,7 +1,10 @@
 'use strict';
 
 import { rand, randChoice } from '../../utils.js';
-import { numBlank, rectangleSvg, triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg, unitGridSvg, perimeterParallelogramSvg, perimeterRhombusSvg } from '../../helpers.js';
+import {
+  numBlank, rectangleSvg, triangleSvg, parallelogramSvg,
+  trapezoidSvg, rhombusSvg, unitGridSvg, perimeterParallelogramSvg, perimeterRhombusSvg,
+} from '../../helpers.js';
 import { horizProblem, shapeProblem } from '../../templates.js';
 
 export function genU6PreUnit() {
@@ -48,19 +51,19 @@ export function genU6MainAreaUnit() {
   const sqcm = rand(1, 4) * 10000; return horizProblem(`${sqcm} cm\u00b2`, numBlank(sqcm / 10000, 'm\u00b2'));
 }
 
-export function genU6MainPara() {
+export function genU6MainPara(_context = {}, problemIndex = 1) {
   const base = rand(4, 14), height = rand(3, 10);
-  return shapeProblem(parallelogramSvg(base, height), '', numBlank(base * height, 'cm\u00b2'));
+  return shapeProblem(parallelogramSvg(base, height, problemIndex - 1), '', numBlank(base * height, 'cm\u00b2'));
 }
 
-export function genU6MainTri() {
-  const base = rand(2, 12) * 2, height = rand(2, 10);
-  return shapeProblem(triangleSvg(base, height), '', numBlank((base * height) / 2, 'cm\u00b2'));
+export function genU6MainTri(_context = {}, problemIndex = 1) {
+  const base = rand(3, 9) * 2, height = rand(3, 12);
+  return shapeProblem(triangleSvg(base, height, problemIndex - 1), '', numBlank((base * height) / 2, 'cm\u00b2'));
 }
 
-export function genU6MainTrap() {
+export function genU6MainTrap(_context = {}, problemIndex = 1) {
   const top = rand(3, 8), bottom = rand(top + 1, top + 8), height = rand(2, 7) * 2;
-  return shapeProblem(trapezoidSvg(top, bottom, height), '', numBlank(((top + bottom) * height) / 2, 'cm\u00b2'));
+  return shapeProblem(trapezoidSvg(top, bottom, height, problemIndex - 1), '', numBlank(((top + bottom) * height) / 2, 'cm\u00b2'));
 }
 
 export function genU6MainRhombus() {
@@ -68,6 +71,6 @@ export function genU6MainRhombus() {
   return shapeProblem(rhombusSvg(d1, d2), '', numBlank((d1 * d2) / 2, 'cm\u00b2'));
 }
 
-export function genU6MainMix() {
-  return randChoice([genU6MainRect, genU6MainPara, genU6MainTri, genU6MainTrap, genU6MainRhombus])();
+export function genU6MainMix(context = {}, problemIndex = 1) {
+  return randChoice([genU6MainRect, genU6MainPara, genU6MainTri, genU6MainTrap, genU6MainRhombus])(context, problemIndex);
 }

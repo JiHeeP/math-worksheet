@@ -155,6 +155,48 @@ export function relationTableHtml(xLabel, yLabel, xs, ys) {
 
 /* -- SVG 도형 헬퍼 -- */
 
+const SHAPE_VIEW_WIDTH = 160;
+const SHAPE_BOTTOM_Y = 80;
+
+function clampValue(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function safePositive(value, fallback = 1) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+}
+
+function svgNum(value) {
+  return Number(Number(value).toFixed(1));
+}
+
+function fitProportionalBox(unitWidth, unitHeight, {
+  maxWidth = 104,
+  maxHeight = 58,
+  minRatio = 0.45,
+  maxRatio = 3.4,
+} = {}) {
+  const ratio = clampValue(safePositive(unitWidth) / safePositive(unitHeight), minRatio, maxRatio);
+  let width = maxWidth;
+  let height = width / ratio;
+
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * ratio;
+  }
+
+  return { width: svgNum(width), height: svgNum(height) };
+}
+
+function centeredX(width) {
+  return svgNum((SHAPE_VIEW_WIDTH - width) / 2);
+}
+
+function svgText(x, y, content, attrs = '') {
+  return `<text x="${svgNum(x)}" y="${svgNum(y)}"${attrs ? ` ${attrs}` : ''}>${content}</text>`;
+}
+
 export function svgShell(inner) {
   return `<svg class="shape-svg" viewBox="0 0 160 104" aria-hidden="true">${inner}</svg>`;
 }
@@ -186,10 +228,16 @@ export function unitGridSvg(cols, rows) {
 }
 
 export function rectangleSvg(w, h) {
+  const size = fitProportionalBox(w, h, { maxWidth: 104, maxHeight: 58, minRatio: 0.4, maxRatio: 3.6 });
+  const x = centeredX(size.width);
+  const y = svgNum(SHAPE_BOTTOM_Y - size.height);
+  const sideTextX = x + size.width + 8;
+  const sideAnchor = sideTextX > 145 ? 'end' : 'start';
+
   return svgShell(`
-    <rect class="outline" x="30" y="20" width="95" height="58"></rect>
-    <text x="67" y="16">${w}cm</text>
-    <text x="131" y="54">${h}cm</text>
+    <rect class="outline" x="${x}" y="${y}" width="${size.width}" height="${size.height}"></rect>
+    ${svgText(x + (size.width / 2), y - 6, `${w}cm`, 'text-anchor="middle"')}
+    ${svgText(sideAnchor === 'end' ? 154 : sideTextX, y + (size.height / 2) + 4, `${h}cm`, `text-anchor="${sideAnchor}"`)}
   `);
 }
 
@@ -201,41 +249,105 @@ export function perimeterParallelogramSvg(base, side) {
   `);
 }
 
-export function triangleSvg(base, height) {
+const TRIANGLE_APEX_RATIOS = [0.5, 0.28, 0.72, 0.4, 0.6, 0.14, 0.86, 0.48];
+
+function variantValue(values, variant = 0) {
+  const safeIndex = Math.max(0, Number(variant) || 0);
+  return values[safeIndex % values.length];
+}
+
+export function triangleSvg(base, height, variant = 0) {
+  const size = fitProportionalBox(base, height, { maxWidth: 108, maxHeight: 58, minRatio: 0.55, maxRatio: 3.2 });
+  const x = centeredX(size.width);
+  const baseY = SHAPE_BOTTOM_Y;
+  const topY = svgNum(baseY - size.height);
+  const apexX = svgNum(x + (size.width * variantValue(TRIANGLE_APEX_RATIOS, variant)));
+  const heightAnchor = apexX > 92 ? 'end' : 'start';
+  const heightLabelX = heightAnchor === 'end' ? apexX - 8 : apexX + 8;
+
   return svgShell(`
-    <polygon class="outline" points="24,78 124,78 58,22"></polygon>
-    <line class="guide" x1="58" y1="22" x2="58" y2="78"></line>
-    <text x="68" y="18">높이 ${height}cm</text>
-    <text x="55" y="95">밑변 ${base}cm</text>
+    <polygon class="outline" points="${x},${baseY} ${svgNum(x + size.width)},${baseY} ${apexX},${topY}"></polygon>
+    <line class="guide" x1="${apexX}" y1="${topY}" x2="${apexX}" y2="${baseY}"></line>
+    ${svgText(heightLabelX, topY + (size.height / 2) + 4, `높이 ${height}cm`, `text-anchor="${heightAnchor}"`)}
+    ${svgText(x + (size.width / 2), baseY + 16, `밑변 ${base}cm`, 'text-anchor="middle"')}
   `);
 }
 
-export function parallelogramSvg(base, height) {
+const PARALLELOGRAM_SLANTS = [18, -18, 10, -24, 26, -10, 22, -14];
+
+function parallelogramGeometry(base, height, variant = 0) {
+  const size = fitProportionalBox(base, height, { maxWidth: 94, maxHeight: 56, minRatio: 0.7, maxRatio: 3.1 });
+  const maxSlant = Math.min(28, Math.max(10, size.width * 0.32));
+  const slant = svgNum(clampValue(variantValue(PARALLELOGRAM_SLANTS, variant), -maxSlant, maxSlant));
+  const totalWidth = size.width + Math.abs(slant);
+  const x = svgNum(((SHAPE_VIEW_WIDTH - totalWidth) / 2) + Math.max(0, -slant));
+  const bottomY = SHAPE_BOTTOM_Y;
+  const topY = svgNum(bottomY - size.height);
+  const guideX = svgNum(slant >= 0 ? x + slant : x + size.width + slant);
+
+  return {
+    x,
+    bottomY,
+    topY,
+    width: size.width,
+    height: size.height,
+    slant,
+    guideX,
+    points: `${x},${bottomY} ${svgNum(x + size.width)},${bottomY} ${svgNum(x + size.width + slant)},${topY} ${svgNum(x + slant)},${topY}`,
+  };
+}
+
+export function parallelogramSvg(base, height, variant = 0) {
+  const shape = parallelogramGeometry(base, height, variant);
+  const heightAnchor = shape.guideX > 84 ? 'end' : 'start';
+  const heightLabelX = heightAnchor === 'end' ? shape.guideX - 8 : shape.guideX + 8;
+
   return svgShell(`
-    <polygon class="outline" points="36,78 122,78 102,28 16,28"></polygon>
-    <line class="guide" x1="102" y1="28" x2="102" y2="78"></line>
-    <text x="44" y="95">밑변 ${base}cm</text>
-    <text x="109" y="56">높이 ${height}cm</text>
+    <polygon class="outline" points="${shape.points}"></polygon>
+    <line class="guide" x1="${shape.guideX}" y1="${shape.topY}" x2="${shape.guideX}" y2="${shape.bottomY}"></line>
+    ${svgText(shape.x + (shape.width / 2), shape.bottomY + 16, `밑변 ${base}cm`, 'text-anchor="middle"')}
+    ${svgText(heightLabelX, shape.topY + (shape.height / 2) + 4, `높이 ${height}cm`, `text-anchor="${heightAnchor}"`)}
   `);
 }
 
-export function trapezoidSvg(top, bottom, height) {
+const TRAPEZOID_TOP_POSITIONS = [0.5, 0.2, 0.8, 0.34, 0.66, 0.1, 0.9, 0.44];
+
+export function trapezoidSvg(top, bottom, height, variant = 0) {
+  const size = fitProportionalBox(bottom, height, { maxWidth: 108, maxHeight: 56, minRatio: 0.75, maxRatio: 3.4 });
+  const bottomX = centeredX(size.width);
+  const bottomY = SHAPE_BOTTOM_Y;
+  const topY = svgNum(bottomY - size.height);
+  const topWidth = svgNum(clampValue(size.width * (safePositive(top) / safePositive(bottom)), 28, size.width - 10));
+  const topRange = Math.max(0, size.width - topWidth);
+  const topX = svgNum(bottomX + (topRange * variantValue(TRAPEZOID_TOP_POSITIONS, variant)));
+  const guideX = svgNum(topX + topWidth);
+  const heightAnchor = guideX > 88 ? 'end' : 'start';
+  const heightLabelX = heightAnchor === 'end' ? guideX - 8 : guideX + 8;
+
   return svgShell(`
-    <polygon class="outline" points="34,78 122,78 104,28 54,28"></polygon>
-    <line class="guide" x1="104" y1="28" x2="104" y2="78"></line>
-    <text x="62" y="20">윗변 ${top}cm</text>
-    <text x="48" y="95">아랫변 ${bottom}cm</text>
-    <text x="110" y="56">높이 ${height}cm</text>
+    <polygon class="outline" points="${bottomX},${bottomY} ${svgNum(bottomX + size.width)},${bottomY} ${svgNum(topX + topWidth)},${topY} ${topX},${topY}"></polygon>
+    <line class="guide" x1="${guideX}" y1="${topY}" x2="${guideX}" y2="${bottomY}"></line>
+    ${svgText(topX + (topWidth / 2), topY - 7, `윗변 ${top}cm`, 'text-anchor="middle"')}
+    ${svgText(bottomX + (size.width / 2), bottomY + 16, `아랫변 ${bottom}cm`, 'text-anchor="middle"')}
+    ${svgText(heightLabelX, topY + (size.height / 2) + 4, `높이 ${height}cm`, `text-anchor="${heightAnchor}"`)}
   `);
 }
 
 export function rhombusSvg(d1, d2) {
+  const size = fitProportionalBox(d1, d2, { maxWidth: 104, maxHeight: 66, minRatio: 0.55, maxRatio: 3 });
+  const cx = SHAPE_VIEW_WIDTH / 2;
+  const cy = 52;
+  const leftX = svgNum(cx - (size.width / 2));
+  const rightX = svgNum(cx + (size.width / 2));
+  const topY = svgNum(cy - (size.height / 2));
+  const bottomY = svgNum(cy + (size.height / 2));
+
   return svgShell(`
-    <polygon class="outline" points="78,18 122,52 78,86 34,52"></polygon>
-    <line class="guide" x1="34" y1="52" x2="122" y2="52"></line>
-    <line class="guide" x1="78" y1="18" x2="78" y2="86"></line>
-    <text x="42" y="47">대각선 ${d1}cm</text>
-    <text x="84" y="34">대각선 ${d2}cm</text>
+    <polygon class="outline" points="${cx},${topY} ${rightX},${cy} ${cx},${bottomY} ${leftX},${cy}"></polygon>
+    <line class="guide" x1="${leftX}" y1="${cy}" x2="${rightX}" y2="${cy}"></line>
+    <line class="guide" x1="${cx}" y1="${topY}" x2="${cx}" y2="${bottomY}"></line>
+    ${svgText(cx, topY - 7, `대각선 ${d1}cm`, 'text-anchor="middle"')}
+    ${svgText(cx, bottomY + 12, `대각선 ${d2}cm`, 'text-anchor="middle"')}
   `);
 }
 
