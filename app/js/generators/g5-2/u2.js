@@ -151,3 +151,54 @@ export function genG52U2FracTimesFracStep(ctx = {}) {
 export function genG52U2MixedTimesMixedStep(ctx = {}) {
   return { left: mixedTerm(ctx, 2), right: mixedTerm(ctx, 2) };
 }
+
+/* ── 본단원: 넓이 모델(그림) 학습지용 순수 데이터 제너레이터 ──
+   그림으로 칸을 셀 수 있어야 하므로 분모·자연수 범위를 작게 잡는다. */
+
+function modelDenRange(ctx) {
+  const stage = ctx.fractionStage || 2;
+  if (stage === 1) return [2, 4];
+  if (stage === 3) return [4, 8];
+  return [2, 6];
+}
+
+function modelMixedLimits(ctx) {
+  const stage = ctx.fractionStage || 2;
+  if (stage === 1) return { wMax: 1, dLo: 2, dHi: 3 };
+  if (stage === 3) return { wMax: 3, dLo: 3, dHi: 5 };
+  return { wMax: 2, dLo: 2, dHi: 4 };
+}
+
+function modelProperTerm(ctx) {
+  const [dLo, dHi] = modelDenRange(ctx);
+  const d = rand(dLo, dHi);
+  return { kind: 'frac', n: rand(1, d - 1), d };
+}
+
+function modelMixedTerm(ctx) {
+  const { wMax, dLo, dHi } = modelMixedLimits(ctx);
+  const d = rand(dLo, dHi);
+  return { kind: 'mixed', w: rand(1, wMax), n: rand(1, d - 1), d };
+}
+
+// (단위분수) × (단위분수) 그림: 1/d1 × 1/d2
+export function genG52U2UnitFracTimesUnitFracModel(ctx = {}) {
+  const [dLo, dHi] = modelDenRange(ctx);
+  let d1, d2, tries = 0;
+  do { d1 = rand(dLo, dHi); d2 = rand(dLo, dHi); tries++; } while (d1 === d2 && tries < 50);
+  if (d1 === d2) d2 = d1 === dHi ? d1 - 1 : d1 + 1;
+  return {
+    left: { kind: 'frac', n: 1, d: d1 },
+    right: { kind: 'frac', n: 1, d: d2 },
+  };
+}
+
+// (진분수) × (진분수) 그림
+export function genG52U2FracTimesFracModel(ctx = {}) {
+  return { left: modelProperTerm(ctx), right: modelProperTerm(ctx) };
+}
+
+// (대분수) × (대분수) 그림
+export function genG52U2MixedTimesMixedModel(ctx = {}) {
+  return { left: modelMixedTerm(ctx), right: modelMixedTerm(ctx) };
+}

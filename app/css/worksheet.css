@@ -1062,6 +1062,97 @@ button:disabled:active { transform: none; }
   stroke-width: 1;
 }
 
+.shape-svg .frac-label {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.shape-svg .frac-label-line,
+.shape-svg .bracket {
+  stroke: #2f3640;
+  stroke-width: 1;
+  fill: none;
+}
+
+.shape-svg .area-base {
+  fill: #ffffff;
+}
+
+.shape-svg .area-line {
+  stroke: #8fa3ba;
+  stroke-width: 0.8;
+}
+
+.shape-svg .area-unit-line {
+  stroke: #2f3640;
+  stroke-width: 1.2;
+}
+
+.shape-svg .area-outline {
+  fill: none;
+  stroke: #2f3640;
+  stroke-width: 1.6;
+}
+
+/* 학생이 이어 그릴 수 있는 점선 눈금 (정답 보기에서는 숨김) */
+.shape-svg .area-guide-line {
+  stroke: #9fb0c4;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 2;
+}
+
+/* 정답 보기에서만 나타나는 완성 그림 요소 */
+.shape-svg .area-answer { display: none; }
+.answers-shown .shape-svg .area-answer { display: inline; }
+.answers-shown .shape-svg .area-guide { display: none; }
+
+/* 분수의 곱셈 넓이 모델 학습지 */
+.problem-item.frac-area-model .shape-layout {
+  margin-top: 6px;
+  gap: 4px;
+  /* 마지막 줄 빈칸의 정렬 오차(1~2px)가 넘침으로 잡히지 않도록 여유 */
+  padding-bottom: 8px;
+}
+
+.problem-item.frac-area-model .shape-svg {
+  /* 학생이 직접 선을 긋고 색칠하므로 기본 도형보다 크게 */
+  width: 200px;
+  height: 130px;
+}
+
+/* (대분수)×(대분수): 4문항/장이므로 그림을 크게, 빈칸은 2단 풀이와 같은 크기로 */
+.problem-item.frac-area-model-mixed .shape-layout {
+  --write-box-size: calc(24px * var(--font-scale, 1));
+  --frac-box-height: calc(22px * var(--font-scale, 1));
+}
+
+.problem-item.frac-area-model .area-model-svg {
+  width: 242px;
+  height: 198px;
+}
+
+.problem-item.frac-area-model .shape-answer {
+  margin-top: 2px;
+  font-size: calc(15px * var(--font-scale, 1));
+}
+
+.problem-item.frac-area-model .frac-step-rows {
+  gap: calc(4px * var(--font-scale, 1));
+}
+
+.problem-item.frac-area-model .frac-step-row {
+  gap: calc(4px * var(--font-scale, 1));
+}
+
+.area-swatch {
+  width: 11px;
+  height: 11px;
+  margin-right: 2px;
+  vertical-align: middle;
+  border: 1px solid #6b7788;
+  border-radius: 2px;
+}
+
 .unit-tail { margin-left: 4px; }
 
 /* 원본 index (1).html 의 1·2학년 연습형 레이아웃 */
