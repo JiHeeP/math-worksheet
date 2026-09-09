@@ -293,14 +293,14 @@ function getPdfLimit(item) {
   return cfg.maxCols * cfg.maxRows;
 }
 
-function getHtmlLimit(item) {
-  const cfg = getHtmlLayoutConfig(item);
+function getHtmlLimit(item, fontScale = 1) {
+  const cfg = getHtmlLayoutConfig(item, fontScale);
   return cfg ? cfg.maxCols * cfg.maxRows : 40;
 }
 
-export function getWorksheetLimit(item) {
+export function getWorksheetLimit(item, fontScale = 1) {
   if (item.kind === 'diagnostic') return (item.sourceIds || []).length * 4;
-  return isPdfWorksheet(item) ? getPdfLimit(item) : getHtmlLimit(item);
+  return isPdfWorksheet(item) ? getPdfLimit(item) : getHtmlLimit(item, fontScale);
 }
 
 function withLayoutOverrides(config, options) {
@@ -367,7 +367,7 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
   }
 
   const count = countOverride || item.count;
-  const layoutCfg = withLayoutOverrides(getHtmlLayoutConfig(item) || {
+  const layoutCfg = withLayoutOverrides(getHtmlLayoutConfig(item, fontScale) || {
     minCols: 1, maxCols: 4, maxRows: 10, targetCellAspect: 1,
     minCellWidth: 44, minCellHeight: 28, baseGap: [12, 8],
   }, options);

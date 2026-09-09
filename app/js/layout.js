@@ -56,9 +56,7 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
   'u5_main_mixed_sub_no_borrow_improper',
   'u5_main_mixed_sub_borrow_improper',
   'u2_main_frac_times_int_step',
-  'u2_main_mixed_times_int_step',
   'u2_main_int_times_frac_step',
-  'u2_main_int_times_mixed_step',
   'u2_main_unit_times_unit_step',
   'u2_main_frac_times_frac_step',
   'u2_main_mixed_times_mixed_step',
@@ -68,6 +66,12 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
   'u1_main_frac_div_frac_step',
   'u1_main_int_div_frac_step',
   'u1_main_mixed_div_frac_step',
+]);
+
+/* 글자 크기 '보통' 이하에서는 2열(풀이 줄을 세로로 쌓음), '크게' 이상에서는 1열 한 줄 풀이 */
+export const TWO_COLUMN_AT_NORMAL_FONT_IDS = new Set([
+  'u2_main_mixed_times_int_step',
+  'u2_main_int_times_mixed_step',
 ]);
 
 export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([
@@ -92,10 +96,31 @@ export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
   'u7_main_2d1d_carry',
 ]);
 
-export function getHtmlLayoutConfig(item) {
+export function getHtmlLayoutConfig(item, fontScale = 1) {
   const base = GRID_LAYOUTS[item.grid];
   if (!base) return null;
   const localId = item.id.replace(/^g\d-\d_/, '');
+
+  if (TWO_COLUMN_AT_NORMAL_FONT_IDS.has(localId)) {
+    if ((Number(fontScale) || 1) <= 1) {
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, maxRows: 6, widthPriority: 1,
+        targetCellAspect: 1.9,
+        minCellWidth: 76,
+        minCellHeight: 34,
+        baseGap: [8, 10],
+      };
+    }
+    return {
+      ...base,
+      minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
+      targetCellAspect: 4.8,
+      minCellWidth: 120,
+      minCellHeight: 34,
+      baseGap: [6, 0],
+    };
+  }
 
   if (SPLIT_WRITE_BOX_WORKSHEET_IDS.has(localId)) {
     return {
@@ -225,4 +250,5 @@ export function applyGridLayout(grid, layout) {
   grid.style.rowGap = `${layout.rowGap}px`;
   grid.style.columnGap = `${layout.colGap}px`;
   grid.dataset.layoutMode = layout.density;
+  grid.dataset.cols = layout.cols;
 }

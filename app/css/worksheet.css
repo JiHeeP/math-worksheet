@@ -812,6 +812,64 @@ button:disabled:active { transform: none; }
   line-height: 1.35;
 }
 
+/* 여러 줄 풀이의 각 줄. 기본은 한 줄 흐름에 녹아 있음 */
+.frac-step-line {
+  display: contents;
+}
+
+/* 분수의 곱셈 계산 과정이 2열로 배치될 때: 줄을 세로로 쌓고 빈칸을 작게 */
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .concept-layout {
+  --write-box-size: calc(22px * var(--font-scale, 1));
+  --frac-box-height: calc(20px * var(--font-scale, 1));
+  align-items: stretch;
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-step-flow {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-left: 24px;
+  gap: calc(2px * var(--font-scale, 1));
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.2;
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-step-line {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(4px * var(--font-scale, 1));
+  white-space: nowrap;
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-d,
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .mixed-d .whole,
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .op-txt,
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .eq-txt {
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-d .ft,
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-d .fb {
+  min-width: 16px;
+  padding: 0 4px;
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .num-blank {
+  border-width: 1.5px;
+  border-radius: 6px;
+  font-size: calc(15px * var(--font-scale, 1));
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-blank {
+  font-size: calc(15px * var(--font-scale, 1));
+}
+
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-blank .fb-top,
+.problem-grid[data-cols="2"] .problem-item.frac-mul-step .frac-blank .fb-bot {
+  border-width: 1.5px;
+  border-radius: 6px;
+}
+
 .frac-d {
   display: inline-flex;
   flex-direction: column;
