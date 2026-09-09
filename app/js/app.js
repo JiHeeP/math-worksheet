@@ -309,10 +309,10 @@ function hasProblemContentOverflow(sheet) {
   });
 }
 
-function getColumnAttempts(item, count) {
+function getColumnAttempts(item, count, fontScale = 1) {
   if (item.kind !== 'html') return [null];
 
-  const config = getHtmlLayoutConfig(item);
+  const config = getHtmlLayoutConfig(item, fontScale);
   if (!config) return [null];
 
   const attempts = [null];
@@ -327,11 +327,11 @@ function createFittedSheet(item, desiredCount, fontScale, updateCache = false, g
   const host = getMeasureHost();
   host.style.setProperty('--font-scale', fontScale);
   host.style.setProperty('--pdf-scale', fontScale);
-  const hardLimit = getWorksheetLimit(item);
+  const hardLimit = getWorksheetLimit(item, fontScale);
   const start = Math.min(hardLimit, Math.max(1, desiredCount || hardLimit));
 
   for (let count = start; count >= 1; count--) {
-    for (const options of getColumnAttempts(item, count)) {
+    for (const options of getColumnAttempts(item, count, fontScale)) {
       const sheet = createSheet(item, count, fontScale, {
         ...(options || {}),
         generatorContext,
@@ -358,7 +358,7 @@ function getSafeWorksheetLimit(item, fontScale, generatorContext = {}) {
   const key = getFitCacheKey(item, fontScale, generatorContext);
   if (fitCountCache.has(key)) return fitCountCache.get(key);
 
-  const hardLimit = getWorksheetLimit(item);
+  const hardLimit = getWorksheetLimit(item, fontScale);
   const { sheet, count } = createFittedSheet(item, hardLimit, fontScale, true, generatorContext);
   sheet.remove();
   return count;
@@ -395,7 +395,7 @@ function generate(mode) {
 
   const maxCount = getSafeWorksheetLimit(item, fontScale, generatorContext);
   const hasCustomCount = customCount > 0;
-  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item), customCount) : maxCount;
+  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item, fontScale), customCount) : maxCount;
   let fittedCount = maxCount;
   for (let i = 0; i < pageCount; i++) {
     const fitted = createFittedSheet(

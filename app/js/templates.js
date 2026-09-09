@@ -91,7 +91,12 @@ function fracStepProblemMultiLine(lines, itemClass = '') {
   const orderedLines = Array.isArray(lines)
     ? lines
     : ['line1', 'line2', 'line3', 'line4', 'line5', 'line6'].map((key) => lines[key]);
-  const stepsHtml = orderedLines.filter(Boolean).join(' ');
+  // 각 줄을 .frac-step-line 으로 감싼다 (기본 display: contents 라 한 줄 흐름은 그대로.
+  // 2열 배치 등에서 CSS 로 줄을 세로로 쌓을 때 사용)
+  const stepsHtml = orderedLines
+    .filter(Boolean)
+    .map((line) => `<span class="frac-step-line">${line}</span>`)
+    .join(' ');
   return htmlProblem('concept-layout', `
     <div class="concept-card">
       <div class="concept-answer frac-step-flow">${stepsHtml}</div>

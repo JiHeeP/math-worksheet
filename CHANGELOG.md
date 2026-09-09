@@ -1,5 +1,20 @@
 # 변경 이력
 
+## 2026-09-09: 5-2 (대분수)×(자연수) 계산 과정 1 — 글자 크기 보통 이하에서 2열 배치
+
+### 변경 내용
+
+- `(대분수) × (자연수) 계산 과정 1 (가분수로 바꾸기)`, `(자연수) × (대분수) 계산 과정 1 (가분수로 바꾸기)` 학습지가 글자 크기 **작게·보통**에서는 2열 × 6행(12문항)으로, **크게·아주 크게**에서는 기존 1열 한 줄 풀이(6문항)로 배치된다.
+  - `layout.js`: `TWO_COLUMN_AT_NORMAL_FONT_IDS` 추가, `getHtmlLayoutConfig(item, fontScale)` 로 글자 크기에 따라 배치 설정을 고른다. `applyGridLayout` 이 `data-cols` 를 grid 에 기록한다.
+  - `templates.js`: 여러 줄 풀이(`fracStepProblemMultiLine`)의 각 줄을 `.frac-step-line` 으로 감싼다 (기본 `display: contents` 라 기존 한 줄 흐름은 그대로).
+  - CSS: 2열(`.problem-grid[data-cols="2"]`)일 때 `.frac-mul-step` 풀이 줄을 세로로 쌓고 빈칸·분수 크기를 5-1 2단 풀이와 같은 크기로 줄인다.
+- `worksheet.html` 파일 버전 쿼리 갱신.
+
+### 검증
+
+- `node --check` 변경 파일 통과. `validate.mjs 1000`, `validate-stages.mjs 500`: 위반 0건.
+- Headless Chrome: 두 학습지 × 글자 크기 4단계 — 작게/보통 12문항 2열, 크게/아주 크게 6문항 1열, overflow 0건. 인쇄 미디어 12문항 정상. 다른 계산 과정 학습지(예: 진분수×자연수)는 기존 1열 유지 확인.
+
 ## 2026-09-09: 5-2 분수의 곱셈 — 대분수×자연수 계산 과정 2종 분리, 그림(넓이 모델) 학습지 추가
 
 ### 변경 내용
