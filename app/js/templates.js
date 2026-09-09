@@ -23,6 +23,7 @@ import {
   relationTableHtml, perimeterTriangleSvg, rectangleSvg,
   triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg,
   unitGridSvg, splitDiagramHtml,
+  fracAreaModelSvg, mixedAreaModelSvg, AREA_MODEL_REGION_COLORS,
 } from './helpers.js';
 
 /* ================================================================
@@ -109,6 +110,20 @@ function fracStepProblemRows(lines, itemClass = '') {
   return htmlProblem('concept-layout', `
     <div class="concept-card">
       <div class="concept-answer frac-step-rows">${rowsHtml}</div>
+    </div>
+  `, itemClass);
+}
+
+/** 그림(넓이 모델) + 여러 줄 풀이 */
+function areaModelProblem(svg, lines, itemClass = '') {
+  const rowsHtml = lines
+    .filter(Boolean)
+    .map((line) => `<div class="frac-step-row">${line}</div>`)
+    .join('');
+  return htmlProblem('shape-layout', `
+    <div class="shape-card">
+      ${svg}
+      <div class="shape-answer frac-step-rows">${rowsHtml}</div>
     </div>
   `, itemClass);
 }
@@ -207,6 +222,79 @@ function inlineFracDivStep(leftTerm, rightTerm) {
   const line3 = `<span class="eq-txt">=</span> ${fracMulProductHtml(left, reciprocal)} <span class="eq-txt">=</span> ${formulaResultHtml(resultNum, resultDen)}`;
 
   return { line1, line2, line3 };
+}
+
+/**
+ * (대분수)×(자연수), (자연수)×(대분수) — 자연수 부분과 진분수 부분을 따로 곱한 뒤 더함.
+ * 예) 1 3/4 × 3 = (1 × 3) + (3/4 × 3) = 3 + 9/4 = 3 + 2 1/4 = 5 1/4
+ */
+function inlineMixedMulSeparate(leftTerm, rightTerm) {
+  const mixedFirst = leftTerm.kind === 'mixed';
+  const mixed = mixedFirst ? leftTerm : rightTerm;
+  const intTerm = mixedFirst ? rightTerm : leftTerm;
+  const { w, n, d } = mixed;
+  const c = intTerm.value;
+  const wholeProd = w * c;
+  const fracNum = n * c;
+  const times = '<span class="op-txt">×</span>';
+  const eq = '<span class="eq-txt">=</span>';
+  const pair = (mixedPart, intPart) => (mixedFirst ? `${mixedPart} ${times} ${intPart}` : `${intPart} ${times} ${mixedPart}`);
+
+  const line1 = pair(mixedD(w, n, d), c);
+  const line2 = `${eq} (${pair(numBlank(w), numBlank(c))}) + (${pair(fracBlank(n, d), numBlank(c))})`;
+  const line3 = `${eq} ${numBlank(wholeProd)} + ${fracD(pair(numBlank(n), numBlank(c)), d)}`;
+  let line4 = `${eq} ${numBlank(wholeProd)} + ${fracBlank(fracNum, d)}`;
+  let line5 = '';
+
+  const [sn, sd] = simplify(fracNum, d);
+  if (sd === 1) {
+    // 분수 부분이 자연수가 되는 경우: 3 + 6/6 = 3 + 1 = 4
+    line5 = `${eq} ${numBlank(wholeProd)} + ${numBlank(sn)} ${eq} ${numBlank(wholeProd + sn)}`;
+  } else if (sn > sd) {
+    // 가분수 → 대분수로 바꾼 뒤 자연수끼리 더함
+    const extra = Math.floor(sn / sd);
+    const remain = sn % sd;
+    line5 = `${eq} ${numBlank(wholeProd)} + ${mixedBlank(extra, remain, sd)} ${eq} ${mixedBlank(wholeProd + extra, remain, sd)}`;
+  } else {
+    line4 += ` ${eq} ${mixedBlank(wholeProd, sn, sd)}`;
+  }
+  return { line1, line2, line3, line4, line5 };
+}
+
+function areaSwatchHtml(color) {
+  return `<svg class="area-swatch" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" fill="${color}"></rect></svg>`;
+}
+
+/** (진분수)×(진분수), (단위분수)×(단위분수) — 넓이 모델 그림 + 한 줄 풀이 */
+function inlineFracAreaModel(leftTerm, rightTerm) {
+  const { n: n1, d: d1 } = leftTerm;
+  const { n: n2, d: d2 } = rightTerm;
+  const num = n1 * n2;
+  const den = d1 * d2;
+  const [sn, sd] = simplify(num, den);
+  const svg = fracAreaModelSvg(n1, d1, n2, d2);
+  let line = `${fracD(n1, d1)} <span class="op-txt">×</span> ${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(num, den)}`;
+  if (sn !== num || sd !== den) {
+    line += ` <span class="eq-txt">=</span> ${formulaResultHtml(num, den)}`;
+  }
+  return { svg, lines: [line] };
+}
+
+/** (대분수)×(대분수) — 넓이 모델 그림 + 네 부분의 곱을 더하는 풀이 */
+function inlineMixedAreaModel(leftTerm, rightTerm) {
+  const { w: w1, n: n1, d: d1 } = leftTerm;
+  const { w: w2, n: n2, d: d2 } = rightTerm;
+  const svg = mixedAreaModelSvg(w1, n1, d1, w2, n2, d2);
+  const total = ((w1 * d1) + n1) * ((w2 * d2) + n2);
+  const eq = '<span class="eq-txt">=</span>';
+  const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">×</span> ${mixedD(w2, n2, d2)}`;
+  // 네 부분의 곱은 약분·대분수 변환 없이 (분자끼리 곱)/(분모) 그대로 두어 그림의 칸 수와 맞춘다.
+  const line2 = `${eq} ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.ww)}${numBlank(w1 * w2)}`
+    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.fw)}${fracBlank(n1 * w2, d1)}`
+    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.wf)}${fracBlank(w1 * n2, d2)}`
+    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.ff)}${fracBlank(n1 * n2, d1 * d2)}`;
+  const line3 = `${eq} ${formulaResultHtml(total, d1 * d2)}`;
+  return { svg, lines: [line1, line2, line3] };
 }
 
 /** 진분수 통분 덧셈 과정 (1줄) */
@@ -647,6 +735,30 @@ export const T = {
   fracMulStep: {
     grid: 'wide', count: 8,
     render: ({ left, right }) => fracStepProblemMultiLine(inlineFracMulStep(left, right), 'frac-mul-step'),
+  },
+
+  /** (대분수)×(자연수), (자연수)×(대분수) — 자연수·분수 따로 곱하기 */
+  mixedMulSeparateStep: {
+    grid: 'wide', count: 6,
+    render: ({ left, right }) => fracStepProblemRows(inlineMixedMulSeparate(left, right), 'mixed-separate-step'),
+  },
+
+  /** (진분수)×(진분수), (단위분수)×(단위분수) — 넓이 모델 그림으로 원리 알아보기 */
+  fracAreaModel: {
+    grid: 'wide', count: 6,
+    render: ({ left, right }) => {
+      const { svg, lines } = inlineFracAreaModel(left, right);
+      return areaModelProblem(svg, lines, 'frac-area-model');
+    },
+  },
+
+  /** (대분수)×(대분수) — 넓이 모델 그림으로 원리 알아보기 */
+  mixedAreaModel: {
+    grid: 'wide', count: 4,
+    render: ({ left, right }) => {
+      const { svg, lines } = inlineMixedAreaModel(left, right);
+      return areaModelProblem(svg, lines, 'frac-area-model frac-area-model-mixed');
+    },
   },
 
   /** 분수의 나눗셈 — 계산 과정 */

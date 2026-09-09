@@ -117,6 +117,8 @@ data-ans 속성 파싱 → 음의 부호 / 소수점 / "0" 단독 토큰 0건 �
 | 분모 같은 (대분수)+(대분수), 받아올림 | `T.sameMixedAddCarryStep` |
 | 분모 같은 (대분수)−(대분수), 받아내림 | `T.sameMixedSubBorrowStep` |
 | 분모 다른 (대분수) 사칙 | `T.mixedImproperStep`, `T.mixedSeparateStep` |
+| (대분수)×(자연수), (자연수)×(대분수) | `T.fracMulStep` (가분수로 바꾸기) / `T.mixedMulSeparateStep` (자연수·분수 따로) |
+| 분수의 곱셈 원리 (넓이 모델 그림) | `T.fracAreaModel` (단위분수·진분수) / `T.mixedAreaModel` (대분수) |
 
 받아올림/내림이 없는 단순 케이스는 한 줄 풀이(`htmlProblem('frac-row', ...)`)로 OK.
 

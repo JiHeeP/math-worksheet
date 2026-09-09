@@ -79,6 +79,8 @@ export const MULTI_ROW_MIXED_SEPARATE_IDS = new Set([
   'u5_main_mixed_add_carry_separate',
   'u5_main_mixed_sub_no_borrow_separate',
   'u5_main_mixed_sub_borrow_separate',
+  'u2_main_mixed_times_int_separate',
+  'u2_main_int_times_mixed_separate',
 ]);
 
 export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([

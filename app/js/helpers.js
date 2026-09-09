@@ -227,6 +227,130 @@ export function unitGridSvg(cols, rows) {
   return svgShell(rects.join(''));
 }
 
+/* -- 분수의 곱셈 넓이 모델 (그림으로 원리 알아보기) -- */
+
+const AREA_MODEL_COLORS = {
+  cols: '#cfe3f7',    // 첫째 분수 (세로 띠)
+  rows: '#fff1b8',    // 둘째 분수 (가로 띠)
+  overlap: '#a8d8a0', // 두 띠가 겹치는 부분 = 곱
+  ww: '#dbe7f5',      // (자연수) × (자연수)
+  fw: '#fde3c4',      // (진분수) × (자연수)
+  wf: '#d9f0d3',      // (자연수) × (진분수)
+  ff: '#f6d3e3',      // (진분수) × (진분수)
+};
+
+export const AREA_MODEL_REGION_COLORS = {
+  ww: AREA_MODEL_COLORS.ww,
+  fw: AREA_MODEL_COLORS.fw,
+  wf: AREA_MODEL_COLORS.wf,
+  ff: AREA_MODEL_COLORS.ff,
+};
+
+/** SVG 안에 세로로 쌓은 분수 라벨 (분자 / 가로선 / 분모). (cx, cy)는 가로선 중심. */
+function svgFracLabel(cx, cy, n, d) {
+  return `<text class="frac-label" x="${svgNum(cx)}" y="${svgNum(cy - 1.5)}" text-anchor="middle">${n}</text>` +
+    `<line class="frac-label-line" x1="${svgNum(cx - 6)}" y1="${svgNum(cy + 0.5)}" x2="${svgNum(cx + 6)}" y2="${svgNum(cy + 0.5)}"></line>` +
+    `<text class="frac-label" x="${svgNum(cx)}" y="${svgNum(cy + 9.5)}" text-anchor="middle">${d}</text>`;
+}
+
+/** 가로 방향 범위 표시 괄호 (위쪽). */
+function svgBracketTop(x1, x2, y) {
+  return `<path class="bracket" d="M ${svgNum(x1)} ${svgNum(y)} v -3 H ${svgNum(x2)} v 3"></path>`;
+}
+
+/** 세로 방향 범위 표시 괄호 (왼쪽). */
+function svgBracketLeft(y1, y2, x) {
+  return `<path class="bracket" d="M ${svgNum(x)} ${svgNum(y1)} h -3 V ${svgNum(y2)} h 3"></path>`;
+}
+
+/**
+ * (진분수) × (진분수) 넓이 모델.
+ * 한 변이 1인 정사각형을 세로로 d1 등분, 가로로 d2 등분하고
+ * n1/d1 (세로 띠) 와 n2/d2 (가로 띠) 를 색칠. 겹치는 부분이 곱.
+ * 단위분수는 n1 = n2 = 1.
+ */
+export function fracAreaModelSvg(n1, d1, n2, d2) {
+  const size = 70;
+  const x0 = 46;
+  const y0 = 28;
+  const cw = size / d1;
+  const rh = size / d2;
+  const parts = [];
+
+  parts.push(`<rect class="area-base" x="${x0}" y="${y0}" width="${size}" height="${size}"></rect>`);
+  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(cw * n1)}" height="${size}" fill="${AREA_MODEL_COLORS.cols}"></rect>`);
+  parts.push(`<rect x="${x0}" y="${y0}" width="${size}" height="${svgNum(rh * n2)}" fill="${AREA_MODEL_COLORS.rows}"></rect>`);
+  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(cw * n1)}" height="${svgNum(rh * n2)}" fill="${AREA_MODEL_COLORS.overlap}"></rect>`);
+
+  for (let k = 1; k < d1; k++) {
+    const x = svgNum(x0 + (k * cw));
+    parts.push(`<line class="area-line" x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + size}"></line>`);
+  }
+  for (let k = 1; k < d2; k++) {
+    const y = svgNum(y0 + (k * rh));
+    parts.push(`<line class="area-line" x1="${x0}" y1="${y}" x2="${x0 + size}" y2="${y}"></line>`);
+  }
+  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${size}" height="${size}"></rect>`);
+
+  // 위: 첫째 분수 (세로 띠 너비), 왼쪽: 둘째 분수 (가로 띠 높이)
+  parts.push(svgBracketTop(x0, x0 + (cw * n1), y0 - 3));
+  parts.push(svgFracLabel(x0 + (cw * n1 / 2), y0 - 18, n1, d1));
+  parts.push(svgBracketLeft(y0, y0 + (rh * n2), x0 - 3));
+  parts.push(svgFracLabel(x0 - 17, y0 + (rh * n2 / 2), n2, d2));
+
+  return svgShell(parts.join(''));
+}
+
+/**
+ * (대분수) × (대분수) 넓이 모델.
+ * 가로 (w1 + n1/d1), 세로 (w2 + n2/d2) 인 직사각형을
+ * 자연수×자연수 / 진분수×자연수 / 자연수×진분수 / 진분수×진분수 네 부분으로 나눠 색칠.
+ */
+export function mixedAreaModelSvg(w1, n1, d1, w2, n2, d2) {
+  const unit = 28;
+  const x0 = 44;
+  const y0 = 28;
+  const xw = w1 * unit;
+  const xf = (n1 / d1) * unit;
+  const yw = w2 * unit;
+  const yf = (n2 / d2) * unit;
+  const width = xw + xf;
+  const height = yw + yf;
+  const parts = [];
+
+  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(xw)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.ww}"></rect>`);
+  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${y0}" width="${svgNum(xf)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.fw}"></rect>`);
+  parts.push(`<rect x="${x0}" y="${svgNum(y0 + yw)}" width="${svgNum(xw)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.wf}"></rect>`);
+  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${svgNum(y0 + yw)}" width="${svgNum(xf)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.ff}"></rect>`);
+
+  // 잔눈금: 모든 단위 정사각형을 d1 × d2 로 나눔
+  const colStep = unit / d1;
+  const rowStep = unit / d2;
+  for (let k = 1; k * colStep < width - 0.01; k++) {
+    const x = svgNum(x0 + (k * colStep));
+    parts.push(`<line class="${k % d1 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x}" y1="${y0}" x2="${x}" y2="${svgNum(y0 + height)}"></line>`);
+  }
+  for (let k = 1; k * rowStep < height - 0.01; k++) {
+    const y = svgNum(y0 + (k * rowStep));
+    parts.push(`<line class="${k % d2 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x0}" y1="${y}" x2="${svgNum(x0 + width)}" y2="${y}"></line>`);
+  }
+  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${svgNum(width)}" height="${svgNum(height)}"></rect>`);
+
+  // 위 라벨: 자연수 부분 / 진분수 부분
+  parts.push(svgBracketTop(x0, x0 + xw, y0 - 3));
+  parts.push(svgText(x0 + (xw / 2), y0 - 8, w1, 'text-anchor="middle"'));
+  parts.push(svgBracketTop(x0 + xw, x0 + width, y0 - 3));
+  parts.push(svgFracLabel(x0 + xw + (xf / 2), y0 - 18, n1, d1));
+
+  // 왼쪽 라벨
+  parts.push(svgBracketLeft(y0, y0 + yw, x0 - 3));
+  parts.push(svgText(x0 - 10, y0 + (yw / 2) + 4, w2, 'text-anchor="middle"'));
+  parts.push(svgBracketLeft(y0 + yw, y0 + height, x0 - 3));
+  parts.push(svgFracLabel(x0 - 17, y0 + yw + (yf / 2), n2, d2));
+
+  return `<svg class="shape-svg area-model-svg" viewBox="0 0 176 144" aria-hidden="true">${parts.join('')}</svg>`;
+}
+
 export function rectangleSvg(w, h) {
   const size = fitProportionalBox(w, h, { maxWidth: 104, maxHeight: 58, minRatio: 0.4, maxRatio: 3.6 });
   const x = centeredX(size.width);

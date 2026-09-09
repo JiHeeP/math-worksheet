@@ -28,6 +28,8 @@ import {
   genG52U2IntTimesFracStep, genG52U2IntTimesMixedStep,
   genG52U2UnitFracTimesUnitFracStep,
   genG52U2FracTimesFracStep, genG52U2MixedTimesMixedStep,
+  genG52U2UnitFracTimesUnitFracModel,
+  genG52U2FracTimesFracModel, genG52U2MixedTimesMixedModel,
 } from '../generators/g5-2/u2.js';
 
 import {
@@ -87,8 +89,13 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       id: 'u2_main_mixed_times_int',
       prereqs: FRAC_MUL_PREREQS,
     }),
-    학습지('(대분수) × (자연수) 계산 과정', T.fracMulStep, genG52U2MixedTimesIntStep, {
+    학습지('(대분수) × (자연수) 계산 과정 1 (가분수로 바꾸기)', T.fracMulStep, genG52U2MixedTimesIntStep, {
       id: 'u2_main_mixed_times_int_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
+    학습지('(대분수) × (자연수) 계산 과정 2 (자연수·분수 따로)', T.mixedMulSeparateStep, genG52U2MixedTimesIntStep, {
+      id: 'u2_main_mixed_times_int_separate',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -109,8 +116,13 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       id: 'u2_main_int_times_mixed',
       prereqs: FRAC_MUL_PREREQS,
     }),
-    학습지('(자연수) × (대분수) 계산 과정', T.fracMulStep, genG52U2IntTimesMixedStep, {
+    학습지('(자연수) × (대분수) 계산 과정 1 (가분수로 바꾸기)', T.fracMulStep, genG52U2IntTimesMixedStep, {
       id: 'u2_main_int_times_mixed_step',
+      prereqs: FRAC_MUL_PREREQS,
+      ...FRAC_MUL_STEP_LAYOUT,
+    }),
+    학습지('(자연수) × (대분수) 계산 과정 2 (자연수·분수 따로)', T.mixedMulSeparateStep, genG52U2IntTimesMixedStep, {
+      id: 'u2_main_int_times_mixed_separate',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -125,6 +137,11 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
+    학습지('(단위분수) × (단위분수) 그림으로 알아보기', T.fracAreaModel, genG52U2UnitFracTimesUnitFracModel, {
+      id: 'u2_main_unit_times_unit_model',
+      prereqs: FRAC_MUL_PREREQS,
+      grid: 'wide', count: 6,
+    }),
   ]),
   차시('6차시 (진분수) × (진분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(진분수) × (진분수)', genG52U2FracTimesFrac, {
@@ -136,6 +153,11 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
+    학습지('(진분수) × (진분수) 그림으로 알아보기', T.fracAreaModel, genG52U2FracTimesFracModel, {
+      id: 'u2_main_frac_times_frac_model',
+      prereqs: FRAC_MUL_PREREQS,
+      grid: 'wide', count: 6,
+    }),
   ]),
   차시('7차시 (대분수) × (대분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(대분수) × (대분수)', genG52U2MixedTimesMixed, {
@@ -146,6 +168,11 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       id: 'u2_main_mixed_times_mixed_step',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
+    }),
+    학습지('(대분수) × (대분수) 그림으로 알아보기', T.mixedAreaModel, genG52U2MixedTimesMixedModel, {
+      id: 'u2_main_mixed_times_mixed_model',
+      prereqs: FRAC_MUL_PREREQS,
+      grid: 'wide', count: 4,
     }),
   ]),
 ]);

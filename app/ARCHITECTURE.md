@@ -106,6 +106,10 @@ defineUnit('g5-1', 'u1', '자연수의 혼합 계산', [
 | `T.fracLcdStep` | 진분수 통분 (1줄) | `{ n1, d1, n2, d2, op }` |
 | `T.mixedImproperStep` | 대분수 (가분수 변환, 1줄) | |
 | `T.mixedSeparateStep` | 대분수 (따로 계산, 3줄) | |
+| `T.fracMulStep` | 분수의 곱셈 계산 과정 (대분수는 가분수로) | `{ left, right }` (term: `{kind:'int'|'frac'|'mixed', ...}`) |
+| `T.mixedMulSeparateStep` | (대분수)×(자연수) 자연수·분수 따로 (여러 줄) | `{ left, right }` |
+| `T.fracAreaModel` | (진분수)×(진분수) 넓이 모델 그림 + 한 줄 풀이 | `{ left, right }` |
+| `T.mixedAreaModel` | (대분수)×(대분수) 넓이 모델 그림 + 네 부분 합 | `{ left, right }` |
 | `T.divMethod` | 최대공약수/최소공배수 | |
 | `T.pdfGrid` | PDF 격자 세로셈 | |
 | `T.raw` | 자유 HTML (호환용) | |
