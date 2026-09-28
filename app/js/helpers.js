@@ -311,10 +311,9 @@ export function fracAreaModelSvg(n1, d1, n2, d2) {
 
 /**
  * (대분수) × (대분수) 넓이 모델.
- * 학생용 그림에는 첫째 대분수만 그려 준다: 가로 (w1 + n1/d1), 세로 1인 띠
- * (자연수 부분·진분수 부분을 색으로 구분). 아래쪽에는 둘째 대분수 높이만큼
- * 학생이 이어 그릴 수 있도록 점선 눈금(한 칸 = 1)을 둔다.
- * 정답 보기(.answers-shown)에서는 네 부분으로 나뉜 완성 직사각형이 나타난다.
+ * 가로 (w1 + n1/d1), 세로 (w2 + n2/d2) 인 직사각형을
+ * 자연수×자연수 / 진분수×자연수 / 자연수×진분수 / 진분수×진분수 네 부분으로 나눠 색칠.
+ * 두 대분수를 모두 그려 준 완성 그림 (학생이 그리는 방식은 진분수 그림에만 적용 — 2026-09-28 사용자 결정).
  */
 export function mixedAreaModelSvg(w1, n1, d1, w2, n2, d2) {
   const unit = 28;
@@ -326,72 +325,37 @@ export function mixedAreaModelSvg(w1, n1, d1, w2, n2, d2) {
   const yf = (n2 / d2) * unit;
   const width = xw + xf;
   const height = yw + yf;
-  const guideHeight = (w2 + 1) * unit; // 학생이 그릴 수 있는 세로 눈금 범위
+  const parts = [];
+
+  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(xw)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.ww}"></rect>`);
+  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${y0}" width="${svgNum(xf)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.fw}"></rect>`);
+  parts.push(`<rect x="${x0}" y="${svgNum(y0 + yw)}" width="${svgNum(xw)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.wf}"></rect>`);
+  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${svgNum(y0 + yw)}" width="${svgNum(xf)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.ff}"></rect>`);
+
+  // 잔눈금: 모든 단위 정사각형을 d1 × d2 로 나눔
   const colStep = unit / d1;
   const rowStep = unit / d2;
-  const parts = [];
-  const answer = (inner) => `<g class="area-answer">${inner}</g>`;
-  const guide = (inner) => `<g class="area-guide">${inner}</g>`;
-
-  /* ── 학생용: 첫째 대분수 띠 (높이 1) ── */
-  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(xw)}" height="${unit}" fill="${AREA_MODEL_COLORS.ww}"></rect>`);
-  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${y0}" width="${svgNum(xf)}" height="${unit}" fill="${AREA_MODEL_COLORS.fw}"></rect>`);
-
-  /* ── 정답: 네 부분 색칠 (띠 위를 덮음) ── */
-  parts.push(answer(
-    `<rect x="${x0}" y="${y0}" width="${svgNum(xw)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.ww}"></rect>` +
-    `<rect x="${svgNum(x0 + xw)}" y="${y0}" width="${svgNum(xf)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.fw}"></rect>` +
-    `<rect x="${x0}" y="${svgNum(y0 + yw)}" width="${svgNum(xw)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.wf}"></rect>` +
-    `<rect x="${svgNum(x0 + xw)}" y="${svgNum(y0 + yw)}" width="${svgNum(xf)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.ff}"></rect>`
-  ));
-
-  /* ── 학생용: 띠 안의 세로 눈금 + 아래로 이어지는 점선 눈금 ── */
-  const bandLines = [];
-  const guideLines = [];
   for (let k = 1; k * colStep < width - 0.01; k++) {
     const x = svgNum(x0 + (k * colStep));
-    const cls = k % d1 === 0 ? 'area-unit-line' : 'area-line';
-    bandLines.push(`<line class="${cls}" x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + unit}"></line>`);
-    if (k % d1 === 0) {
-      guideLines.push(`<line class="area-guide-line" x1="${x}" y1="${y0 + unit}" x2="${x}" y2="${svgNum(y0 + guideHeight)}"></line>`);
-    }
-  }
-  parts.push(bandLines.join(''));
-  guideLines.push(`<line class="area-guide-line" x1="${x0}" y1="${y0 + unit}" x2="${x0}" y2="${svgNum(y0 + guideHeight)}"></line>`);
-  guideLines.push(`<line class="area-guide-line" x1="${svgNum(x0 + width)}" y1="${y0 + unit}" x2="${svgNum(x0 + width)}" y2="${svgNum(y0 + guideHeight)}"></line>`);
-  for (let k = 2; k * unit <= guideHeight + 0.01; k++) {
-    const y = svgNum(y0 + (k * unit));
-    guideLines.push(`<line class="area-guide-line" x1="${x0}" y1="${y}" x2="${svgNum(x0 + width)}" y2="${y}"></line>`);
-  }
-  parts.push(guide(guideLines.join('')));
-  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${svgNum(width)}" height="${unit}"></rect>`);
-
-  /* ── 정답: 완성 직사각형의 눈금과 테두리 ── */
-  const answerLines = [];
-  for (let k = 1; k * colStep < width - 0.01; k++) {
-    const x = svgNum(x0 + (k * colStep));
-    answerLines.push(`<line class="${k % d1 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x}" y1="${y0}" x2="${x}" y2="${svgNum(y0 + height)}"></line>`);
+    parts.push(`<line class="${k % d1 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x}" y1="${y0}" x2="${x}" y2="${svgNum(y0 + height)}"></line>`);
   }
   for (let k = 1; k * rowStep < height - 0.01; k++) {
     const y = svgNum(y0 + (k * rowStep));
-    answerLines.push(`<line class="${k % d2 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x0}" y1="${y}" x2="${svgNum(x0 + width)}" y2="${y}"></line>`);
+    parts.push(`<line class="${k % d2 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x0}" y1="${y}" x2="${svgNum(x0 + width)}" y2="${y}"></line>`);
   }
-  answerLines.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${svgNum(width)}" height="${svgNum(height)}"></rect>`);
-  parts.push(answer(answerLines.join('')));
+  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${svgNum(width)}" height="${svgNum(height)}"></rect>`);
 
-  // 위 라벨 (학생용에 항상): 첫째 대분수의 자연수 부분 / 진분수 부분
+  // 위 라벨: 자연수 부분 / 진분수 부분
   parts.push(svgBracketTop(x0, x0 + xw, y0 - 3));
   parts.push(svgText(x0 + (xw / 2), y0 - 8, w1, 'text-anchor="middle"'));
   parts.push(svgBracketTop(x0 + xw, x0 + width, y0 - 3));
   parts.push(svgFracLabel(x0 + xw + (xf / 2), y0 - 18, n1, d1));
 
-  // 왼쪽 라벨 (정답 보기에서만): 둘째 대분수
-  parts.push(answer(
-    svgBracketLeft(y0, y0 + yw, x0 - 3) +
-    svgText(x0 - 10, y0 + (yw / 2) + 4, w2, 'text-anchor="middle"') +
-    svgBracketLeft(y0 + yw, y0 + height, x0 - 3) +
-    svgFracLabel(x0 - 17, y0 + yw + (yf / 2), n2, d2)
-  ));
+  // 왼쪽 라벨
+  parts.push(svgBracketLeft(y0, y0 + yw, x0 - 3));
+  parts.push(svgText(x0 - 10, y0 + (yw / 2) + 4, w2, 'text-anchor="middle"'));
+  parts.push(svgBracketLeft(y0 + yw, y0 + height, x0 - 3));
+  parts.push(svgFracLabel(x0 - 17, y0 + yw + (yf / 2), n2, d2));
 
   return `<svg class="shape-svg area-model-svg" viewBox="0 0 176 144" aria-hidden="true">${parts.join('')}</svg>`;
 }
