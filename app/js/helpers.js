@@ -233,17 +233,7 @@ const AREA_MODEL_COLORS = {
   cols: '#cfe3f7',    // 첫째 분수 (세로 띠)
   rows: '#fff1b8',    // 둘째 분수 (가로 띠)
   overlap: '#a8d8a0', // 두 띠가 겹치는 부분 = 곱
-  ww: '#dbe7f5',      // (자연수) × (자연수)
-  fw: '#fde3c4',      // (진분수) × (자연수)
-  wf: '#d9f0d3',      // (자연수) × (진분수)
-  ff: '#f6d3e3',      // (진분수) × (진분수)
-};
-
-export const AREA_MODEL_REGION_COLORS = {
-  ww: AREA_MODEL_COLORS.ww,
-  fw: AREA_MODEL_COLORS.fw,
-  wf: AREA_MODEL_COLORS.wf,
-  ff: AREA_MODEL_COLORS.ff,
+  improper: '#dcdcf3', // (대분수)×(대분수) 가분수 직사각형
 };
 
 /** SVG 안에 세로로 쌓은 분수 라벨 (분자 / 가로선 / 분모). (cx, cy)는 가로선 중심. */
@@ -310,52 +300,60 @@ export function fracAreaModelSvg(n1, d1, n2, d2) {
 }
 
 /**
- * (대분수) × (대분수) 넓이 모델.
- * 가로 (w1 + n1/d1), 세로 (w2 + n2/d2) 인 직사각형을
- * 자연수×자연수 / 진분수×자연수 / 자연수×진분수 / 진분수×진분수 네 부분으로 나눠 색칠.
- * 두 대분수를 모두 그려 준 완성 그림 (학생이 그리는 방식은 진분수 그림에만 적용 — 2026-09-28 사용자 결정).
+ * (대분수) × (대분수) 넓이 모델 — 대분수를 가분수로 나타내어 계산하기.
+ * 한 변이 1인 단위 정사각형을 (w1 + 1) × (w2 + 1) 개 놓은 모눈 위에
+ * 가로 (w1 + n1/d1), 세로 (w2 + n2/d2) 인 직사각형을 색칠한 완성 그림.
+ * 단위 정사각형은 실선, 1/d1 · 1/d2 잔눈금은 점선. 원점은 왼쪽 아래.
+ * 아래·왼쪽에 눈금 수(0, 1, 2, ...)와 가분수 길이(점선 호)를 표시한다.
+ * (교과서 '방법② 대분수를 가분수로 나타내어 계산하기' 그림 — 2026-09-30 사용자 요청)
  */
 export function mixedAreaModelSvg(w1, n1, d1, w2, n2, d2) {
-  const unit = 28;
-  const x0 = 44;
-  const y0 = 28;
-  const xw = w1 * unit;
-  const xf = (n1 / d1) * unit;
-  const yw = w2 * unit;
-  const yf = (n2 / d2) * unit;
-  const width = xw + xf;
-  const height = yw + yf;
+  const cols = w1 + 1;
+  const rows = w2 + 1;
+  const left = 46;   // 왼쪽 라벨(눈금 수 + 호 + 가분수) 영역
+  const right = 170;
+  const yB = 94;     // 가로축 (아래 라벨 영역 확보)
+  const unit = Math.min(46, (right - left) / cols, (yB - 6) / rows);
+  const x0 = left + (((right - left) - (cols * unit)) / 2);
+  const gw = cols * unit;
+  const gh = rows * unit;
+  const yT = yB - gh;
+  const sw = (w1 + (n1 / d1)) * unit;
+  const sh = (w2 + (n2 / d2)) * unit;
   const parts = [];
 
-  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(xw)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.ww}"></rect>`);
-  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${y0}" width="${svgNum(xf)}" height="${svgNum(yw)}" fill="${AREA_MODEL_COLORS.fw}"></rect>`);
-  parts.push(`<rect x="${x0}" y="${svgNum(y0 + yw)}" width="${svgNum(xw)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.wf}"></rect>`);
-  parts.push(`<rect x="${svgNum(x0 + xw)}" y="${svgNum(y0 + yw)}" width="${svgNum(xf)}" height="${svgNum(yf)}" fill="${AREA_MODEL_COLORS.ff}"></rect>`);
+  parts.push(`<rect class="area-base" x="${svgNum(x0)}" y="${svgNum(yT)}" width="${svgNum(gw)}" height="${svgNum(gh)}"></rect>`);
+  parts.push(`<rect x="${svgNum(x0)}" y="${svgNum(yB - sh)}" width="${svgNum(sw)}" height="${svgNum(sh)}" fill="${AREA_MODEL_COLORS.improper}"></rect>`);
 
-  // 잔눈금: 모든 단위 정사각형을 d1 × d2 로 나눔
-  const colStep = unit / d1;
-  const rowStep = unit / d2;
-  for (let k = 1; k * colStep < width - 0.01; k++) {
-    const x = svgNum(x0 + (k * colStep));
-    parts.push(`<line class="${k % d1 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x}" y1="${y0}" x2="${x}" y2="${svgNum(y0 + height)}"></line>`);
+  for (let k = 1; k < cols * d1; k++) {
+    const x = svgNum(x0 + (k * unit / d1));
+    parts.push(`<line class="${k % d1 === 0 ? 'area-unit-line' : 'area-dash-line'}" x1="${x}" y1="${svgNum(yT)}" x2="${x}" y2="${svgNum(yB)}"></line>`);
   }
-  for (let k = 1; k * rowStep < height - 0.01; k++) {
-    const y = svgNum(y0 + (k * rowStep));
-    parts.push(`<line class="${k % d2 === 0 ? 'area-unit-line' : 'area-line'}" x1="${x0}" y1="${y}" x2="${svgNum(x0 + width)}" y2="${y}"></line>`);
+  for (let k = 1; k < rows * d2; k++) {
+    const y = svgNum(yB - (k * unit / d2));
+    parts.push(`<line class="${k % d2 === 0 ? 'area-unit-line' : 'area-dash-line'}" x1="${svgNum(x0)}" y1="${y}" x2="${svgNum(x0 + gw)}" y2="${y}"></line>`);
   }
-  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${svgNum(width)}" height="${svgNum(height)}"></rect>`);
+  parts.push(`<rect class="area-outline" x="${svgNum(x0)}" y="${svgNum(yT)}" width="${svgNum(gw)}" height="${svgNum(gh)}"></rect>`);
 
-  // 위 라벨: 자연수 부분 / 진분수 부분
-  parts.push(svgBracketTop(x0, x0 + xw, y0 - 3));
-  parts.push(svgText(x0 + (xw / 2), y0 - 8, w1, 'text-anchor="middle"'));
-  parts.push(svgBracketTop(x0 + xw, x0 + width, y0 - 3));
-  parts.push(svgFracLabel(x0 + xw + (xf / 2), y0 - 18, n1, d1));
+  // 눈금 수: 원점 0, 가로 1..cols, 세로 1..rows
+  parts.push(svgText(x0 - 4, yB + 11, 0, 'text-anchor="end"'));
+  for (let k = 1; k <= cols; k++) {
+    parts.push(svgText(x0 + (k * unit), yB + 11, k, 'text-anchor="middle"'));
+  }
+  for (let k = 1; k <= rows; k++) {
+    parts.push(svgText(x0 - 4, yB - (k * unit) + 4, k, 'text-anchor="end"'));
+  }
 
-  // 왼쪽 라벨
-  parts.push(svgBracketLeft(y0, y0 + yw, x0 - 3));
-  parts.push(svgText(x0 - 10, y0 + (yw / 2) + 4, w2, 'text-anchor="middle"'));
-  parts.push(svgBracketLeft(y0 + yw, y0 + height, x0 - 3));
-  parts.push(svgFracLabel(x0 - 17, y0 + yw + (yf / 2), n2, d2));
+  // 가분수 길이: 아래(가로), 왼쪽(세로) 점선 호 + 라벨.
+  // 눈금 수와 겹치지 않도록 호는 눈금 수 바깥(gap)에서 시작한다.
+  const gap = 13;
+  const depth = 12;
+  const by = yB + gap;
+  const lx = x0 - gap;
+  parts.push(`<path class="area-arc" d="M ${svgNum(x0)} ${svgNum(by)} Q ${svgNum(x0 + (sw / 2))} ${svgNum(by + (depth * 2))} ${svgNum(x0 + sw)} ${svgNum(by)}"></path>`);
+  parts.push(svgFracLabel(x0 + (sw / 2), by + depth + 12, (w1 * d1) + n1, d1));
+  parts.push(`<path class="area-arc" d="M ${svgNum(lx)} ${svgNum(yB)} Q ${svgNum(lx - (depth * 2))} ${svgNum(yB - (sh / 2))} ${svgNum(lx)} ${svgNum(yB - sh)}"></path>`);
+  parts.push(svgFracLabel(lx - depth - 10, yB - (sh / 2), (w2 * d2) + n2, d2));
 
   return `<svg class="shape-svg area-model-svg" viewBox="0 0 176 144" aria-hidden="true">${parts.join('')}</svg>`;
 }

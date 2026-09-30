@@ -23,7 +23,7 @@ import {
   relationTableHtml, perimeterTriangleSvg, rectangleSvg,
   triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg,
   unitGridSvg, splitDiagramHtml,
-  fracAreaModelSvg, mixedAreaModelSvg, AREA_MODEL_REGION_COLORS,
+  fracAreaModelSvg, mixedAreaModelSvg,
 } from './helpers.js';
 
 /* ================================================================
@@ -266,10 +266,6 @@ function inlineMixedMulSeparate(leftTerm, rightTerm) {
   return { line1, line2, line3, line4, line5 };
 }
 
-function areaSwatchHtml(color) {
-  return `<svg class="area-swatch" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" fill="${color}"></rect></svg>`;
-}
-
 /** (진분수)×(진분수), (단위분수)×(단위분수) — 넓이 모델 그림 + 한 줄 풀이 */
 function inlineFracAreaModel(leftTerm, rightTerm) {
   const { n: n1, d: d1 } = leftTerm;
@@ -285,20 +281,21 @@ function inlineFracAreaModel(leftTerm, rightTerm) {
   return { svg, lines: [line] };
 }
 
-/** (대분수)×(대분수) — 넓이 모델 그림 + 네 부분의 곱을 더하는 풀이 */
+/** (대분수)×(대분수) — 넓이 모델 그림 + 대분수를 가분수로 나타내어 계산하는 풀이 */
 function inlineMixedAreaModel(leftTerm, rightTerm) {
   const { w: w1, n: n1, d: d1 } = leftTerm;
   const { w: w2, n: n2, d: d2 } = rightTerm;
   const svg = mixedAreaModelSvg(w1, n1, d1, w2, n2, d2);
-  const total = ((w1 * d1) + n1) * ((w2 * d2) + n2);
+  const i1 = (w1 * d1) + n1;
+  const i2 = (w2 * d2) + n2;
+  const den = d1 * d2;
   const eq = '<span class="eq-txt">=</span>';
-  const line1 = `${mixedD(w1, n1, d1)} <span class="op-txt">×</span> ${mixedD(w2, n2, d2)}`;
-  // 네 부분의 곱은 약분·대분수 변환 없이 (분자끼리 곱)/(분모) 그대로 두어 그림의 칸 수와 맞춘다.
-  const line2 = `${eq} ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.ww)}${numBlank(w1 * w2)}`
-    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.fw)}${fracBlank(n1 * w2, d1)}`
-    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.wf)}${fracBlank(w1 * n2, d2)}`
-    + ` + ${areaSwatchHtml(AREA_MODEL_REGION_COLORS.ff)}${fracBlank(n1 * n2, d1 * d2)}`;
-  const line3 = `${eq} ${formulaResultHtml(total, d1 * d2)}`;
+  const times = '<span class="op-txt">×</span>';
+  // 교과서 그림처럼 가분수는 그림의 길이 라벨과 같게 보여 주고, 분자끼리 곱하는 과정과 결과를 빈칸으로 둔다.
+  const line1 = `${mixedD(w1, n1, d1)} ${times} ${mixedD(w2, n2, d2)} ${eq} ${fracD(i1, d1)} ${times} ${fracD(i2, d2)}`;
+  const line2 = `${eq} ${fracD(`${numBlank(i1)} × ${numBlank(i2)}`, `${d1} × ${d2}`)}`
+    + ` ${eq} ${fracD(`<span class="blank-wide">${numBlank(i1 * i2)}</span>`, den)}`;
+  const line3 = `${eq} ${formulaResultHtml(i1 * i2, den)}`;
   return { svg, lines: [line1, line2, line3] };
 }
 

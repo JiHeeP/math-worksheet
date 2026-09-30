@@ -169,7 +169,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
-    학습지('(대분수) × (대분수) 그림으로 알아보기', T.mixedAreaModel, genG52U2MixedTimesMixedModel, {
+    학습지('(대분수) × (대분수) 그림으로 알아보기 (가분수로 바꾸기)', T.mixedAreaModel, genG52U2MixedTimesMixedModel, {
       id: 'u2_main_mixed_times_mixed_model',
       prereqs: FRAC_MUL_PREREQS,
       grid: 'wide', count: 4,
