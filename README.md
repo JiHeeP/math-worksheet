@@ -13,7 +13,7 @@
 
 ### 웹에서 바로 쓰기
 
-배포된 사이트에 접속해서 사용합니다. (Netlify 배포)
+배포된 사이트에 접속해서 사용합니다. (Vercel 배포)
 
 > 📌 배포 URL은 추후 여기에 추가
 
@@ -34,13 +34,12 @@ math-worksheet/
 ├── README.md              ← (이 파일) 프로젝트 안내
 ├── CLAUDE.md              ← AI 협업 가이드 (Claude/Cursor 등)
 ├── CHANGELOG.md           ← 변경 이력
-├── netlify.toml           ← Netlify 배포 설정 (publish 폴더 지정)
+├── vercel.json            ← Vercel 배포 설정 (출력 폴더·라우팅)
 ├── docs/
 │   └── references/        ← 교육과정 참고 자료 (배포에서 제외)
-└── app/                   ← 실제 앱 (Netlify publish 대상)
+└── app/                   ← 실제 앱 (Vercel 출력 대상)
     ├── ARCHITECTURE.md    ← 코드 구조 상세
     ├── worksheet.html     ← 진입점 (HTML 껍데기)
-    ├── _redirects         ← Netlify 라우팅 설정
     ├── css/
     │   └── worksheet.css
     └── js/
@@ -59,7 +58,7 @@ math-worksheet/
 
 - **순수 HTML / CSS / JavaScript (ES Modules)**
 - 빌드 도구 없음 (`<script type="module">` 로 브라우저 직접 로딩)
-- **배포**: Netlify (정적 파일 호스팅)
+- **배포**: Vercel (정적 파일 호스팅)
 
 학습 부담이 적도록 의도적으로 단순한 구성을 유지합니다.
 
@@ -90,7 +89,7 @@ python3 -m http.server 8000
 
 ### 배포
 
-`main` 브랜치에 push 하면 Netlify가 자동 배포합니다.
+`main` 브랜치에 push 하면 Vercel이 자동 배포합니다.
 
 ## 로드맵
 
