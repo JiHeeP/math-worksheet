@@ -1,5 +1,9 @@
 # 변경 이력
 
+## 2026-10-11
+
+- 배포 플랫폼을 Netlify → Vercel 로 이전. `netlify.toml`, `app/_redirects` 제거, `vercel.json` 추가 (출력 폴더 `app`, 모든 경로 → `worksheet.html`).
+
 ## 2026-09-30: 5-2 (대분수)×(대분수) 그림으로 알아보기 — 가분수로 바꿔 계산하는 그림으로 변경
 
 ### 변경 내용
