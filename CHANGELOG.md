@@ -8,6 +8,8 @@
   - `계산 과정 1 (분수로)` — `T.decimalFracStep`. `1.4 × 6 = □/10 × 6 = (□ × 6)/10 = □/10 = □`, 소수×소수는 분모 `10 × 10 → 100`. 세 자리 수·소수 답이 들어가게 빈칸 폭을 내용에 맞춤(`decimal-frac-step`).
   - `계산 과정 2 (자연수로)` — `T.decimalNaturalStep`. 자연수 세로셈(26 × 3) → `1/□ 배 →` → 소수 세로셈(2.6 × 3). 배율 빈칸 답은 두 곱의 관계(1/10, 소수×소수는 1/100).
   - `가로셈` — `T.decimalHorizontal`. `2.6 × 3 = □`.
+- 1·2차시 계산 과정 1·2는 소수 한 자리(1/10배)와 두 자리(1/100배)를 문항 번호에 따라 번갈아 출제(홀수 번 한 자리, 짝수 번 두 자리 — 사용자 요청). 새 generator `genG52U4DecimalTimesIntMixedPlaces`, `genG52U4IntTimesDecimalMixedPlaces`. 세로셈·가로셈은 기존대로 소수 한 자리.
+  - 이를 위해 `bindTemplate` 이 문항 번호(`problemIndex`)도 generator 에 넘기도록 변경(템플릿 없는 generator 는 이미 받고 있었음).
 - 기존 세로셈 학습지 라벨에 ` 세로셈` 을 붙여 구분(ID는 그대로).
 - 소수 곱셈 세로셈 격자에 문제 영역(곱하는 두 수)과 계산 영역을 나누는 굵은 선 추가(`decimal-vertical-sep-line`). 4차시 `소수 × 10, 100` 에도 적용.
 - generator 정리(`g5-2/u4.js`, 1~3차시):

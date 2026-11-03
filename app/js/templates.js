@@ -882,7 +882,8 @@ export const T = {
  */
 export function bindTemplate(template, generator) {
   if (!template) return generator; // 템플릿 없으면 제너레이터 직접 사용
-  const bound = (ctx = {}) => template.render(generator(ctx));
+  // problemIndex(문항 번호)도 넘겨 제너레이터가 번호에 따라 유형을 번갈아 낼 수 있게 함
+  const bound = (ctx = {}, problemIndex) => template.render(generator(ctx, problemIndex));
   bound._template = template;
   bound._generator = generator;
   return bound;

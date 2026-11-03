@@ -52,6 +52,31 @@ export function genG52U4IntTimesDecimal() {
   return decimalProblem(rand(2, 9), 0, randNonMultipleOf10(2, 99), 1, 1);
 }
 
+/**
+ * 계산 과정 1·2용: 소수 한 자리(1/10)와 두 자리(1/100)를 문항 번호에 따라 번갈아 출제
+ *   홀수 번 → 소수 한 자리 (2.6, 1/10배) / 짝수 번 → 소수 두 자리 (1.36, 1/100배)
+ *   문항 번호가 없으면(회귀 테스트 등) 무작위
+ */
+function decimalPlacesForIndex(problemIndex) {
+  const n = Number(problemIndex);
+  if (!Number.isFinite(n) || n < 1) return rand(1, 2);
+  return n % 2 === 1 ? 1 : 2;
+}
+
+function randDecimalInt(places) {
+  return places === 1 ? randNonMultipleOf10(2, 99) : randNonMultipleOf10(11, 999);
+}
+
+export function genG52U4DecimalTimesIntMixedPlaces(_context = {}, problemIndex) {
+  const places = decimalPlacesForIndex(problemIndex);
+  return decimalProblem(randDecimalInt(places), places, rand(2, 9), 0, 1);
+}
+
+export function genG52U4IntTimesDecimalMixedPlaces(_context = {}, problemIndex) {
+  const places = decimalPlacesForIndex(problemIndex);
+  return decimalProblem(rand(2, 9), 0, randDecimalInt(places), places, 1);
+}
+
 export function genG52U4DecimalTimesDecimalTenths() {
   return decimalProblem(randNonMultipleOf10(2, 99), 1, randNonMultipleOf10(2, 99), 1, 2);
 }
