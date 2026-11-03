@@ -213,6 +213,36 @@ function inlineFracMulStep(leftTerm, rightTerm) {
   return { line1, line2, line3 };
 }
 
+/* ── 소수의 곱셈 ── */
+
+/** '2.6' → { int: 26, places: 1 } / '3' → { int: 3, places: 0 } */
+function decimalScaled(text) {
+  const str = String(text);
+  const point = str.indexOf('.');
+  const places = point === -1 ? 0 : str.length - point - 1;
+  return { int: Number(str.replace('.', '')), places };
+}
+
+/**
+ * 소수의 곱셈 — 분수로 바꾸어 계산하기
+ * 예) 1.4 × 6 = □/10 × 6 = (□ × 6)/10 = □/10 = □
+ *     0.3 × 1.4 = □/10 × □/10 = (□ × □)/100 = □/100 = □
+ */
+function inlineDecimalFracStep(num1, num2, ans) {
+  const left = decimalScaled(num1);
+  const right = decimalScaled(num2);
+  const den = 10 ** (left.places + right.places);
+  const asFrac = (term) => (term.places ? fracD(numBlank(term.int), 10 ** term.places) : term.int);
+  const asNumer = (term) => (term.places ? numBlank(term.int) : term.int);
+
+  return [
+    `${num1} <span class="op-txt">×</span> ${num2}`,
+    `<span class="eq-txt">=</span> ${asFrac(left)} <span class="op-txt">×</span> ${asFrac(right)}`,
+    `<span class="eq-txt">=</span> ${fracD(`${asNumer(left)} × ${asNumer(right)}`, den)}`,
+    `<span class="eq-txt">=</span> ${fracD(numBlank(left.int * right.int), den)} <span class="eq-txt">=</span> ${numBlank(ans)}`,
+  ];
+}
+
 /** 분수의 나눗셈 과정: 나누는 수의 역수를 곱함 */
 function inlineFracDivStep(leftTerm, rightTerm) {
   const left = fracMulImproper(leftTerm);
@@ -625,6 +655,39 @@ export const T = {
   decimalVertical: {
     grid: 'wide', count: 8,
     render: (data) => ({ kind: 'decimalVertical', ...data }),
+  },
+
+  /** 소수 곱셈 가로셈: 2.6 × 3 = □ */
+  decimalHorizontal: {
+    grid: 'practice', count: 15,
+    render: ({ num1, num2, op, ans }) => horizProblem(`${num1} ${op} ${num2}`, numBlank(ans)),
+  },
+
+  /** 소수 곱셈 계산 과정 1 — 분수로 바꾸어 계산 */
+  decimalFracStep: {
+    grid: 'wide', count: 6,
+    render: ({ num1, num2, ans }) => fracStepProblemMultiLine(inlineDecimalFracStep(num1, num2, ans), 'frac-mul-step decimal-frac-step'),
+  },
+
+  /**
+   * 소수 곱셈 계산 과정 2 — 자연수의 곱셈으로 계산
+   * 왼쪽: 자연수 세로셈(26 × 3), 가운데: 1/□ 배 →, 오른쪽: 소수 세로셈(2.6 × 3)
+   * 가운데 배율은 두 곱(78 → 7.8)의 관계: 소수 자릿수 합이 1이면 1/10, 2이면 1/100
+   */
+  decimalNaturalStep: {
+    grid: 'wide', count: 8,
+    render: (data) => {
+      const left = decimalScaled(data.num1);
+      const right = decimalScaled(data.num2);
+      const factor = 10 ** (left.places + right.places);
+      const natAns = String(left.int * right.int);
+      return {
+        kind: 'decimalNaturalStep',
+        natural: { num1: String(left.int), num2: String(right.int), op: data.op, ans: natAns, workRows: data.workRows },
+        decimal: { num1: data.num1, num2: data.num2, op: data.op, ans: data.ans, workAns: data.workAns, workRows: data.workRows },
+        relationHtml: `${fracD(1, numBlank(factor))}<span class="decimal-natural-times">배</span>`,
+      };
+    },
   },
 
   /** 소수 나눗셈 세로셈 격자 */

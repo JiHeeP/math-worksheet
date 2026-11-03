@@ -1569,6 +1569,60 @@ button:disabled:active { transform: none; }
   pointer-events: none;
 }
 
+/* 소수 곱셈 계산 과정 1: 세 자리 수·소수 답이 들어가도록 빈칸 폭을 내용에 맞춤 */
+.problem-item.decimal-frac-step .frac-step-flow .num-blank {
+  width: auto;
+  min-width: var(--write-box-size);
+  padding: 0 calc(6px * var(--font-scale, 1));
+}
+
+/* 소수 곱셈 세로셈: 문제 영역(1·2행)과 계산 영역(3행~) 구분선 */
+.decimal-vertical-sep-line {
+  z-index: 3;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  height: 0;
+  border-top: 2.5px solid #2f3640;
+  align-self: start;
+  pointer-events: none;
+}
+
+/* 소수 곱셈 계산 과정 2: 자연수 세로셈 → (1/□ 배) → 소수 세로셈 */
+.decimal-natural-step {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: calc(8px * var(--font-scale, 1));
+}
+
+.decimal-natural-relation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* 격자 위쪽 두 행(곱하는 두 수) 높이에 맞춰 가운데 정렬 */
+  margin-top: 4px;
+  height: calc(60px * var(--font-scale, 1));
+  gap: calc(4px * var(--font-scale, 1));
+  font-size: calc(15px * var(--font-scale, 1));
+  white-space: nowrap;
+}
+
+.decimal-natural-ratio {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.decimal-natural-ratio .frac-d {
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
+.decimal-natural-arrow {
+  font-size: calc(20px * var(--font-scale, 1));
+  line-height: 1;
+}
+
 .answers-shown .decimal-vertical-grid [data-ans],
 .answers-shown .decimal-longdiv-grid [data-ans] {
   color: #e74c3c;

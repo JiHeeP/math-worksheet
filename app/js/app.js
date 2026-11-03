@@ -296,7 +296,7 @@ function hasProblemContentOverflow(sheet) {
 
     return content.some((child) => {
       const rect = child.getBoundingClientRect();
-      const isDecimalGrid = child.matches('.decimal-vertical-grid, .decimal-longdiv-grid');
+      const isDecimalGrid = child.matches('.decimal-vertical-grid, .decimal-longdiv-grid, .decimal-natural-step');
       const scrollOverflow = !isDecimalGrid && (child.scrollWidth > child.clientWidth + 1 || child.scrollHeight > child.clientHeight + 1);
       const outsideItem = (
         rect.left < itemRect.left - 1 ||
