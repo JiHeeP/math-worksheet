@@ -66,6 +66,9 @@ export const ONE_COLUMN_WORKSHEET_IDS = new Set([
   'u1_main_frac_div_frac_step',
   'u1_main_int_div_frac_step',
   'u1_main_mixed_div_frac_step',
+  'u4_main_decimal_times_int_frac_step',
+  'u4_main_int_times_decimal_frac_step',
+  'u4_main_decimal_times_decimal_frac_step',
 ]);
 
 /* 글자 크기 '보통' 이하에서는 2열(풀이 줄을 세로로 쌓음), '크게' 이상에서는 1열 한 줄 풀이 */

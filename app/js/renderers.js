@@ -45,6 +45,10 @@ export function renderItem(problem, idx) {
     return renderDecimalVertical(problem, idx);
   }
 
+  if (problem.kind === 'decimalNaturalStep') {
+    return renderDecimalNaturalStep(problem, idx);
+  }
+
   if (problem.kind === 'decimalLongDiv') {
     return renderDecimalLongDiv(problem, idx);
   }
@@ -88,10 +92,11 @@ function decimalPointNode(parts, startCol, row, isAnswer = false, lineOffset = 2
   return `<span class="decimal-point-on-line${answerClass}" style="--grid-line:${line + lineOffset};--row:${row};"></span>`;
 }
 
-function renderDecimalVertical(problem, idx) {
+/** 소수 곱셈 세로셈 격자 (문제 영역 | 구분선 | 계산 영역) */
+function decimalVerticalGridHtml(problem) {
   const num1 = decimalParts(problem.num1);
   const num2 = decimalParts(problem.num2);
-  const ans = decimalParts(problem.ans);
+  const ans = decimalParts(problem.workAns ?? problem.ans);
   const workRows = problem.workRows ?? 2;
   const cols = Math.max(num1.digits.length, num2.digits.length, ans.digits.length, 4);
   const rows = workRows + 3;
@@ -101,6 +106,8 @@ function renderDecimalVertical(problem, idx) {
 
   const body = [
     '<div class="decimal-grid-surface"></div>',
+    // 곱하는 두 수(1·2행)와 계산 영역(3행~)을 나누는 선
+    '<span class="decimal-vertical-sep-line"></span>',
     `<span class="decimal-grid-op" style="--row:2;">${problem.op}</span>`,
     decimalDigitNodes(num1, topStart, 1),
     decimalPointNode(num1, topStart, 1),
@@ -110,7 +117,25 @@ function renderDecimalVertical(problem, idx) {
     decimalPointNode(ans, answerStart, rows, true),
   ].join('');
 
-  return `<div class="problem-item decimal-grid-item"><div class="problem-num">${idx}</div><div class="decimal-vertical-grid" style="--cols:${cols};--rows:${rows};">${body}</div></div>`;
+  return `<div class="decimal-vertical-grid" style="--cols:${cols};--rows:${rows};">${body}</div>`;
+}
+
+function renderDecimalVertical(problem, idx) {
+  return `<div class="problem-item decimal-grid-item"><div class="problem-num">${idx}</div>${decimalVerticalGridHtml(problem)}</div>`;
+}
+
+/** 자연수 세로셈 → (1/□ 배) → 소수 세로셈 */
+function renderDecimalNaturalStep(problem, idx) {
+  return `<div class="problem-item decimal-grid-item decimal-natural-item"><div class="problem-num">${idx}</div>
+    <div class="decimal-natural-step">
+      ${decimalVerticalGridHtml(problem.natural)}
+      <div class="decimal-natural-relation">
+        <div class="decimal-natural-ratio">${problem.relationHtml}</div>
+        <div class="decimal-natural-arrow">\u2192</div>
+      </div>
+      ${decimalVerticalGridHtml(problem.decimal)}
+    </div>
+  </div>`;
 }
 
 function renderDecimalLongDiv(problem, idx) {
