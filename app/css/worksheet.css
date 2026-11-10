@@ -1623,6 +1623,28 @@ button:disabled:active { transform: none; }
   line-height: 1;
 }
 
+/* 소수 곱셈 계산 과정 3: 위 자연수 가로셈 / 아래 소수 가로셈 — 같은 자리끼리 세로 정렬 */
+.decimal-natural-horiz {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: calc(6px * var(--font-scale, 1));
+  row-gap: calc(8px * var(--font-scale, 1));
+  margin-top: 10px;
+  font-size: calc(20px * var(--font-scale, 1));
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+/* 앞 수는 오른쪽, 뒤 수는 왼쪽 정렬 — × 기호 양옆이 벌어지지 않게 */
+.decimal-natural-horiz .dnh-num { text-align: right; }
+.decimal-natural-horiz .dnh-num + .op-txt + .dnh-num { text-align: left; }
+.decimal-natural-horiz .dnh-ans { justify-self: start; }
+.decimal-natural-horiz .num-blank {
+  min-width: calc(var(--write-box-size) * 1.6);
+}
+
 .answers-shown .decimal-vertical-grid [data-ans],
 .answers-shown .decimal-longdiv-grid [data-ans] {
   color: #e74c3c;

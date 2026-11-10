@@ -197,6 +197,10 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_NATURAL_STEP_LAYOUT,
     }),
+    학습지('(소수) × (자연수) 계산 과정 3 (가로셈)', T.decimalNaturalHorizontal, genG52U4DecimalTimesIntMixedPlaces, {
+      id: 'u4_main_decimal_times_int_natural_horizontal',
+      prereqs: DECIMAL_MUL_PREREQS,
+    }),
     학습지('(소수) × (자연수) 세로셈', T.decimalVertical, genG52U4DecimalTimesInt, {
       id: 'u4_main_decimal_times_int',
       prereqs: DECIMAL_MUL_PREREQS,
@@ -217,6 +221,10 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
       id: 'u4_main_int_times_decimal_natural_step',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_NATURAL_STEP_LAYOUT,
+    }),
+    학습지('(자연수) × (소수) 계산 과정 3 (가로셈)', T.decimalNaturalHorizontal, genG52U4IntTimesDecimalMixedPlaces, {
+      id: 'u4_main_int_times_decimal_natural_horizontal',
+      prereqs: DECIMAL_MUL_PREREQS,
     }),
     학습지('(자연수) × (소수) 세로셈', T.decimalVertical, genG52U4IntTimesDecimal, {
       id: 'u4_main_int_times_decimal',
