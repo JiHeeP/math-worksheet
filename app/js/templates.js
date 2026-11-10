@@ -690,6 +690,28 @@ export const T = {
     },
   },
 
+  /**
+   * 소수 곱셈 계산 과정 3 — 자연수 곱셈 가로셈을 위에, 원래 식을 아래에
+   * 예)  26 × 3 = □
+   *     2.6 × 3 = □
+   * 두 줄의 같은 자리(곱하는 수, = , 답)를 세로로 맞춰 자연수 곱 → 소수점 찍기를 반복 연습
+   */
+  decimalNaturalHorizontal: {
+    grid: 'practice', count: 12,
+    render: ({ num1, num2, op, ans }) => {
+      const left = decimalScaled(num1);
+      const right = decimalScaled(num2);
+      const natAns = String(left.int * right.int);
+      const row = (a, b, answer) => `
+        <span class="dnh-num">${a}</span><span class="op-txt">${op}</span><span class="dnh-num">${b}</span>
+        <span class="eq-txt">=</span><span class="dnh-ans">${numBlank(answer)}</span>`;
+      return htmlProblem('decimal-natural-horiz', `
+        ${row(left.int, right.int, natAns)}
+        ${row(num1, num2, ans)}
+      `, 'decimal-natural-horiz-item');
+    },
+  },
+
   /** 소수 나눗셈 세로셈 격자 */
   decimalLongDiv: {
     grid: 'wide', count: 6,
