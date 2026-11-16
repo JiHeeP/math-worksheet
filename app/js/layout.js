@@ -17,6 +17,11 @@ export const PDF_LAYOUTS = {
   div_2d1d_rem: { type: 'div', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
   div_3d1d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 3, targetCellAspect: 0.78, minCellWidth: 40, minCellHeight: 58, baseGap: [10, 8] },
   div_3d2d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 3, targetCellAspect: 0.78, minCellWidth: 42, minCellHeight: 58, baseGap: [10, 8] },
+  // 5-2 곱셈과 나눗셈 총연습
+  mul_2d2d_full:   { type: 'mul_l', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.62, minCellWidth: 34, minCellHeight: 48, baseGap: [10, 8] },
+  // 나머지 있음·없음 반반이 정확하도록 짝수: 세 자리÷한 자리 2열×3행(6), 세 자리÷두 자리 2열×4행(8)
+  div_3d1d_mixrem: { type: 'div',   minCols: 2, maxCols: 2, maxRows: 3, targetCellAspect: 0.78, minCellWidth: 40, minCellHeight: 58, baseGap: [10, 8] },
+  div_3d2d_mixrem: { type: 'div',   minCols: 2, maxCols: 2, maxRows: 4, targetCellAspect: 0.78, minCellWidth: 42, minCellHeight: 58, baseGap: [10, 8] },
 };
 
 export const GRID_LAYOUTS = {

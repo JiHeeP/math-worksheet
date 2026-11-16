@@ -295,9 +295,15 @@ function renderPdfDiv(problem, idx) {
     html += '</tr>';
   }
 
+  // 맨 아랫줄 = 나머지 자리. showRem 이면 정답 보기에서 나머지(없으면 0)를 보여 준다.
+  const remDigits = problem.showRem ? pdfDigits(problem.rem, workCols) : [];
   html += '<tr>';
   for (let c = 0; c < divisorCols; c++) html += '<td></td>';
-  for (let c = 0; c < workCols; c++) html += '<td class="pdf-b"></td>';
+  for (let c = 0; c < workCols; c++) {
+    html += problem.showRem
+      ? `<td class="pdf-b ans-digit">${pdfCell(remDigits[c])}</td>`
+      : '<td class="pdf-b"></td>';
+  }
   html += '</tr>';
 
   return `<div class="problem-item"><div class="problem-num">${idx}</div><table class="pdf-div-table">${html}</table></div>`;
@@ -383,7 +389,8 @@ export function createSheet(item, countOverride, fontScale = 1, options = {}) {
     applyGridLayout(grid, layout);
 
     for (let i = 1; i <= count; i++) {
-      const problem = generateWithUnique(PDF_GENERATORS[opType]);
+      // 문항 번호도 넘겨 generator 가 번호에 따라 유형(예: 나머지 있음/없음)을 고르게 낼 수 있게 함
+      const problem = generateWithUnique(() => PDF_GENERATORS[opType](i));
       grid.insertAdjacentHTML('beforeend', renderPdfProblem(opType, problem, i));
     }
 

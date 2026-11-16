@@ -8,6 +8,7 @@
  *   2단원 분수의 곱셈
  *   4단원 소수의 곱셈
  *   분수 총연습 (분모 같은 분수 덧셈·뺄셈 유형 섞기 + 5-1 분모 다른 분수 + 5-2 분수의 곱셈)
+ *   곱셈과 나눗셈 총연습 (두 자리×두 자리, 세 자리÷한 자리, 세 자리÷두 자리 세로셈)
  * 미구현: 3단원 합동과 대칭, 5단원 직육면체, 6단원 평균과 가능성
  */
 
@@ -43,6 +44,11 @@ import {
   genG52ReviewSameAdd13, genG52ReviewSameAdd24, genG52ReviewSameAddAll,
   genG52ReviewSameSub13, genG52ReviewSameSub24, genG52ReviewSameSubAll,
 } from '../generators/g5-2/fracReview.js';
+
+import {
+  genG52CalcMul2d2d, genG52CalcDiv3d1d, genG52CalcDiv3d2d,
+  PDF_GENERATORS_CALC_REVIEW,
+} from '../generators/g5-2/calcReview.js';
 
 import { entries as g51Entries } from './g5-1.js';
 
@@ -336,6 +342,18 @@ const reviewMul = cloneForReview(u2, '분수의 곱셈');
 
 const fracReview = [...reviewSame, ...reviewDiff, ...reviewMul];
 
+/* ── 곱셈과 나눗셈 총연습 (세로셈 격자, pdfMap 으로 렌더러 연결) ── */
+
+const calcReview = defineUnit(GRADE_ID, 'calc_review', '곱셈과 나눗셈', [
+  차시('곱셈', { kind: 'pdf' }, [
+    학습지('두 자리 수 × 두 자리 수 (세로셈)', genG52CalcMul2d2d, { id: 'calc_review_mul_2d2d', grid: 'standard', count: 12 }),
+  ]),
+  차시('나눗셈', { kind: 'pdf', grid: 'divgrid', count: 8 }, [
+    학습지('세 자리 수 ÷ 한 자리 수 (나머지 있음·없음 섞기)', genG52CalcDiv3d1d, { id: 'calc_review_div_3d1d', count: 6 }),
+    학습지('세 자리 수 ÷ 두 자리 수 (나머지 있음·없음 섞기)', genG52CalcDiv3d2d, { id: 'calc_review_div_3d2d' }),
+  ]),
+]);
+
 /* ── 학기 메타 ── */
 
 export const meta = {
@@ -347,10 +365,15 @@ export const meta = {
     u2: { short: '2단원', name: '분수의 곱셈' },
     u4: { short: '4단원', name: '소수의 곱셈' },
     frac_review: { short: '총연습', name: '분수 총연습' },
+    calc_review: { short: '총연습', name: '곱셈과 나눗셈' },
   },
 };
 
-export const entries = [...u1, ...u2, ...u4, ...fracReview];
+export const entries = [...u1, ...u2, ...u4, ...fracReview, ...calcReview];
 
-export const pdfMap = {};
-export const pdfGenerators = {};
+export const pdfMap = {
+  'g5-2_calc_review_mul_2d2d': 'mul_2d2d_full',
+  'g5-2_calc_review_div_3d1d': 'div_3d1d_mixrem',
+  'g5-2_calc_review_div_3d2d': 'div_3d2d_mixrem',
+};
+export const pdfGenerators = { ...PDF_GENERATORS_CALC_REVIEW };
