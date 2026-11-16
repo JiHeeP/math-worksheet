@@ -35,7 +35,7 @@ import {
 import {
   genG52U4DecimalTimesInt, genG52U4IntTimesDecimal,
   genG52U4DecimalTimesIntMixedPlaces, genG52U4IntTimesDecimalMixedPlaces,
-  genG52U4DecimalTimesDecimalTenths, genG52U4DecimalTimes10,
+  genG52U4DecimalTimesDecimalMixedPlaces, genG52U4DecimalTimes10,
 } from '../generators/g5-2/u4.js';
 
 const GRADE_ID = 'g5-2';
@@ -237,22 +237,22 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
     }),
   ]),
   차시('3차시 (소수) × (소수)', { grid: 'practice', count: 15 }, [
-    학습지('(소수) × (소수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4DecimalTimesDecimalTenths, {
+    학습지('(소수) × (소수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4DecimalTimesDecimalMixedPlaces, {
       id: 'u4_main_decimal_times_decimal_frac_step',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_FRAC_STEP_LAYOUT,
     }),
-    학습지('(소수) × (소수) 계산 과정 2 (자연수로)', T.decimalNaturalStep, genG52U4DecimalTimesDecimalTenths, {
+    학습지('(소수) × (소수) 계산 과정 2 (자연수로)', T.decimalNaturalStep, genG52U4DecimalTimesDecimalMixedPlaces, {
       id: 'u4_main_decimal_times_decimal_natural_step',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_NATURAL_STEP_LAYOUT,
     }),
-    학습지('(소수) × (소수) 세로셈', T.decimalVertical, genG52U4DecimalTimesDecimalTenths, {
+    학습지('(소수) × (소수) 세로셈', T.decimalVertical, genG52U4DecimalTimesDecimalMixedPlaces, {
       id: 'u4_main_decimal_times_decimal',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_GRID_LAYOUT,
     }),
-    학습지('(소수) × (소수) 가로셈', T.decimalHorizontal, genG52U4DecimalTimesDecimalTenths, {
+    학습지('(소수) × (소수) 가로셈', T.decimalHorizontal, genG52U4DecimalTimesDecimalMixedPlaces, {
       id: 'u4_main_decimal_times_decimal_horizontal',
       prereqs: DECIMAL_MUL_PREREQS,
     }),
