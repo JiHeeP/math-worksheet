@@ -7,6 +7,7 @@
  *   1단원 수의 범위와 어림하기
  *   2단원 분수의 곱셈
  *   4단원 소수의 곱셈
+ *   분수 총연습 (분모 같은 분수 덧셈·뺄셈 유형 섞기 + 5-1 분모 다른 분수 + 5-2 분수의 곱셈)
  * 미구현: 3단원 합동과 대칭, 5단원 직육면체, 6단원 평균과 가능성
  */
 
@@ -37,6 +38,13 @@ import {
   genG52U4DecimalTimesIntMixedPlaces, genG52U4IntTimesDecimalMixedPlaces,
   genG52U4DecimalTimesDecimalTenths, genG52U4DecimalTimes10,
 } from '../generators/g5-2/u4.js';
+
+import {
+  genG52ReviewSameAdd13, genG52ReviewSameAdd24, genG52ReviewSameAddAll,
+  genG52ReviewSameSub13, genG52ReviewSameSub24, genG52ReviewSameSubAll,
+} from '../generators/g5-2/fracReview.js';
+
+import { entries as g51Entries } from './g5-1.js';
 
 const GRADE_ID = 'g5-2';
 
@@ -266,6 +274,68 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   ]),
 ]);
 
+/* ── 분수 총연습 ──
+   1) 분모 같은 분수: 덧셈·뺄셈 각각 유형 1·3 반반 / 유형 2·4 반반 / 유형 1~4 모두 섞기
+   2) 분모 다른 분수: 5-1 5단원 본단원 학습지를 그대로 가져옴
+   3) 분수의 곱셈: 5-2 2단원 본단원 학습지를 그대로 가져옴
+   (원본 학습지를 고치면 총연습에도 자동 반영된다.) */
+
+const REVIEW_UNIT_ID = 'frac_review';
+const REVIEW_FRAC_CONTROLS = { controls: { fractionDifficulty: { stages: [1, 2, 3] } } };
+
+const reviewSame = defineUnit(GRADE_ID, REVIEW_UNIT_ID, '분수 총연습', [
+  차시('분모가 같은 분수의 덧셈', REVIEW_FRAC_CONTROLS, [
+    학습지('분모 같은 분수의 덧셈: 진분수끼리 (합이 1 이상·미만 섞기)', T.sameFracMixed, genG52ReviewSameAdd13, { id: 'frac_review_same_add_13' }),
+    학습지('분모 같은 분수의 덧셈: 대분수끼리 (받아올림 있음·없음 섞기)', T.sameFracMixed, genG52ReviewSameAdd24, { id: 'frac_review_same_add_24' }),
+    학습지('분모 같은 분수의 덧셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameAddAll, { id: 'frac_review_same_add_all' }),
+  ]),
+  차시('분모가 같은 분수의 뺄셈', REVIEW_FRAC_CONTROLS, [
+    학습지('분모 같은 분수의 뺄셈: 받아내림 있음 ((자연수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub13, { id: 'frac_review_same_sub_13' }),
+    학습지('분모 같은 분수의 뺄셈: 받아내림 없음 ((진분수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub24, { id: 'frac_review_same_sub_24' }),
+    학습지('분모 같은 분수의 뺄셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameSubAll, { id: 'frac_review_same_sub_all' }),
+  ]),
+]);
+
+/**
+ * 다른 단원의 본단원 학습지를 총연습 단원으로 복제.
+ * generator·grid·count·controls 는 원본 그대로, id·단원·라벨만 바꾼다.
+ */
+function cloneForReview(sourceEntries, lessonRef, relabel = (label) => label) {
+  return sourceEntries
+    .filter((entry) => entry.section === '본단원')
+    .map((entry) => {
+      const sourceLocalId = entry.id.slice(entry.grade.length + 1);
+      return {
+        ...entry,
+        id: `${GRADE_ID}_${REVIEW_UNIT_ID}_${sourceLocalId}`,
+        layoutId: sourceLocalId, // layout.js 의 학습지별 배치(1열·2열 등)를 원본과 똑같이
+        grade: GRADE_ID,
+        unit: REVIEW_UNIT_ID,
+        label: relabel(entry.label),
+        lessonRef,
+        prereqs: null,
+        from: null,
+      };
+    });
+}
+
+// 5-1 대분수 학습지 라벨엔 '분모 다른'이 없어서 총연습 목록에서 구분되도록 앞에 붙인다.
+// ('받아올림 대분수 덧셈 (…)' → '분모 다른 대분수 덧셈 - 받아올림 (…)', 뺄셈 라벨과 같은 꼴로)
+function withDiffDenom(label) {
+  if (label.startsWith('분모 다른')) return label;
+  const carry = label.match(/^받아올림 대분수 덧셈 (.+)$/);
+  return carry ? `분모 다른 대분수 덧셈 - 받아올림 ${carry[1]}` : `분모 다른 ${label}`;
+}
+
+const reviewDiff = cloneForReview(
+  g51Entries.filter((entry) => entry.unit === 'u5'),
+  '분모가 다른 분수의 덧셈과 뺄셈',
+  withDiffDenom,
+);
+const reviewMul = cloneForReview(u2, '분수의 곱셈');
+
+const fracReview = [...reviewSame, ...reviewDiff, ...reviewMul];
+
 /* ── 학기 메타 ── */
 
 export const meta = {
@@ -276,10 +346,11 @@ export const meta = {
     u1: { short: '1단원', name: '수의 범위와 어림하기' },
     u2: { short: '2단원', name: '분수의 곱셈' },
     u4: { short: '4단원', name: '소수의 곱셈' },
+    frac_review: { short: '총연습', name: '분수 총연습' },
   },
 };
 
-export const entries = [...u1, ...u2, ...u4];
+export const entries = [...u1, ...u2, ...u4, ...fracReview];
 
 export const pdfMap = {};
 export const pdfGenerators = {};

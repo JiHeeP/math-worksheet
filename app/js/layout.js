@@ -77,6 +77,16 @@ export const TWO_COLUMN_AT_NORMAL_FONT_IDS = new Set([
   'u2_main_int_times_mixed_step',
 ]);
 
+/* 5-2 분수 총연습: 분모 같은 분수 유형 섞기 중 받아올림·받아내림 단계 풀이(긴 줄)가
+   섞이는 장 → 1열로 쌓는다. 값 = 최대 행 수.
+   반반 섞기는 6행(3:3 정확히), 4유형 섞기는 8행(글자 '작게'면 유형별 2문항씩, '보통'은 7문항) */
+export const SAME_FRAC_MIXED_ONE_COLUMN_ROWS = {
+  frac_review_same_add_24: 6,
+  frac_review_same_sub_13: 6,
+  frac_review_same_add_all: 8,
+  frac_review_same_sub_all: 8,
+};
+
 export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([
   'u2_main_mixed_times_mixed',
 ]);
@@ -102,7 +112,8 @@ export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
 export function getHtmlLayoutConfig(item, fontScale = 1) {
   const base = GRID_LAYOUTS[item.grid];
   if (!base) return null;
-  const localId = item.id.replace(/^g\d-\d_/, '');
+  // layoutId: 다른 단원 학습지를 복제한 항목(예: 5-2 분수 총연습)이 원본 배치를 그대로 쓰도록
+  const localId = item.layoutId || item.id.replace(/^g\d-\d_/, '');
 
   if (TWO_COLUMN_AT_NORMAL_FONT_IDS.has(localId)) {
     if ((Number(fontScale) || 1) <= 1) {
@@ -161,6 +172,17 @@ export function getHtmlLayoutConfig(item, fontScale = 1) {
       targetCellAspect: 4.8,
       minCellWidth: 120,
       minCellHeight: 34,
+      baseGap: [6, 0],
+    };
+  }
+
+  if (SAME_FRAC_MIXED_ONE_COLUMN_ROWS[localId]) {
+    return {
+      ...base,
+      minCols: 1, maxCols: 1, maxRows: SAME_FRAC_MIXED_ONE_COLUMN_ROWS[localId], widthPriority: 2,
+      targetCellAspect: 4.8,
+      minCellWidth: 120,
+      minCellHeight: 28,
       baseGap: [6, 0],
     };
   }

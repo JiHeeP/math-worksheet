@@ -91,6 +91,33 @@ export function mixedWholeForStage(stage) {
   return { wMin: 2, wMax: 5 };
 }
 
+/* -- 유형 섞기: 문항 번호(problemIndex) 기준으로 유형을 고르게 배분 --
+   options 개수(k)만큼 문항을 한 묶음으로 보고, 묶음마다 유형 순서를 섞는다.
+   → 묶음 안에서는 각 유형이 정확히 1번씩 (반반·4등분 보장), 순서는 매번 무작위.
+   problemIndex 가 없으면(회귀 테스트 등) 무작위로 하나 고른다. */
+
+const balancedBlocks = new Map();
+
+export function pickBalanced(key, options, problemIndex) {
+  const idx = Number(problemIndex);
+  if (!Number.isInteger(idx) || idx < 1) return randChoice(options);
+  const k = options.length;
+  const block = Math.floor((idx - 1) / k);
+  const pos = (idx - 1) % k;
+  let cached = balancedBlocks.get(key);
+  // 묶음의 첫 문항이면 새로 섞는다 (새 학습지 = 1번 문항부터 다시 시작)
+  if (pos === 0 || !cached || cached.block !== block) {
+    const order = options.slice();
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = rand(0, i);
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    cached = { block, order };
+    balancedBlocks.set(key, cached);
+  }
+  return cached.order[pos];
+}
+
 /* -- sheet-scoped context: 한 장 안에서 중복 방지 -- */
 
 const sheetContext = { usedNumbers: new Set() };
