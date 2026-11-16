@@ -505,6 +505,21 @@ function inline1MinusFrac(n, d) {
 }
 
 /** (자연수) − (진분수): 자연수에서 1 받아내림 */
+/** 분모 같은 분수, 받아올림·받아내림 없는 한 줄 풀이 (sameFracMixed 용) */
+function inlineSameFracOneLine({ type, a, b, w1, n1, w2, n2, d }) {
+  const op = (sym) => ` <span class="op-txt">${sym}</span> `;
+  const eq = ' <span class="eq-txt">=</span> ';
+  if (type === 'addLt1') return `${fracD(a, d)}${op('+')}${fracD(b, d)}${eq}${formulaResultHtml(a + b, d)}`;
+  if (type === 'subFrac') return `${fracD(a, d)}${op('−')}${fracD(b, d)}${eq}${formulaResultHtml(a - b, d)}`;
+  if (type === 'mixedAddNoCarry') {
+    return `${mixedD(w1, n1, d)}${op('+')}${mixedD(w2, n2, d)}${eq}${formulaResultHtml((w1 + w2) * d + n1 + n2, d)}`;
+  }
+  if (type === 'mixedSubNoBorrow') {
+    return `${mixedD(w1, n1, d)}${op('−')}${mixedD(w2, n2, d)}${eq}${formulaResultHtml((w1 - w2) * d + n1 - n2, d)}`;
+  }
+  throw new Error(`sameFracMixed: 알 수 없는 유형 ${type}`);
+}
+
 function inlineIntMinusFrac(w, n, d) {
   let s = `${w} <span class="op-txt">−</span> ${fracD(n, d)}`;
   s += ` <span class="eq-txt">=</span> ${mixedBlank(w - 1, d, d)} <span class="op-txt">−</span> ${fracD(n, d)}`;
@@ -786,6 +801,25 @@ export const T = {
   sameFracAddGe1Step: {
     grid: 'wide', count: 6,
     render: ({ a, b, d }) => fracStepProblem(inlineSameFracAddGe1(a, b, d)),
+  },
+
+  /**
+   * 분모 같은 분수의 덧셈·뺄셈 유형 섞기 (5-2 분수 총연습)
+   * 제너레이터가 { type, ...data } 를 주면 유형에 맞는 풀이로 그린다.
+   *   받아올림·받아내림 있는 유형 → 단계 풀이 템플릿
+   *   없는 유형 → 한 줄 풀이
+   */
+  sameFracMixed: {
+    grid: 'wide', count: 8,
+    render: (data) => {
+      const { type } = data;
+      if (type === 'addGe1') return T.sameFracAddGe1Step.render(data);
+      if (type === 'mixedAddCarry') return T.sameMixedAddCarryStep.render(data);
+      if (type === 'oneMinusFrac') return T.oneMinusFracStep.render(data);
+      if (type === 'intMinusFrac') return T.intMinusFracStep.render(data);
+      if (type === 'mixedSubBorrow') return T.sameMixedSubBorrowStep.render(data);
+      return htmlProblem('frac-row', inlineSameFracOneLine(data));
+    },
   },
 
   /** 1 − (진분수) — 1 = d/d 변환 단계 */
