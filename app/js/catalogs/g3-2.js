@@ -7,7 +7,7 @@
  * 곱셈/나눗셈은 세로셈(PDF) 표준 출력.
  *
  * 현재 구현 단원:
- *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈)
+ *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈, 난이도 중·상)
  *   2단원 나눗셈 — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
  *   4단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
  */
@@ -15,7 +15,7 @@
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
 
 import {
-  genU1PreMul,
+  genU1PreMul, genU1PreMulHard,
   genU1PreDiv2d1d, genU1PreDiv2d1dNoRem, genU1PreDiv2d1dRem,
   genDiv3d1,
   PDF_GENERATORS_U1,
@@ -29,7 +29,8 @@ const GRADE_ID = 'g3-2';
 
 const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
   차시('1차시 두 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
-    학습지('두 자리 × 두 자리 (세로셈)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
+    학습지('두 자리 × 두 자리 (세로셈, 난이도 중)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
+    학습지('두 자리 × 두 자리 (세로셈, 난이도 상 · 모든 자리 올림)', genU1PreMulHard, { id: 'u1_main_mul_2d2d_hard' }),
   ]),
 ]);
 
@@ -81,6 +82,7 @@ export const entries = [...u1, ...u3, ...u5];
 
 export const pdfMap = {
   'g3-2_u1_main_mul_2d2d': 'mul_2d2d',
+  'g3-2_u1_main_mul_2d2d_hard': 'mul_2d2d_hard',
   'g3-2_u3_main_div_2d1d': 'div_2d1d',
   'g3-2_u3_main_div_norem': 'div_2d1d_norem',
   'g3-2_u3_main_div_rem': 'div_2d1d_rem',

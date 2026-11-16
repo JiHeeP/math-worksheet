@@ -57,6 +57,37 @@ export function genU1PreMul() {
   return { kind: 'vertical', num1: a, num2: b, op: '\u00d7', ans: a * b };
 }
 
+/**
+ * 두 자리 × 두 자리 — 난이도 상 (모든 자리 계산에서 올림)
+ *   a = AB, b = CD 일 때 아래 6곳에서 모두 올림이 생긴다.
+ *   ① B×D ≥ 10            ② A×D + 올림 ≥ 10   (a×D 가 세 자리)
+ *   ③ B×C ≥ 10            ④ A×C + 올림 ≥ 10   (a×C 가 세 자리)
+ *   ⑤ 부분곱 더하기 십의 자리 올림   ⑥ 백의 자리 올림 (답이 네 자리)
+ */
+export function isMul2d2dAllCarry(a, b) {
+  const A = Math.floor(a / 10), B = a % 10, C = Math.floor(b / 10), D = b % 10;
+  if (A < 1 || C < 1) return false;
+  if (B * D < 10) return false;
+  if (A * D + Math.floor(B * D / 10) < 10) return false;
+  if (B * C < 10) return false;
+  if (A * C + Math.floor(B * C / 10) < 10) return false;
+  const p1 = a * D, p2 = a * C;
+  const tensSum = Math.floor(p1 / 10) % 10 + p2 % 10;
+  if (tensSum < 10) return false;
+  const hundredsSum = Math.floor(p1 / 100) % 10 + Math.floor(p2 / 10) % 10 + Math.floor(tensSum / 10);
+  if (hundredsSum < 10) return false;
+  return true;
+}
+
+export function genU1PreMulHard() {
+  let a, b;
+  do {
+    a = rand(22, 99);
+    b = rand(22, 99);
+  } while (!isMul2d2dAllCarry(a, b));
+  return { kind: 'vertical', num1: a, num2: b, op: '\u00d7', ans: a * b };
+}
+
 export function genU1PreMul3x2() {
   const a = rand(100, 399), b = rand(11, 25);
   return { kind: 'vertical', num1: a, num2: b, op: '\u00d7', ans: a * b };
@@ -261,6 +292,7 @@ export const PDF_GENERATORS_U1 = {
   sub_3d() { const b = rand(100, 399), a = b + rand(10, 300); return { num1: a, num2: b, op: '\u2212', ans: a - b }; },
   mul_2d1d() { const a = rand(12, 99), b = rand(2, 9); return { num1: a, num2: b, op: '\u00d7', ans: a * b }; },
   mul_2d2d() { const a = rand(12, 45), b = rand(11, 25); return { num1: a, num2: b, op: '\u00d7', ans: a * b }; },
+  mul_2d2d_hard() { const { num1, num2, op, ans } = genU1PreMulHard(); return { num1, num2, op, ans }; },
   mul_3d2d() { const a = rand(100, 399), b = rand(11, 25); return { num1: a, num2: b, op: '\u00d7', ans: a * b }; },
   div_2d1d() { const dvsr = rand(2, 9), dvnd = rand(10, 99); return { dvsr, dvnd, quot: Math.floor(dvnd / dvsr), rem: dvnd % dvsr }; },
   div_2d1d_norem() { const dvsr = rand(2, 9), q = rand(3, Math.floor(99 / dvsr)), dvnd = dvsr * q; return { dvsr, dvnd, quot: q, rem: 0 }; },

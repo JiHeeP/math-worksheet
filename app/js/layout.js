@@ -11,6 +11,7 @@ export const PDF_LAYOUTS = {
   sub_3d:   { type: 'addsub', minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 0.66, minCellWidth: 32, minCellHeight: 35, baseGap: [12, 8] },
   mul_2d1d: { type: 'mul_s',  minCols: 2, maxCols: 3, maxRows: 5, targetCellAspect: 0.68, minCellWidth: 32, minCellHeight: 36, baseGap: [12, 8] },
   mul_2d2d: { type: 'mul_l',  minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.62, minCellWidth: 34, minCellHeight: 48, baseGap: [10, 8] },
+  mul_2d2d_hard: { type: 'mul_l', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.62, minCellWidth: 34, minCellHeight: 48, baseGap: [10, 8] },
   mul_3d2d: { type: 'mul_l',  minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.58, minCellWidth: 36, minCellHeight: 48, baseGap: [10, 8] },
   div_2d1d: { type: 'div',    minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
   div_2d1d_norem: { type: 'div', minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 0.72, minCellWidth: 38, minCellHeight: 48, baseGap: [10, 8] },
