@@ -90,8 +90,24 @@ export function genG52U4IntTimesDecimalMixedPlaces(_context = {}, problemIndex) 
   return decimalProblem(rand(2, 9), 0, randDecimalInt(places), places);
 }
 
-export function genG52U4DecimalTimesDecimalTenths() {
-  return decimalProblem(randNonMultipleOf10(2, 99), 1, randNonMultipleOf10(2, 99), 1);
+/**
+ * (소수) × (소수): 소수 한 자리와 두 자리를 문항 번호에 따라 섞어 출제
+ *   1, 4, 7 … 번 → 한 자리 × 한 자리 (2.6 × 0.7, 1/100배)
+ *   2, 5, 8 … 번 → 두 자리 × 한 자리 (1.36 × 2.4, 1/1000배)
+ *   3, 6, 9 … 번 → 한 자리 × 두 자리 (2.4 × 1.36, 1/1000배)
+ *   문항 번호가 없으면(회귀 테스트 등) 무작위
+ */
+const DECIMAL_TIMES_DECIMAL_PLACES = [[1, 1], [2, 1], [1, 2]];
+
+function decimalTimesDecimalPlacesForIndex(problemIndex) {
+  const n = Number(problemIndex);
+  const i = Number.isFinite(n) && n >= 1 ? (n - 1) % 3 : rand(0, 2);
+  return DECIMAL_TIMES_DECIMAL_PLACES[i];
+}
+
+export function genG52U4DecimalTimesDecimalMixedPlaces(_context = {}, problemIndex) {
+  const [places1, places2] = decimalTimesDecimalPlacesForIndex(problemIndex);
+  return decimalProblem(randDecimalInt(places1), places1, randDecimalInt(places2), places2);
 }
 
 export function genG52U4DecimalTimes10() {
