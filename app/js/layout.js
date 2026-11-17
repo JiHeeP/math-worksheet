@@ -32,6 +32,8 @@ export const GRID_LAYOUTS = {
   divgrid:  { minCols: 2, maxCols: 3, maxRows: 4, targetCellAspect: 1.0,  minCellWidth: 50, minCellHeight: 30, widthPriority: 1.0, baseGap: [12, 8] },
   concept:  { minCols: 1, maxCols: 2, maxRows: 5, targetCellAspect: 1.05, minCellWidth: 72, minCellHeight: 44, widthPriority: 0.9, baseGap: [14, 14] },
   wide:     { minCols: 1, maxCols: 2, maxRows: 4, targetCellAspect: 1.08, minCellWidth: 78, minCellHeight: 66, widthPriority: 0.8, baseGap: [16, 16] },
+  // 한 줄에 한 문항 (긴 문장틀·풀이+고치기처럼 가로로 넓은 문항)
+  single:   { minCols: 1, maxCols: 1, maxRows: 4, targetCellAspect: 2.6, minCellWidth: 120, minCellHeight: 48, widthPriority: 2, baseGap: [10, 12] },
 };
 
 export const THREE_PLUS_HORIZONTAL_IDS = new Set([
