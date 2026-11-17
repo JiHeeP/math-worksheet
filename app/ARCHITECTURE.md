@@ -110,6 +110,7 @@ defineUnit('g5-1', 'u1', '자연수의 혼합 계산', [
 | `T.mixedMulSeparateStep` | (대분수)×(자연수) 자연수·분수 따로 (여러 줄) | `{ left, right }` |
 | `T.fracAreaModel` | (진분수)×(진분수) 넓이 모델 그림 + 한 줄 풀이 | `{ left, right }` |
 | `T.mixedAreaModel` | (대분수)×(대분수) 넓이 모델 그림 + 네 부분 합 | `{ left, right }` |
+| `T.mul2d2dTens` 외 5종 | (두 자리)×(두 자리) 곱셈의 원리 (몇십 곱·넓이 그림·갈라 계산·부분곱 세로셈·틀린 풀이·문장틀) | `{ a, b, tens, ones }` (틀린 풀이는 `errorType` 추가) |
 | `T.divMethod` | 최대공약수/최소공배수 | |
 | `T.pdfGrid` | PDF 격자 세로셈 | |
 | `T.raw` | 자유 HTML (호환용) | |

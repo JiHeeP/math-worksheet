@@ -139,6 +139,9 @@ function markSheetNumbers(nums) {
 
 function extractProblemNumbers(problem) {
   if (!problem || typeof problem !== 'object') return [];
+  // 템플릿이 중복 판단 기준을 직접 준 경우 (예: 곱셈 원리 학습지는 '25×35' 같은 식 자체로 판단.
+  // 모든 문항에 공통으로 들어가는 10, 0 같은 수 때문에 중복 검사가 매번 실패하지 않도록)
+  if (Array.isArray(problem.uniqueKeys)) return problem.uniqueKeys;
   if (problem.kind === 'vertical') {
     const out = [];
     if (Number.isFinite(problem.num1)) out.push(problem.num1);

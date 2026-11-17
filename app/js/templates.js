@@ -23,7 +23,7 @@ import {
   relationTableHtml, perimeterTriangleSvg, rectangleSvg,
   triangleSvg, parallelogramSvg, trapezoidSvg, rhombusSvg,
   unitGridSvg, splitDiagramHtml,
-  fracAreaModelSvg, mixedAreaModelSvg,
+  fracAreaModelSvg, mixedAreaModelSvg, mulSplitAreaSvg,
 } from './helpers.js';
 
 /* ================================================================
@@ -637,6 +637,162 @@ function buildDivMethodHtml(a, b, mode) {
   </div>`;
 }
 
+/* ── (두 자리 수) × (두 자리 수) 곱셈의 원리 (3-2 1단원, 5-2 곱셈 총연습) ──
+   데이터: { a, b, tens, ones }  예) a=25, b=35 → tens=3, ones=5
+   부분곱: a×ones(125), a×tens×10(750) — 둘째 줄의 0은 한 개만. */
+
+function mulParts({ a, tens, ones }) {
+  const tensValue = tens * 10;
+  const onesProduct = a * ones;          // 25 × 5  = 125
+  const tensDigitProduct = a * tens;     // 25 × 3  = 75
+  const tensProduct = tensDigitProduct * 10; // 25 × 30 = 750
+  return { tensValue, onesProduct, tensDigitProduct, tensProduct, total: onesProduct + tensProduct };
+}
+
+/** 수를 소리 내어 읽을 때 끝에 받침이 있는지 (일·삼·육·칠·팔, 십·백·천·만 → 받침 있음) */
+function numHasBatchim(n) {
+  const last = Math.abs(n) % 10;
+  if (last === 0) return true;
+  return [1, 3, 6, 7, 8].includes(last);
+}
+
+const josa = {
+  eunNeun: (n) => (numHasBatchim(n) ? '은' : '는'),
+  gwaWa: (n) => (numHasBatchim(n) ? '과' : '와'),
+  eulReul: (n) => (numHasBatchim(n) ? '을' : '를'),
+  ieyo: (n) => (numHasBatchim(n) ? '이에요' : '예요'),
+};
+
+const MUL = '<span class="op-txt">×</span>';
+const EQ = '<span class="eq-txt">=</span>';
+const PLUS = '<span class="op-txt">+</span>';
+
+/** 곱셈 원리 문항 객체 — 한 장 안의 중복 검사는 '곱해지는 수 × 곱하는 수' 식으로 한다. */
+function mulPrincipleProblem(data, layout, html, itemClass) {
+  return { ...htmlProblem(layout, html, itemClass), uniqueKeys: [`mul2d2d:${data.a}x${data.b}`] };
+}
+
+function mulPrincipleRows(lines, extraClass = '') {
+  const rowsHtml = lines
+    .filter(Boolean)
+    .map((line) => `<div class="mul-principle-row">${line}</div>`)
+    .join('');
+  return `<div class="mul-principle-rows${extraClass ? ` ${extraClass}` : ''}">${rowsHtml}</div>`;
+}
+
+/**
+ * 곱셈 세로셈 칸 (자릿값 칸을 맞춘 표)
+ *   rows: [{ value, answer, label }] — 부분곱 줄들. answer=true 이면 학생이 쓰는 칸(정답 보기에서만 보임)
+ *   total: { value, answer }
+ */
+function mulColumnTable(a, b, rows, total) {
+  const cols = Math.max(
+    String(a).length, String(b).length,
+    ...rows.map((r) => String(r.value).length),
+    String(total.value).length,
+  );
+  const digitCells = (value, cls = '') => {
+    const digits = String(value).split('');
+    while (digits.length < cols) digits.unshift('');
+    return digits.map((d) => `<td class="${cls}">${d}</td>`).join('');
+  };
+  const ansClass = (isAnswer) => (isAnswer ? 'mul-col-ans' : '');
+  const labelCell = (label) => `<td class="mul-col-label">${label || ''}</td>`;
+
+  let html = '';
+  html += `<tr><td class="mul-col-op"></td>${digitCells(a)}${labelCell('')}</tr>`;
+  html += `<tr class="mul-col-sep"><td class="mul-col-op">×</td>${digitCells(b)}${labelCell('')}</tr>`;
+  rows.forEach((row, i) => {
+    const sep = i === rows.length - 1 ? ' class="mul-col-sep"' : '';
+    html += `<tr${sep}><td class="mul-col-op">${i === rows.length - 1 ? '+' : ''}</td>${digitCells(row.value, ansClass(row.answer))}${labelCell(row.label)}</tr>`;
+  });
+  html += `<tr><td class="mul-col-op"></td>${digitCells(total.value, ansClass(total.answer))}${labelCell('')}</tr>`;
+  return `<table class="mul-col-table">${html}</table>`;
+}
+
+/** ① (두 자리 수) × (몇십): 25 × 3 = 75 → 25 × 30 = 75 × 10 = 750 */
+function inlineMulTens(data) {
+  const { a, tens } = data;
+  const { tensValue, tensDigitProduct, tensProduct } = mulParts(data);
+  return [
+    `${a} ${MUL} ${tens} ${EQ} ${numBlank(tensDigitProduct)}`,
+    `${a} ${MUL} ${tensValue} ${EQ} ${numBlank(tensDigitProduct)} ${MUL} ${numBlank(10)} ${EQ} ${numBlank(tensProduct)}`,
+  ];
+}
+
+/** ② 넓이 그림: ㉮ = a × 몇십, ㉯ = a × 몇, 전체 = ㉮ + ㉯ */
+function inlineMulArea(data) {
+  const { a, b, tens, ones } = data;
+  const { tensValue, onesProduct, tensProduct, total } = mulParts(data);
+  return {
+    svg: mulSplitAreaSvg(a, tens, ones),
+    lines: [
+      `㉮ ${a} ${MUL} ${numBlank(tensValue)} ${EQ} ${numBlank(tensProduct)}`,
+      `㉯ ${a} ${MUL} ${numBlank(ones)} ${EQ} ${numBlank(onesProduct)}`,
+      `${a} ${MUL} ${b} ${EQ} ${numBlank(tensProduct)} ${PLUS} ${numBlank(onesProduct)} ${EQ} ${numBlank(total)}`,
+    ],
+  };
+}
+
+/** ③ 자릿값으로 갈라서: 25×35 = 25×5 + 25×30 */
+function inlineMulSplit(data) {
+  const { a, b, tens, ones } = data;
+  const { tensValue, onesProduct, tensDigitProduct, tensProduct, total } = mulParts(data);
+  return [
+    `${a} ${MUL} ${b} ${EQ} ${a} ${MUL} ${numBlank(ones)} ${PLUS} ${a} ${MUL} ${numBlank(tensValue)}`,
+    `${a} ${MUL} ${ones} ${EQ} ${numBlank(onesProduct)}`,
+    `${a} ${MUL} ${tensValue} ${EQ} ${a} ${MUL} ${tens} ${MUL} 10`,
+    `<span class="mul-indent"></span>${EQ} ${numBlank(tensDigitProduct)} ${MUL} 10 ${EQ} ${numBlank(tensProduct)}`,
+    `${a} ${MUL} ${b} ${EQ} ${numBlank(onesProduct)} ${PLUS} ${numBlank(tensProduct)} ${EQ} ${numBlank(total)}`,
+  ];
+}
+
+/** ④ 세로셈 두 줄: 둘째 줄은 a × 몇십 (끝의 0까지 쓴다) */
+function mulVerticalPartialHtml(data) {
+  const { a, b, ones } = data;
+  const { tensValue, onesProduct, tensProduct, total } = mulParts(data);
+  return mulColumnTable(a, b, [
+    { value: onesProduct, answer: true, label: `← ${a} × ${numBlank(ones)}` },
+    { value: tensProduct, answer: true, label: `← ${a} × ${numBlank(tensValue)}` },
+  ], { value: total, answer: true });
+}
+
+/** ⑤ 틀린 풀이 고치기: 왼쪽 틀린 세로셈(그대로 보여 줌) + 오른쪽 바르게 고치기 */
+function mulErrorFixHtml(data) {
+  const { a, b, errorType } = data;
+  const { tensValue, onesProduct, tensDigitProduct, tensProduct, total } = mulParts(data);
+  const wrongRow = errorType === 'extraZero' ? tensProduct * 10 : tensDigitProduct;
+  const wrongTotal = onesProduct + wrongRow;
+  const table = mulColumnTable(a, b, [
+    { value: onesProduct, answer: false },
+    { value: wrongRow, answer: false },
+  ], { value: wrongTotal, answer: false });
+  const rows = mulPrincipleRows([
+    `틀린 수 ${numBlank(wrongRow)}`,
+    `${a} ${MUL} ${tensValue} ${EQ} ${numBlank(tensProduct)}`,
+    `${a} ${MUL} ${b} ${EQ} ${numBlank(total)}`,
+  ]);
+  return `<div class="mul-error-fix">
+    <div class="mul-error-work"><span class="mul-error-mark">✗</span>${table}</div>
+    <div class="mul-error-arrow">→</div>
+    ${rows}
+  </div>`;
+}
+
+/** ⑥ 문장으로 설명하기 — 개념 연결 순서(가르기 → 나누어 곱하기 → ×10 → 더하기)가 박힌 빈칸 문장틀 */
+function inlineMulSentence(data) {
+  const { a, b, tens, ones } = data;
+  const { tensValue, onesProduct, tensDigitProduct, tensProduct, total } = mulParts(data);
+  return [
+    `${b}${josa.eunNeun(b)} ${numBlank(tensValue)}${josa.gwaWa(tensValue)} ${numBlank(ones)}${josa.eulReul(ones)} 더한 수예요.`,
+    `그래서 ${a} × ${b}${josa.eunNeun(b)} ${a} × ${numBlank(ones)}${josa.gwaWa(ones)} ${a} × ${numBlank(tensValue)}${josa.eulReul(tensValue)} 더한 것과 같아요.`,
+    `먼저 ${a} × ${ones} = ${numBlank(onesProduct)}`,
+    `다음으로 ${tensValue}${josa.eunNeun(tensValue)} ${tens}의 ${numBlank(10)}배예요. 그래서 ${a} × ${tensValue}${josa.eunNeun(tensValue)} ${a} × ${tens}의 값 뒤에 0을 ${numBlank(1)}개 붙여요.`,
+    `${a} × ${tens} = ${numBlank(tensDigitProduct)} 이므로 ${a} × ${tensValue} = ${numBlank(tensProduct)}`,
+    `따라서 ${a} × ${b} = ${numBlank(onesProduct)} + ${numBlank(tensProduct)} = ${numBlank(total)}${josa.ieyo(total)}.`,
+  ];
+}
+
 /* ================================================================
    고수준: 템플릿 정의
    ================================================================
@@ -904,6 +1060,47 @@ export const T = {
   twoDigitOneDigitCarryStep: {
     grid: 'practice', count: 15,
     render: ({ a, b }) => fracStepProblem(inline2d1dCarry(a, b)),
+  },
+
+  /* ── (두 자리 수) × (두 자리 수) 곱셈의 원리 ── */
+
+  /** ① (두 자리 수) × (몇십) — 0을 한 개 붙이는 까닭 */
+  mul2d2dTens: {
+    grid: 'concept', count: 10,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulPrincipleRows(inlineMulTens(data)), 'mul-principle'),
+  },
+
+  /** ② 넓이 그림으로 알아보기 — 곱하는 수를 몇십과 몇으로 가른 직사각형 */
+  mul2d2dArea: {
+    grid: 'wide', count: 6,
+    render: (data) => {
+      const { svg, lines } = inlineMulArea(data);
+      return mulPrincipleProblem(data, 'shape-layout', `<div class="shape-card">${svg}${mulPrincipleRows(lines)}</div>`, 'mul-principle mul-principle-area');
+    },
+  },
+
+  /** ③ 자릿값으로 갈라서 계산하기 */
+  mul2d2dSplit: {
+    grid: 'wide', count: 6,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulPrincipleRows(inlineMulSplit(data)), 'mul-principle'),
+  },
+
+  /** ④ 세로셈 — 부분곱 두 줄을 따로 쓰고 더하기 */
+  mul2d2dVertical: {
+    grid: 'wide', count: 6,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulVerticalPartialHtml(data), 'mul-principle mul-principle-vertical'),
+  },
+
+  /** ⑤ 틀린 풀이 고치기 (0을 하나 더 붙임 / 십의 자리를 일의 자리처럼 곱함) */
+  mul2d2dErrorFix: {
+    grid: 'single', count: 4,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulErrorFixHtml(data), 'mul-principle mul-principle-error'),
+  },
+
+  /** ⑥ 문장으로 설명하기 (빈칸 문장틀) */
+  mul2d2dSentence: {
+    grid: 'single', count: 3,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulPrincipleRows(inlineMulSentence(data), 'mul-sentence'), 'mul-principle mul-principle-sentence'),
   },
 
   /** 나눗셈법 (최대공약수/최소공배수 구하기) */

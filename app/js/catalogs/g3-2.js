@@ -7,12 +7,13 @@
  * 곱셈/나눗셈은 세로셈(PDF) 표준 출력.
  *
  * 현재 구현 단원:
- *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈, 난이도 중·상)
+ *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈, 난이도 중·상) + 곱셈의 원리 6종
  *   2단원 나눗셈 — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
  *   4단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
  */
 
 import { defineUnit, 차시, 학습지 } from '../catalog.js';
+import { T } from '../templates.js';
 
 import {
   genU1PreMul, genU1PreMulHard,
@@ -20,6 +21,7 @@ import {
   genDiv3d1,
   PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
+import { genG32U1Mul2d2dPrinciple, genG32U1Mul2d2dErrorFix } from '../generators/g3-2/u1.js';
 import { genU4PreCmp, genU4PreConv, genU4PreImproperToMixedProcess } from '../generators/g5-1/u4.js';
 import {
   genU5PreMixedToImproperProcess, genU5PreMixedToImproper,
@@ -27,7 +29,26 @@ import {
 
 const GRADE_ID = 'g3-2';
 
+/**
+ * (두 자리 수) × (두 자리 수) 곱셈의 원리 학습지 6종 (배우는 순서대로).
+ * 5-2 '곱셈과 나눗셈' 총연습에서도 같은 목록을 쓰므로 함수로 export.
+ * (catalogs 끼리 import 하므로 호이스팅되는 function 선언으로 둔다.)
+ *   idPrefix: 'u1_main' → 'u1_main_mul_principle_tens' …
+ */
+export function mul2d2dPrincipleSheets(idPrefix) {
+  const id = (suffix) => ({ id: `${idPrefix}_mul_principle_${suffix}` });
+  return [
+    학습지('곱셈 원리 ① (두 자리 수) × (몇십) — 0을 붙이는 까닭', T.mul2d2dTens, genG32U1Mul2d2dPrinciple, id('tens')),
+    학습지('곱셈 원리 ② 넓이 그림으로 알아보기', T.mul2d2dArea, genG32U1Mul2d2dPrinciple, id('area')),
+    학습지('곱셈 원리 ③ 자릿값으로 갈라서 계산하기', T.mul2d2dSplit, genG32U1Mul2d2dPrinciple, id('split')),
+    학습지('곱셈 원리 ④ 세로셈 — 두 줄로 나누어 쓰기', T.mul2d2dVertical, genG32U1Mul2d2dPrinciple, id('vertical')),
+    학습지('곱셈 원리 ⑤ 틀린 풀이 고치기', T.mul2d2dErrorFix, genG32U1Mul2d2dErrorFix, id('error_fix')),
+    학습지('곱셈 원리 ⑥ 문장으로 설명하기 (빈칸 채우기)', T.mul2d2dSentence, genG32U1Mul2d2dPrinciple, id('sentence')),
+  ];
+}
+
 const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
+  차시('두 자리 × 두 자리 곱셈의 원리', mul2d2dPrincipleSheets('u1_main')),
   차시('1차시 두 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 × 두 자리 (세로셈, 난이도 중)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
     학습지('두 자리 × 두 자리 (세로셈, 난이도 상 · 모든 자리 올림)', genU1PreMulHard, { id: 'u1_main_mul_2d2d_hard' }),

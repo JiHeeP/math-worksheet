@@ -497,3 +497,40 @@ export function perimeterTriangleSvg(a, b, c) {
     <text x="97" y="48">${c}cm</text>
   `);
 }
+
+/**
+ * (두 자리 수) × (두 자리 수) 넓이 그림 — 곱하는 수 b 를 몇십(tens×10)과 몇(ones)으로 가른 직사각형.
+ *   세로 = a, 가로 = 몇십 | 몇  →  왼쪽 칸 ㉮ = a × 몇십, 오른쪽 칸 ㉯ = a × 몇
+ * 가로 길이는 몇십 : 몇 비율을 따르되, 좁은 칸도 글자가 들어가도록 최소 폭을 둔다.
+ */
+export function mulSplitAreaSvg(a, tens, ones) {
+  const x0 = 26;
+  const y0 = 18;
+  const totalW = 150;
+  const h = 70;
+  const b = (tens * 10) + ones;
+  let onesW = Math.max(26, totalW * ones / b);
+  const tensW = totalW - onesW;
+  onesW = totalW - tensW;
+  const xMid = x0 + tensW;
+  const yB = y0 + h;
+  const parts = [];
+
+  parts.push(`<rect x="${x0}" y="${y0}" width="${svgNum(tensW)}" height="${h}" fill="${AREA_MODEL_COLORS.cols}"></rect>`);
+  parts.push(`<rect x="${svgNum(xMid)}" y="${y0}" width="${svgNum(onesW)}" height="${h}" fill="${AREA_MODEL_COLORS.rows}"></rect>`);
+  parts.push(`<line class="area-unit-line" x1="${svgNum(xMid)}" y1="${y0}" x2="${svgNum(xMid)}" y2="${yB}"></line>`);
+  parts.push(`<rect class="area-outline" x="${x0}" y="${y0}" width="${totalW}" height="${h}"></rect>`);
+
+  // 칸 이름 (㉮ 몇십 칸, ㉯ 몇 칸)
+  parts.push(svgText(x0 + (tensW / 2), y0 + (h / 2) + 6, '㉮', 'text-anchor="middle" class="mul-area-part"'));
+  parts.push(svgText(xMid + (onesW / 2), y0 + (h / 2) + 6, '㉯', 'text-anchor="middle" class="mul-area-part"'));
+
+  // 세로 길이 a (왼쪽)
+  parts.push(svgText(x0 - 5, y0 + (h / 2) + 4, a, 'text-anchor="end" class="mul-area-len"'));
+  // 가로 길이: 위쪽 전체 b, 아래쪽 몇십 | 몇
+  parts.push(svgText(x0 + (totalW / 2), y0 - 6, b, 'text-anchor="middle" class="mul-area-len"'));
+  parts.push(svgText(x0 + (tensW / 2), yB + 14, tens * 10, 'text-anchor="middle" class="mul-area-len"'));
+  parts.push(svgText(xMid + (onesW / 2), yB + 14, ones, 'text-anchor="middle" class="mul-area-len"'));
+
+  return `<svg class="shape-svg mul-area-svg" viewBox="0 0 186 108" aria-hidden="true">${parts.join('')}</svg>`;
+}
