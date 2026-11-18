@@ -20,6 +20,8 @@ import {
 import {
   genG42U3DecimalAddTenths, genG42U3DecimalSubTenths,
   genG42U3DecimalAddHundredths, genG42U3DecimalSubHundredths,
+  genG42U3DecimalSubHundredthsMinusTenths, genG42U3DecimalSubTenthsMinusHundredths,
+  genG42U3IntMinusTenths, genG42U3IntMinusHundredths,
 } from '../generators/g4-2/u3.js';
 
 const GRADE_ID = 'g4-2';
@@ -116,6 +118,24 @@ const u3 = defineUnit(GRADE_ID, 'u3', '소수의 덧셈과 뺄셈', [
     학습지('소수 두 자리 수의 뺄셈', genG42U3DecimalSubHundredths, {
       id: 'u3_main_decimal_sub_hundredths',
       prereqs: [unitRef('g3-1', 'u6')],
+    }),
+  ]),
+  차시('3차시 자릿수가 다른 소수의 뺄셈', { grid: 'practice', count: 15 }, [
+    학습지('소수 두 자리 수 − 소수 한 자리 수', genG42U3DecimalSubHundredthsMinusTenths, {
+      id: 'u3_main_decimal_sub_hundredths_tenths',
+      prereqs: [sheetRef('u3_main_decimal_sub_hundredths')],
+    }),
+    학습지('소수 한 자리 수 − 소수 두 자리 수', genG42U3DecimalSubTenthsMinusHundredths, {
+      id: 'u3_main_decimal_sub_tenths_hundredths',
+      prereqs: [sheetRef('u3_main_decimal_sub_hundredths')],
+    }),
+    학습지('자연수 − 소수 한 자리 수', genG42U3IntMinusTenths, {
+      id: 'u3_main_int_minus_tenths',
+      prereqs: [sheetRef('u3_main_decimal_sub_tenths')],
+    }),
+    학습지('자연수 − 소수 두 자리 수', genG42U3IntMinusHundredths, {
+      id: 'u3_main_int_minus_hundredths',
+      prereqs: [sheetRef('u3_main_decimal_sub_hundredths')],
     }),
   ]),
 ]);
