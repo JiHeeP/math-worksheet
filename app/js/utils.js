@@ -21,6 +21,33 @@ export function simplify(n, d) {
   return [n / g, d / g];
 }
 
+/**
+ * 수를 소리 내어 읽을 때 끝에 받침이 있는지.
+ * 일·삼·육·칠·팔 → 받침 있음, 이·사·오·구 → 없음.
+ * 끝자리가 0이면 십·백·천·만 으로 끝나므로 모두 받침 있음.
+ */
+export function numHasBatchim(n) {
+  const last = Math.abs(Number(n)) % 10;
+  if (last === 0) return true;
+  return [1, 3, 6, 7, 8].includes(last);
+}
+
+/** 수 뒤에 붙는 조사 (예: `${n}${josa.eunNeun(n)}` → 32는, 26은) */
+export const josa = {
+  eunNeun: (n) => (numHasBatchim(n) ? '은' : '는'),
+  gwaWa: (n) => (numHasBatchim(n) ? '과' : '와'),
+  eulReul: (n) => (numHasBatchim(n) ? '을' : '를'),
+  ieyo: (n) => (numHasBatchim(n) ? '이에요' : '예요'),
+};
+
+/**
+ * 자릿값 가르기 식의 항 — 0인 자리는 빼고 ' + ' 로 잇는다.
+ * 예: [800, 0, 2] → '800 + 2'  ('800 + 00 + 2' 처럼 쓰지 않기 위해)
+ */
+export function expandedTerms(values) {
+  return values.filter((v) => v > 0).join(' + ');
+}
+
 export function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }

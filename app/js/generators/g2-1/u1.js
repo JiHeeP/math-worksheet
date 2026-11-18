@@ -4,7 +4,7 @@
  * 2학년 1학기 1단원 — 세 자리 수
  */
 
-import { rand } from '../../utils.js';
+import { rand, josa, expandedTerms } from '../../utils.js';
 import { numBlank, placeValueModelHtml, symBlank } from '../../helpers.js';
 import { conceptProblem, horizProblem, htmlProblem, modelCountProblem } from '../../templates.js';
 
@@ -21,15 +21,16 @@ export function genG21U1HundredsTensOnes() {
   const h = Math.floor(n / 100);
   const t = Math.floor((n % 100) / 10);
   const o = n % 10;
-  return conceptProblem(`${n}은 백 ${numBlank(h)}개, 십 ${numBlank(t)}개, 낱개 ${numBlank(o)}개입니다.`, '');
+  return conceptProblem(`${n}${josa.eunNeun(n)} 백 ${numBlank(h)}개, 십 ${numBlank(t)}개, 낱개 ${numBlank(o)}개입니다.`, '');
 }
 
 export function genG21U1Expanded() {
   const h = rand(1, 9);
-  const t = rand(0, 9);
-  const o = rand(0, 9);
+  let t, o;
+  // 항이 하나뿐인 식(800 = 800)이 되지 않도록 십·일의 자리 중 하나는 0이 아니게
+  do { t = rand(0, 9); o = rand(0, 9); } while (t === 0 && o === 0);
   const n = h * 100 + t * 10 + o;
-  return conceptProblem(`${h}00 + ${t}0 + ${o} = ${numBlank(n)}`, '');
+  return conceptProblem(`${expandedTerms([h * 100, t * 10, o])} = ${numBlank(n)}`, '');
 }
 
 export function genG21U1BeforeAfter() {

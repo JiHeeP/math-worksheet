@@ -1,6 +1,6 @@
 'use strict';
 
-import { rand, randChoice, gcd, lcm, factorsOf, multiplesOf } from '../../utils.js';
+import { rand, randChoice, gcd, lcm, factorsOf, multiplesOf, josa } from '../../utils.js';
 import { numBlank, multiBlank } from '../../helpers.js';
 import { horizProblem, conceptProblem } from '../../templates.js';
 
@@ -32,7 +32,7 @@ export function genU2MainMultipleConcept() {
 export function genU2MainCommonFactorConcept() {
   const g = rand(2, 6), p = rand(2, 5), q = rand(2, 5);
   const a = g * p, b = g * q;
-  return conceptProblem(`${a}와 ${b}의 공약수`, multiBlank(factorsOf(gcd(a, b))));
+  return conceptProblem(`${a}${josa.gwaWa(a)} ${b}의 공약수`, multiBlank(factorsOf(gcd(a, b))));
 }
 
 function pickGcdLcmPair() {
@@ -54,5 +54,5 @@ export function genU2MainLcmData() {
 
 export function genU2MainCommonMultipleConcept() {
   const a = rand(2, 7), b = rand(2, 7), base = lcm(a, b);
-  return conceptProblem(`${a}와 ${b}의 공배수 5개`, multiBlank([base, base * 2, base * 3, base * 4, base * 5]));
+  return conceptProblem(`${a}${josa.gwaWa(a)} ${b}의 공배수 5개`, multiBlank([base, base * 2, base * 3, base * 4, base * 5]));
 }
