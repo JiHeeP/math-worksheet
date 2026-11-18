@@ -194,7 +194,8 @@ export function genU1MainMulDivParen() {
   const type = rand(1, 3);
   if (type === 1) { const a = rand(2, 6), b = rand(2, 6), c = rand(2, 8), k = rand(2, 5); return horizProblem(`${a} \u00d7 (${b} \u00d7 ${k * c}) \u00f7 ${c}`, numBlank(a * b * k)); }
   if (type === 2) { const a = rand(10, 50), b = rand(2, 9), c = rand(2, 9); return horizProblem(`(${a * b} \u00f7 ${b}) \u00d7 ${c}`, numBlank(a * c)); }
-  const d = rand(2, 8), q1 = rand(2, 6), q2 = rand(2, 6); return horizProblem(`${q1 * d} \u00f7 (${d} \u00d7 ${q2}) \u00d7 ${q2}`, numBlank(q1));
+  // a ÷ (b × c) × e — 괄호 안을 먼저 곱해야 나누어떨어진다. 중간값 모두 자연수 (예전 식은 18 ÷ 12 처럼 중간값이 분수였음)
+  const b = rand(2, 5), c = rand(2, 5), q = rand(2, 6), e = rand(2, 6); return horizProblem(`${q * b * c} \u00f7 (${b} \u00d7 ${c}) \u00d7 ${e}`, numBlank(q * e));
 }
 
 export function genU1MainMulDivMix() { return rand(1, 2) === 1 ? genU1MainMulDivOrder() : genU1MainMulDivParen(); }
@@ -230,7 +231,8 @@ export function genU1MainAddSubDivParen() {
   const type = rand(1, 3);
   if (type === 1) { const d = rand(2, 9), q = rand(3, 12), s1 = rand(1, q * d - 1), s2 = q * d - s1; return horizProblem(`(${s1} + ${s2}) \u00f7 ${d}`, numBlank(q)); }
   if (type === 2) { const d = rand(2, 9), q = rand(2, 10), b = rand(1, 30), a = q * d + b; return horizProblem(`(${a} \u2212 ${b}) \u00f7 ${d}`, numBlank(q)); }
-  const d = rand(2, 8), q1 = rand(2, 9), q2 = rand(2, 9); return horizProblem(`${q1 * d} \u00f7 ${d} + ${q2 * d} \u00f7 ${d}`, numBlank(q1 + q2));
+  // a − (s1 + s2) ÷ d — 괄호 학습지이므로 괄호가 꼭 들어가게 (예전 식 'q1d ÷ d + q2d ÷ d' 는 괄호가 없었음)
+  const d = rand(2, 9), q = rand(2, 10), s1 = rand(1, q * d - 1), s2 = q * d - s1, a = rand(q + 1, q + 40); return horizProblem(`${a} \u2212 (${s1} + ${s2}) \u00f7 ${d}`, numBlank(a - q));
 }
 
 export function genU1MainAddSubDiv() { return rand(1, 2) === 1 ? genU1MainAddSubDivOrder() : genU1MainAddSubDivParen(); }
