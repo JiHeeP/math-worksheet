@@ -16,7 +16,7 @@
  *   → T.fracLcdStep.render(data)가 풀이 과정 HTML 생성
  */
 
-import { gcd, lcm, simplify } from './utils.js';
+import { gcd, lcm, simplify, josa } from './utils.js';
 import {
   fracD, mixedD, numBlank, textBlank, symBlank, multiBlank,
   fracBlank, mixedBlank, formulaResultHtml,
@@ -648,20 +648,6 @@ function mulParts({ a, tens, ones }) {
   const tensProduct = tensDigitProduct * 10; // 25 × 30 = 750
   return { tensValue, onesProduct, tensDigitProduct, tensProduct, total: onesProduct + tensProduct };
 }
-
-/** 수를 소리 내어 읽을 때 끝에 받침이 있는지 (일·삼·육·칠·팔, 십·백·천·만 → 받침 있음) */
-function numHasBatchim(n) {
-  const last = Math.abs(n) % 10;
-  if (last === 0) return true;
-  return [1, 3, 6, 7, 8].includes(last);
-}
-
-const josa = {
-  eunNeun: (n) => (numHasBatchim(n) ? '은' : '는'),
-  gwaWa: (n) => (numHasBatchim(n) ? '과' : '와'),
-  eulReul: (n) => (numHasBatchim(n) ? '을' : '를'),
-  ieyo: (n) => (numHasBatchim(n) ? '이에요' : '예요'),
-};
 
 const MUL = '<span class="op-txt">×</span>';
 const EQ = '<span class="eq-txt">=</span>';

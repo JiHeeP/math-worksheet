@@ -4,7 +4,7 @@
  * 1학년 2학기 1단원 — 100까지의 수
  */
 
-import { rand } from '../../utils.js';
+import { rand, josa } from '../../utils.js';
 import { baseTenModelHtml, numBlank, symBlank } from '../../helpers.js';
 import { conceptProblem, horizProblem, htmlProblem, modelCountProblem } from '../../templates.js';
 
@@ -19,7 +19,7 @@ export function genG12U1TensOnes() {
   const n = rand(20, 99);
   const tens = Math.floor(n / 10);
   const ones = n % 10;
-  return conceptProblem(`${n}은 십 ${numBlank(tens)}개, 낱개 ${numBlank(ones)}개입니다.`, '');
+  return conceptProblem(`${n}${josa.eunNeun(n)} 십 ${numBlank(tens)}개, 낱개 ${numBlank(ones)}개입니다.`, '');
 }
 
 export function genG12U1BeforeAfter() {
