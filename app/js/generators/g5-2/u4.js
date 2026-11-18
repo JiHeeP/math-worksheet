@@ -11,7 +11,9 @@
  *   workRows   : 선 아래 부분곱 줄 수 (학생이 실제로 쓰는 줄 수와 같게 — workRowsFor 참고)
  */
 
-import { rand } from '../../utils.js';
+import { rand, pickBalanced } from '../../utils.js';
+import { numBlank } from '../../helpers.js';
+import { htmlProblem, horizProblem } from '../../templates.js';
 
 function dec(value) {
   return Number(value.toFixed(3)).toString();
@@ -113,4 +115,49 @@ export function genG52U4DecimalTimesDecimalMixedPlaces(_context = {}, problemInd
 export function genG52U4DecimalTimes10() {
   const unit = [10, 100][rand(0, 1)];
   return decimalProblem(randNonMultipleOf10(2, 999), 1, unit, 0);
+}
+
+/* ================================================================
+ * 곱의 소수점 위치 (2026-11-18 추가)
+ * 성취기준 [6수01-13] 소수의 곱셈의 계산 원리를 탐구하고 그 계산을 할 수 있다.
+ * 수는 (정수, 소수점 아래 자리 수) 쌍으로 다뤄 부동소수점 오차 없이 문자열로 만든다.
+ * ================================================================ */
+
+/** 정수 m 에 소수점 아래 places 자리를 찍고 끝의 0을 지운 문자열 (places < 0 이면 0을 붙임) */
+function shiftPoint(m, places) {
+  if (places <= 0) return String(m) + '0'.repeat(-places);
+  const s = String(m).padStart(places + 1, '0');
+  const whole = s.slice(0, s.length - places);
+  const frac = s.slice(s.length - places).replace(/0+$/, '');
+  return frac ? `${whole}.${frac}` : whole;
+}
+
+/**
+ * 곱의 소수점 위치 — × 1000, × 0.1, × 0.01, × 0.001 을 번갈아
+ * 곱해지는 수: 자연수(두·세 자리) 또는 소수 한·두 자리 수
+ */
+export function genG52U4PointShift(_ctx, problemIndex) {
+  const type = pickBalanced('g52PointShift', [3, -1, -2, -3], problemIndex);
+  const places = rand(0, 2);
+  const m = randNonMultipleOf10(places === 0 ? 12 : 101, places === 0 ? 999 : 9999);
+  const factor = type > 0 ? '1000' : shiftPoint(1, -type);
+  const p = horizProblem(`${shiftPoint(m, places)} × ${factor}`, numBlank(shiftPoint(m, places - type)));
+  p.uniqueKeys = [`${m}.${places}x${type}`];
+  return p;
+}
+
+/**
+ * 자연수의 곱을 이용해 소수의 곱 구하기 (예: 24 × 13 = 312 → 2.4 × 1.3 = □)
+ * 두 수의 소수점 아래 자리 수 합(1~3)만큼 곱의 소수점을 왼쪽으로 옮긴다.
+ */
+export function genG52U4ProductToDecimal() {
+  const a = randNonMultipleOf10(12, 99);
+  const b = randNonMultipleOf10(2, 99);
+  let p1, p2;
+  do { p1 = rand(0, 2); p2 = rand(0, 2); } while (p1 + p2 === 0 || p1 + p2 > 3);
+  const p = htmlProblem('stack-box',
+    `<div class="stack-main">${a} × ${b} = ${a * b}</div>`
+    + `<div class="stack-sub">${shiftPoint(a, p1)} × ${shiftPoint(b, p2)} = ${numBlank(shiftPoint(a * b, p1 + p2))}</div>`);
+  p.uniqueKeys = [`${a}x${b}`];
+  return p;
 }
