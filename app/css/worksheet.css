@@ -386,6 +386,36 @@ button:disabled:active { transform: none; }
   gap: calc(8px * var(--font-scale, 1));
 }
 
+/* 두 줄 문항 (위: 주어진 식, 아래: 어림셈·검산·곱셈식 이용 등 빈칸 줄) */
+/* horiz-box 와 같은 글자 크기. horiz-box 클래스를 쓰지 않는 까닭: 한 줄짜리만 허용하는
+   자동 맞춤 검사(hasWrappedHorizontalProblem)가 두 줄 문항을 '줄바꿈됨'으로 오판함 */
+.stack-box {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6px * var(--font-scale, 1));
+  font-size: calc(20px * var(--font-scale, 1));
+  line-height: 1.35;
+  padding: 0 3px;
+}
+
+.stack-box .stack-main,
+.stack-box .stack-sub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 줄바꿈 대신 넘침으로 두어, 자동 맞춤이 열 수를 줄이게 함 */
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: calc(5px * var(--font-scale, 1));
+}
+
+.stack-box .stack-sub {
+  font-size: 0.9em;
+}
+
 .problem-item.frac-mul-row .frac-row,
 .problem-item.frac-mul-step .frac-step-flow,
 .problem-item.frac-mul-step .concept-answer {

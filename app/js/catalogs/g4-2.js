@@ -22,6 +22,7 @@ import {
   genG42U3DecimalAddHundredths, genG42U3DecimalSubHundredths,
   genG42U3DecimalSubHundredthsMinusTenths, genG42U3DecimalSubTenthsMinusHundredths,
   genG42U3IntMinusTenths, genG42U3IntMinusHundredths,
+  genG42U3ThousandthsPlace, genG42U3DecimalRelation,
 } from '../generators/g4-2/u3.js';
 
 const GRADE_ID = 'g4-2';
@@ -100,6 +101,11 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 덧셈과 뺄셈', [
 ]);
 
 const u3 = defineUnit(GRADE_ID, 'u3', '소수의 덧셈과 뺄셈', [
+  // [4수01-13] 소수 두·세 자리 수 — 차시명은 성취기준 기준(교과서 차시명 미확인)
+  차시('소수 세 자리 수와 소수 사이의 관계', { grid: 'practice', count: 15 }, [
+    학습지('소수 세 자리 수 알기', genG42U3ThousandthsPlace, { id: 'u3_main_thousandths_place' }),
+    학습지('소수 사이의 관계 (10배, 100배, 1/10, 1/100)', genG42U3DecimalRelation, { id: 'u3_main_decimal_relation' }),
+  ]),
   차시('1차시 소수 한 자리 수의 덧셈과 뺄셈', { grid: 'practice', count: 15 }, [
     학습지('소수 한 자리 수의 덧셈', genG42U3DecimalAddTenths, {
       id: 'u3_main_decimal_add_tenths',

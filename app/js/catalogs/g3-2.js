@@ -21,7 +21,18 @@ import {
   genDiv3d1,
   PDF_GENERATORS_U1,
 } from '../generators/g5-1/u1.js';
-import { genG32U1Mul2d2dPrinciple, genG32U1Mul2d2dErrorFix } from '../generators/g3-2/u1.js';
+import {
+  genG32U1Mul2d2dPrinciple, genG32U1Mul2d2dErrorFix,
+  genG32U1Mul3d1dNoCarry, genG32U1Mul3d1dCarry1, genG32U1Mul3d1dCarryMany,
+  genG32U1MulTensTens, genG32U1MulOnesTensOnes, genG32U1MulEstimate,
+  PDF_GENERATORS_G32_U1,
+} from '../generators/g3-2/u1.js';
+import {
+  genG32U3DivTens,
+  genG32U3Div2d1dNoBringNoRem, genG32U3Div2d1dBringNoRem,
+  genG32U3Div2d1dNoBringRem, genG32U3Div2d1dBringRem,
+  genG32U3DivCheck, PDF_GENERATORS_G32_U3,
+} from '../generators/g3-2/u3.js';
 import { genU4PreCmp, genU4PreConv, genU4PreImproperToMixedProcess } from '../generators/g5-1/u4.js';
 import {
   genU5PreMixedToImproperProcess, genU5PreMixedToImproper,
@@ -48,6 +59,20 @@ export function mul2d2dPrincipleSheets(idPrefix) {
 }
 
 const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
+  // [4수01-04] (세 자리 수) × (한 자리 수) — 올림 횟수별
+  차시('(세 자리 수) × (한 자리 수)', { kind: 'pdf', grid: 'standard', count: 15 }, [
+    학습지('(세 자리 수) × (한 자리 수) (올림 없음)', genG32U1Mul3d1dNoCarry, { id: 'u1_main_mul_3d1d_c0' }),
+    학습지('(세 자리 수) × (한 자리 수) (올림 1번)', genG32U1Mul3d1dCarry1, { id: 'u1_main_mul_3d1d_c1' }),
+    학습지('(세 자리 수) × (한 자리 수) (올림 여러 번)', genG32U1Mul3d1dCarryMany, { id: 'u1_main_mul_3d1d_cn' }),
+  ]),
+  차시('(몇십) × (몇십), (몇) × (몇십몇)', { grid: 'standard', count: 20 }, [
+    학습지('(몇십) × (몇십), (몇십몇) × (몇십)', genG32U1MulTensTens, { id: 'u1_main_mul_tens_tens' }),
+    학습지('(몇) × (몇십몇)', genG32U1MulOnesTensOnes, { id: 'u1_main_mul_ones_2d' }),
+  ]),
+  // [4수01-08] 어림셈
+  차시('곱셈 어림셈', { grid: 'practice', count: 12 }, [
+    학습지('곱셈 어림셈 (몇백으로 어림하기)', genG32U1MulEstimate, { id: 'u1_main_mul_estimate' }),
+  ]),
   차시('두 자리 × 두 자리 곱셈의 원리', mul2d2dPrincipleSheets('u1_main')),
   차시('1차시 두 자리 × 두 자리 (세로셈)', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('두 자리 × 두 자리 (세로셈, 난이도 중)', genU1PreMul, { id: 'u1_main_mul_2d2d' }),
@@ -56,6 +81,19 @@ const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
 ]);
 
 const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈', [
+  // [4수01-06] 내림 있음·없음, 나머지 있음·없음 단계별 (소단원 순서: 2022 개정 3-2 나눗셈)
+  차시('(몇십) ÷ (몇)', { kind: 'pdf', grid: 'standard', count: 12 }, [
+    학습지('(몇십) ÷ (몇) (내림 없음·있음)', genG32U3DivTens, { id: 'u3_main_div_tens' }),
+  ]),
+  차시('(몇십몇) ÷ (몇), 내림·나머지 단계별', { kind: 'pdf', grid: 'standard', count: 12 }, [
+    학습지('(몇십몇) ÷ (몇) (내림 없음, 나머지 없음)', genG32U3Div2d1dNoBringNoRem, { id: 'u3_main_div_2d1d_nb' }),
+    학습지('(몇십몇) ÷ (몇) (내림 있음, 나머지 없음)', genG32U3Div2d1dBringNoRem, { id: 'u3_main_div_2d1d_b' }),
+    학습지('(몇십몇) ÷ (몇) (내림 없음, 나머지 있음)', genG32U3Div2d1dNoBringRem, { id: 'u3_main_div_2d1d_nb_rem' }),
+    학습지('(몇십몇) ÷ (몇) (내림 있음, 나머지 있음)', genG32U3Div2d1dBringRem, { id: 'u3_main_div_2d1d_b_rem' }),
+  ]),
+  차시('나눗셈 계산 결과 확인하기', { grid: 'practice', count: 10 }, [
+    학습지('나머지가 있는 나눗셈 검산하기', genG32U3DivCheck, { id: 'u3_main_div_check' }),
+  ]),
   차시('1차시 두 자리 ÷ 한 자리 (세로셈)', { kind: 'html', grid: 'standard', count: 12 }, [
     학습지('두 자리 ÷ 한 자리 (세로셈)', genU1PreDiv2d1d, { id: 'u3_main_div_2d1d' }),
   ]),
@@ -108,6 +146,14 @@ export const pdfMap = {
   'g3-2_u3_main_div_norem': 'div_2d1d_norem',
   'g3-2_u3_main_div_rem': 'div_2d1d_rem',
   'g3-2_u3_main_div_3d1': 'div_3d1d',
+  'g3-2_u1_main_mul_3d1d_c0': 'mul_3d1d_c0',
+  'g3-2_u1_main_mul_3d1d_c1': 'mul_3d1d_c1',
+  'g3-2_u1_main_mul_3d1d_cn': 'mul_3d1d_cn',
+  'g3-2_u3_main_div_tens': 'div_tens_1d',
+  'g3-2_u3_main_div_2d1d_nb': 'div_2d1d_nb',
+  'g3-2_u3_main_div_2d1d_b': 'div_2d1d_b',
+  'g3-2_u3_main_div_2d1d_nb_rem': 'div_2d1d_nb_rem',
+  'g3-2_u3_main_div_2d1d_b_rem': 'div_2d1d_b_rem',
 };
 
-export const pdfGenerators = { ...PDF_GENERATORS_U1 };
+export const pdfGenerators = { ...PDF_GENERATORS_U1, ...PDF_GENERATORS_G32_U1, ...PDF_GENERATORS_G32_U3 };

@@ -38,6 +38,7 @@ import {
   genG52U4DecimalTimesInt, genG52U4IntTimesDecimal,
   genG52U4DecimalTimesIntMixedPlaces, genG52U4IntTimesDecimalMixedPlaces,
   genG52U4DecimalTimesDecimalMixedPlaces, genG52U4DecimalTimes10,
+  genG52U4PointShift, genG52U4ProductToDecimal,
 } from '../generators/g5-2/u4.js';
 
 import {
@@ -277,6 +278,17 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
       id: 'u4_main_decimal_times_10_100',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_GRID_LAYOUT,
+    }),
+  ]),
+  // [6수01-13] 곱의 소수점 위치
+  차시('곱의 소수점 위치', { grid: 'practice', count: 15 }, [
+    학습지('곱의 소수점 위치 (× 1000, × 0.1, × 0.01, × 0.001)', genG52U4PointShift, {
+      id: 'u4_main_point_shift',
+      prereqs: DECIMAL_MUL_PREREQS,
+    }),
+    학습지('자연수의 곱을 이용한 소수의 곱셈', genG52U4ProductToDecimal, {
+      id: 'u4_main_product_to_decimal',
+      prereqs: DECIMAL_MUL_PREREQS,
     }),
   ]),
 ]);
