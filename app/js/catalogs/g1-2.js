@@ -82,7 +82,7 @@ const u6 = defineUnit(GRADE_ID, 'u6', '덧셈과 뺄셈(2)', [
 
 const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
   차시('1차시 (한 자리) + (한 자리), 받아올림 - 원본 연습형', { grid: 'practice', count: 15 }, [
-    학습지('한 자리 수 + 한 자리 수(받아올림) - 가로 연습', genG12U71d1dCarryHorizPractice, { id: 'u7_main_1d1d_carry_horiz_prac' }),
+    학습지('한 자리 수 + 한 자리 수(받아올림) - 가로 연습', genG12U71d1dCarryHorizPractice, { id: 'u7_main_1d1d_carry_horiz_prac', layout: 'splitWriteBox' }),
     학습지('한 자리 수 + 한 자리 수(받아올림) - 연습', genG12U71d1dCarryPractice, { id: 'u7_main_1d1d_carry_prac' }),
   ]),
   차시('1차시 (한 자리) + (한 자리), 받아올림 - 원본 일반형', [
@@ -91,12 +91,12 @@ const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
   ]),
   차시('1차시 (한 자리) + (한 자리), 받아올림 (가르기 풀이)', [
     학습지('(한 자리) + (한 자리), 받아올림', T.makeTenAddStep, genG12U71d1dCarry, {
-      id: 'u7_main_1d1d_carry',
+      id: 'u7_main_1d1d_carry', layout: 'splitWriteBox',
       prereqs: [sheetRef('u6_main_make_ten_add')],
     }),
   ]),
   차시('2차시 (십몇) − (몇), 받아내림 - 원본 연습형', { grid: 'practice', count: 15 }, [
-    학습지('십몇 - 몇(받아내림) - 가로 연습', genG12U7TeenBorrowHorizPractice, { id: 'u7_main_teen_borrow_horiz_prac' }),
+    학습지('십몇 - 몇(받아내림) - 가로 연습', genG12U7TeenBorrowHorizPractice, { id: 'u7_main_teen_borrow_horiz_prac', layout: 'splitWriteBox' }),
     학습지('십몇 - 몇(받아내림) - 연습', genG12U7TeenBorrowPractice, { id: 'u7_main_teen_borrow_prac' }),
   ]),
   차시('2차시 (십몇) − (몇), 받아내림 - 원본 일반형', [
@@ -105,7 +105,7 @@ const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
   ]),
   차시('2차시 (십몇) − (몇), 받아내림 (가르기 풀이)', [
     학습지('(십몇) − (몇), 받아내림', T.teenBorrowStep, genG12U7TeenBorrow, {
-      id: 'u7_main_teen_borrow',
+      id: 'u7_main_teen_borrow', layout: 'splitWriteBox',
       prereqs: [sheetRef('u6_main_make_ten_sub')],
     }),
   ]),
@@ -116,7 +116,7 @@ const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
     }),
   ]),
   차시('3차시 (두 자리) + (한 자리), 받아올림 - 원본 연습형', { grid: 'practice', count: 15 }, [
-    학습지('두 자리 수 + 한 자리 수(받아올림) - 가로 연습', genG12U72d1dCarryHorizPractice, { id: 'u7_main_2d1d_carry_horiz_prac' }),
+    학습지('두 자리 수 + 한 자리 수(받아올림) - 가로 연습', genG12U72d1dCarryHorizPractice, { id: 'u7_main_2d1d_carry_horiz_prac', layout: 'splitWriteBox' }),
     학습지('두 자리 수 + 한 자리 수(받아올림) - 연습', genG12U72d1dCarryPractice, { id: 'u7_main_2d1d_carry_prac' }),
   ]),
   차시('3차시 (두 자리) + (한 자리), 받아올림 - 원본 일반형', { grid: 'standard', count: 20 }, [
@@ -124,7 +124,7 @@ const u7 = defineUnit(GRADE_ID, 'u7', '덧셈과 뺄셈(3)', [
   ]),
   차시('3차시 (두 자리) + (한 자리), 받아올림 (가르기 풀이)', [
     학습지('(두 자리) + (한 자리), 받아올림', T.twoDigitOneDigitCarryStep, genG12U72d1dCarry, {
-      id: 'u7_main_2d1d_carry',
+      id: 'u7_main_2d1d_carry', layout: 'splitWriteBox',
       prereqs: [sheetRef('u7_main_1d1d_carry')],
     }),
   ]),
@@ -136,6 +136,8 @@ export const meta = {
   id: GRADE_ID,
   short: '1-2',
   name: '1학년 2학기',
+  // 저학년은 글자를 크게 시작 (학습지를 고를 때 기본값, 사용자가 바꿀 수 있음)
+  defaultFontScale: 1.2,
   units: {
     u1: { short: '1단원', name: '100까지의 수' },
     u4: { short: '2단원', name: '덧셈과 뺄셈(1)' },

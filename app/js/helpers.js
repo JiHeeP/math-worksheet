@@ -360,7 +360,8 @@ export function mixedAreaModelSvg(w1, n1, d1, w2, n2, d2) {
 
 export function rectangleSvg(w, h) {
   const size = fitProportionalBox(w, h, { maxWidth: 104, maxHeight: 58, minRatio: 0.4, maxRatio: 3.6 });
-  const x = centeredX(size.width);
+  // 오른쪽 세로 길이 글자('12cm')가 그림 밖으로 잘리지 않게, 넓은 직사각형은 왼쪽으로 조금 민다
+  const x = svgNum(Math.max(4, Math.min(centeredX(size.width), 126 - size.width)));
   const y = svgNum(SHAPE_BOTTOM_Y - size.height);
   const sideTextX = x + size.width + 8;
   const sideAnchor = sideTextX > 145 ? 'end' : 'start';

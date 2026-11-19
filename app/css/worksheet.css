@@ -167,6 +167,31 @@ button:disabled:active { transform: none; }
 }
 
 .dan-control[hidden] { display: none; }
+.input-group[hidden],
+.jump-button[hidden],
+.jump-select[hidden] { display: none !important; }
+
+/* 선수학습 ↔ 원본 이동 (연습지 드롭다운 오른쪽 버튼 1개 / 대상이 여럿이면 드롭다운 1개) */
+.jump-button {
+  padding: 8px 12px;
+  border: 2px solid #9ec5f0;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #1d5fa8;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.jump-button:hover { background: #dcecff; }
+.jump-select {
+  max-width: 260px;
+  border-color: #9ec5f0;
+  background: #eef6ff;
+  color: #1d5fa8;
+  font-weight: 700;
+}
 
 .dan-label {
   font-size: 13px;
@@ -1717,6 +1742,112 @@ button:disabled:active { transform: none; }
   padding: 14mm 16mm 15mm;
 }
 
+/* ── 수준 진단지 (2026-11-19) ── */
+.level-diagnostic-sheet .diagnostic-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.level-diagnostic-sheet .diagnostic-block {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+.level-diagnostic-sheet .diagnostic-problems {
+  flex: 1;
+  min-height: 0;
+}
+/* 도형 블록이 있는 단: 계산 블록은 내용 높이만, 남는 높이는 도형 블록이 나눠 가진다 */
+.level-diagnostic-sheet .diagnostic-column:has(svg) .diagnostic-block:not(:has(svg)) { flex: 0 0 auto; }
+.level-diagnostic-sheet .diagnostic-column:has(svg) .diagnostic-block:not(:has(svg)) .diagnostic-problems {
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  row-gap: 10px;
+}
+/* 문항이 칸을 넘치면(대분수 답, 개념 문제) 한 줄에 1문항, 그 블록은 세로로 더 넓게 */
+.level-diagnostic-sheet .diagnostic-block:has(.single-col) { flex-grow: 1.7; }
+.level-diagnostic-sheet .diagnostic-problems.single-col {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+/* 수준 진단지는 본단원 개념·대응 문제가 섞이므로 질문 문장을 보인다 (도형은 그림이 설명하므로 숨김 유지) */
+.level-diagnostic-sheet .diagnostic-html .concept-question,
+.level-diagnostic-sheet .diagnostic-html .relation-question {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.85em;
+  white-space: normal;
+}
+.level-diagnostic-sheet .diagnostic-html svg {
+  max-width: 100%;
+  height: auto;
+}
+.diagnostic-level-title {
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  padding: 2px 6px;
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 800;
+  color: #1d5fa8;
+  background: #eef6ff;
+  border-radius: 4px;
+}
+.diagnostic-student-line {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin: -2px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+.diagnostic-fill {
+  display: inline-block;
+  width: 70px;
+  border-bottom: 1.2px solid #4b5563;
+}
+.diagnostic-judge-sheet { display: none; }
+.answers-shown .diagnostic-judge-sheet { display: flex; }
+.diagnostic-judge {
+  flex: 1;
+  min-height: 0;
+  font-size: 11px;
+  color: #1f2937;
+}
+.diagnostic-judge-rule { margin: 0 0 4px; font-size: 12px; }
+.diagnostic-judge-outcome { margin: 0 0 8px; padding-left: 18px; line-height: 1.5; }
+.diagnostic-judge-table,
+.diagnostic-record-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.diagnostic-judge-table th,
+.diagnostic-judge-table td,
+.diagnostic-record-table th,
+.diagnostic-record-table td {
+  border: 1px solid #9aa4b2;
+  padding: 2px 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.diagnostic-judge-table th,
+.diagnostic-record-table th { background: #f1f5f9; font-weight: 700; }
+.diagnostic-judge-table td.num,
+.diagnostic-record-table td.num { text-align: center; }
+.diagnostic-judge-table td { white-space: normal; }
+.diagnostic-judge-table th:nth-child(1) { width: 6%; }
+.diagnostic-judge-table th:nth-child(2) { width: 13%; }
+.diagnostic-judge-table th:nth-child(4) { width: 11%; }
+.diagnostic-judge-table th:nth-child(5) { width: 16%; }
+.diagnostic-judge-table th:nth-child(6) { width: 30%; }
+.diagnostic-record-title { margin: 10px 0 4px; font-size: 12px; }
+.diagnostic-record-title span { font-weight: 400; color: #4b5563; }
+.diagnostic-record-table td { height: 5.2mm; }
+.diagnostic-record-table th:first-child { width: 9%; }
+.diagnostic-record-table th:last-child { width: 16%; }
+
 .diagnostic-title {
   margin-bottom: 8px;
   padding-bottom: 7px;
@@ -2001,6 +2132,8 @@ button:disabled:active { transform: none; }
   }
 
   .sheet:last-child { page-break-after: auto; }
+  /* 정답을 끄면 판정표 쪽이 숨겨지므로, 그 앞 쪽 뒤에 빈 페이지가 생기지 않게 */
+  #sheets-container:not(.answers-shown) .sheet:has(+ .diagnostic-judge-sheet:last-child) { page-break-after: auto; }
 }
 
 @media screen and (max-width: 980px) {
@@ -2015,6 +2148,8 @@ button:disabled:active { transform: none; }
   .stage-filter-button { flex: 1 1 auto; }
   #unitSelect,
   #worksheetSelect { min-width: 0; width: 100%; }
+  .input-group:has(#worksheetSelect) { flex-wrap: wrap; }
+  .jump-select { max-width: none; flex: 1 1 100%; }
 }
 
 @media screen and (max-width: 850px) {

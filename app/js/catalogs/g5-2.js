@@ -96,7 +96,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(진분수) × (자연수) 계산 과정', T.fracMulStep, genG52U2FracTimesIntStep, {
-      id: 'u2_main_frac_times_int_step',
+      id: 'u2_main_frac_times_int_step', layout: 'oneCol',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -107,12 +107,12 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(대분수) × (자연수) 계산 과정 1 (가분수로 바꾸기)', T.fracMulStep, genG52U2MixedTimesIntStep, {
-      id: 'u2_main_mixed_times_int_step',
+      id: 'u2_main_mixed_times_int_step', layout: 'twoColAtNormalFont',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
     학습지('(대분수) × (자연수) 계산 과정 2 (자연수·분수 따로)', T.mixedMulSeparateStep, genG52U2MixedTimesIntStep, {
-      id: 'u2_main_mixed_times_int_separate',
+      id: 'u2_main_mixed_times_int_separate', layout: 'mixedSeparate',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -123,7 +123,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(자연수) × (진분수) 계산 과정', T.fracMulStep, genG52U2IntTimesFracStep, {
-      id: 'u2_main_int_times_frac_step',
+      id: 'u2_main_int_times_frac_step', layout: 'oneCol',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -134,12 +134,12 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(자연수) × (대분수) 계산 과정 1 (가분수로 바꾸기)', T.fracMulStep, genG52U2IntTimesMixedStep, {
-      id: 'u2_main_int_times_mixed_step',
+      id: 'u2_main_int_times_mixed_step', layout: 'twoColAtNormalFont',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
     학습지('(자연수) × (대분수) 계산 과정 2 (자연수·분수 따로)', T.mixedMulSeparateStep, genG52U2IntTimesMixedStep, {
-      id: 'u2_main_int_times_mixed_separate',
+      id: 'u2_main_int_times_mixed_separate', layout: 'mixedSeparate',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -150,7 +150,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(단위분수) × (단위분수) 계산 과정', T.fracMulStep, genG52U2UnitFracTimesUnitFracStep, {
-      id: 'u2_main_unit_times_unit_step',
+      id: 'u2_main_unit_times_unit_step', layout: 'oneCol',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -166,7 +166,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(진분수) × (진분수) 계산 과정', T.fracMulStep, genG52U2FracTimesFracStep, {
-      id: 'u2_main_frac_times_frac_step',
+      id: 'u2_main_frac_times_frac_step', layout: 'oneCol',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -178,11 +178,11 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
   ]),
   차시('7차시 (대분수) × (대분수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(대분수) × (대분수)', genG52U2MixedTimesMixed, {
-      id: 'u2_main_mixed_times_mixed',
+      id: 'u2_main_mixed_times_mixed', layout: 'fracTwoCol',
       prereqs: FRAC_MUL_PREREQS,
     }),
     학습지('(대분수) × (대분수) 계산 과정', T.fracMulStep, genG52U2MixedTimesMixedStep, {
-      id: 'u2_main_mixed_times_mixed_step',
+      id: 'u2_main_mixed_times_mixed_step', layout: 'oneCol',
       prereqs: FRAC_MUL_PREREQS,
       ...FRAC_MUL_STEP_LAYOUT,
     }),
@@ -199,12 +199,12 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
 const DECIMAL_MUL_GRID_LAYOUT = { grid: 'wide', count: 8 };
 const DECIMAL_MUL_FRAC_STEP_LAYOUT = { grid: 'wide', count: 6 };
 const DECIMAL_MUL_NATURAL_STEP_LAYOUT = { grid: 'wide', count: 6 };
-const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3')];
+const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3'), unitRef('g3-2', 'u1'), unitRef('g4-1', 'u3')];
 
 const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   차시('1차시 (소수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(소수) × (자연수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4DecimalTimesIntMixedPlaces, {
-      id: 'u4_main_decimal_times_int_frac_step',
+      id: 'u4_main_decimal_times_int_frac_step', layout: 'oneCol',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_FRAC_STEP_LAYOUT,
     }),
@@ -229,7 +229,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   ]),
   차시('2차시 (자연수) × (소수)', { grid: 'practice', count: 15 }, [
     학습지('(자연수) × (소수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4IntTimesDecimalMixedPlaces, {
-      id: 'u4_main_int_times_decimal_frac_step',
+      id: 'u4_main_int_times_decimal_frac_step', layout: 'oneCol',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_FRAC_STEP_LAYOUT,
     }),
@@ -254,7 +254,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   ]),
   차시('3차시 (소수) × (소수)', { grid: 'practice', count: 15 }, [
     학습지('(소수) × (소수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4DecimalTimesDecimalMixedPlaces, {
-      id: 'u4_main_decimal_times_decimal_frac_step',
+      id: 'u4_main_decimal_times_decimal_frac_step', layout: 'oneCol',
       prereqs: DECIMAL_MUL_PREREQS,
       ...DECIMAL_MUL_FRAC_STEP_LAYOUT,
     }),
@@ -304,14 +304,14 @@ const REVIEW_FRAC_CONTROLS = { controls: { fractionDifficulty: { stages: [1, 2, 
 
 const reviewSame = defineUnit(GRADE_ID, REVIEW_UNIT_ID, '분수 총연습', [
   차시('분모가 같은 분수의 덧셈', REVIEW_FRAC_CONTROLS, [
-    학습지('분모 같은 분수의 덧셈: 진분수끼리 (합이 1 이상·미만 섞기)', T.sameFracMixed, genG52ReviewSameAdd13, { id: 'frac_review_same_add_13' }),
-    학습지('분모 같은 분수의 덧셈: 대분수끼리 (받아올림 있음·없음 섞기)', T.sameFracMixed, genG52ReviewSameAdd24, { id: 'frac_review_same_add_24' }),
-    학습지('분모 같은 분수의 덧셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameAddAll, { id: 'frac_review_same_add_all' }),
+    학습지('분모 같은 분수의 덧셈: 진분수끼리 (합이 1 이상·미만 섞기)', T.sameFracMixed, genG52ReviewSameAdd13, { id: 'frac_review_same_add_13', layout: { countMultiple: 2 } }),
+    학습지('분모 같은 분수의 덧셈: 대분수끼리 (받아올림 있음·없음 섞기)', T.sameFracMixed, genG52ReviewSameAdd24, { id: 'frac_review_same_add_24', layout: { preset: 'oneColRows', rows: 6, countMultiple: 2 } }),
+    학습지('분모 같은 분수의 덧셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameAddAll, { id: 'frac_review_same_add_all', layout: { preset: 'oneColRows', rows: 8 } }),
   ]),
   차시('분모가 같은 분수의 뺄셈', REVIEW_FRAC_CONTROLS, [
-    학습지('분모 같은 분수의 뺄셈: 받아내림 있음 ((자연수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub13, { id: 'frac_review_same_sub_13' }),
-    학습지('분모 같은 분수의 뺄셈: 받아내림 없음 ((진분수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub24, { id: 'frac_review_same_sub_24' }),
-    학습지('분모 같은 분수의 뺄셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameSubAll, { id: 'frac_review_same_sub_all' }),
+    학습지('분모 같은 분수의 뺄셈: 받아내림 있음 ((자연수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub13, { id: 'frac_review_same_sub_13', layout: { preset: 'oneColRows', rows: 6, countMultiple: 2 } }),
+    학습지('분모 같은 분수의 뺄셈: 받아내림 없음 ((진분수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub24, { id: 'frac_review_same_sub_24', layout: { countMultiple: 2 } }),
+    학습지('분모 같은 분수의 뺄셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameSubAll, { id: 'frac_review_same_sub_all', layout: { preset: 'oneColRows', rows: 8 } }),
   ]),
 ]);
 

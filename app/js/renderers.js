@@ -476,6 +476,12 @@ function renderDiagnosticProblem(problem, idx) {
 }
 
 function generateDiagnosticProblem(source) {
+  // 단계 풀이 템플릿은 진단지에서 '식 = □' 한 줄 꼴(compact)로 줄인다.
+  if (source.diagnosticGenerator) return generateWithUnique(source.diagnosticGenerator);
+  const bound = source.generator;
+  if (bound && bound._template && bound._template.compact && bound._generator) {
+    return generateWithUnique((ctx, idx) => bound._template.compact(bound._generator(ctx || {}, idx)));
+  }
   const generator = isPdfWorksheet(source) ? PDF_GENERATORS[getPdfOpType(source)] : source.generator;
   return generateWithUnique(generator);
 }
@@ -507,7 +513,161 @@ function appendDiagnosticColumn(container, sources, problemIndex) {
   return nextIndex;
 }
 
+/* ── 수준 진단지 (2026-11-19) ──
+   블록 = 학습지 1개 × 4문항, 수준(level) 순서로 배치.
+   마지막에 교사용 판정표·번호별 기록표 쪽 (정답 보기를 켰을 때만 보이고 인쇄됨). */
+
+export const LEVEL_NAMES = { 0: '① 선수학습', 1: '② 기초', 2: '③ 표준' };
+export const DIAGNOSTIC_PASS_COUNT = 3;
+const RECORD_ROWS = 30;
+
+function levelRemedyLabel(source) {
+  const tag = source.from ? ` (${formatGradeShort(source.from)})` : '';
+  return `[${source.section}] ${source.label}${tag}`;
+}
+
+function buildDiagnosticHeader(item, pageIndex, pageCount, extraClass = '') {
+  const titleWrap = document.createElement('div');
+  titleWrap.className = `sheet-title diagnostic-title ${extraClass}`.trim();
+  const title = buildSheetTitle(item);
+  const main = document.createElement('div');
+  main.className = 'sheet-title-main';
+  main.textContent = pageCount > 1 ? `${title.main} (${pageIndex + 1}/${pageCount})` : title.main;
+  titleWrap.appendChild(main);
+  return titleWrap;
+}
+
+function buildStudentLine() {
+  // 학생 이름 칸은 두지 않는다 (번호만).
+  const line = document.createElement('div');
+  line.className = 'diagnostic-student-line';
+  line.innerHTML = '<span>번호 <span class="diagnostic-fill"></span></span><span>날짜 <span class="diagnostic-fill"></span></span>';
+  return line;
+}
+
+function appendLevelColumn(container, entries, problemIndex, ranges) {
+  let nextIndex = problemIndex;
+  let lastLevel = null;
+  entries.forEach(({ source, continued }) => {
+    if (source.level !== lastLevel) {
+      const heading = continued && lastLevel === null ? `${LEVEL_NAMES[source.level]} (이어서)` : LEVEL_NAMES[source.level];
+      container.insertAdjacentHTML('beforeend', `<h3 class="diagnostic-level-title">${heading}</h3>`);
+      lastLevel = source.level;
+    }
+    const rendered = renderDiagnosticBlock(source, nextIndex);
+    container.insertAdjacentHTML('beforeend', rendered.html);
+    ranges.push({ source, from: nextIndex, to: rendered.nextIndex - 1 });
+    nextIndex = rendered.nextIndex;
+  });
+  return nextIndex;
+}
+
+function buildJudgeSheet(item, ranges) {
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet diagnostic-sheet diagnostic-judge-sheet';
+  const header = buildDiagnosticHeader(item, 0, 1);
+  header.querySelector('.sheet-title-main').textContent += ' — 판정표 (교사용)';
+  sheet.appendChild(header);
+
+  const levels = [...new Set(ranges.map((r) => r.source.level))].sort((a, b) => a - b);
+  const outcome = levels.map((lv, i) => {
+    const name = LEVEL_NAMES[lv];
+    if (i === 0) return `${name} 블록 중 하나라도 통과 못 함 → <b>${name} 학습지부터</b>`;
+    return `${LEVEL_NAMES[levels[i - 1]]}까지 통과, ${name} 통과 못 함 → <b>${name} 학습지</b>`;
+  });
+  outcome.push(`모두 통과 → <b>단원 도달</b> (본단원 심화·총연습으로)`);
+
+  const rows = ranges.map((r, i) => `<tr>
+      <td class="num">${i + 1}</td>
+      <td>${LEVEL_NAMES[r.source.level]}</td>
+      <td>${r.source.label}</td>
+      <td class="num">${r.from}~${r.to}번</td>
+      <td class="num">4문항 중 ${DIAGNOSTIC_PASS_COUNT}개 이상</td>
+      <td>${levelRemedyLabel(r.source)}</td>
+    </tr>`).join('');
+
+  const blockHeads = ranges.map((r, i) => `<th title="${escapeAttr(r.source.label)}">${i + 1}</th>`).join('');
+  const recordRows = Array.from({ length: RECORD_ROWS }, (_, i) => (
+    `<tr><td class="num">${i + 1}</td>${ranges.map(() => '<td></td>').join('')}<td></td></tr>`
+  )).join('');
+
+  const body = document.createElement('div');
+  body.className = 'diagnostic-judge';
+  body.innerHTML = `
+    <p class="diagnostic-judge-rule">블록마다 <b>4문항 중 ${DIAGNOSTIC_PASS_COUNT}개 이상</b> 맞으면 통과입니다. 낮은 수준부터 차례로 봅니다.</p>
+    <ul class="diagnostic-judge-outcome">${outcome.map((o) => `<li>${o}</li>`).join('')}</ul>
+    <table class="diagnostic-judge-table">
+      <thead><tr><th>칸</th><th>수준</th><th>블록</th><th>문항</th><th>통과 기준</th><th>통과 못 하면 풀 학습지</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <h3 class="diagnostic-record-title">번호별 기록표 <span>(블록 칸에 맞은 개수, 마지막 칸에 도달 수준)</span></h3>
+    <table class="diagnostic-record-table">
+      <thead><tr><th>번호</th>${blockHeads}<th>도달 수준</th></tr></thead>
+      <tbody>${recordRows}</tbody>
+    </table>`;
+  sheet.appendChild(body);
+  return sheet;
+}
+
+function levelBlockWeight(source) {
+  return source.grid === 'wide' ? 2 : 1;
+}
+
+// 왼쪽 단에 넣을 블록 수: 두 단의 무게 차가 가장 작은 곳 (같으면 왼쪽을 더 많이)
+function splitLevelColumns(sources) {
+  const weights = sources.map(levelBlockWeight);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let best = Math.ceil(sources.length / 2);
+  let bestDiff = Infinity;
+  let left = 0;
+  for (let k = 0; k <= sources.length; k++) {
+    if (k > 0) left += weights[k - 1];
+    if (k > DIAGNOSTIC_SOURCES_PER_COLUMN || sources.length - k > DIAGNOSTIC_SOURCES_PER_COLUMN) continue;
+    const diff = Math.abs(total - 2 * left);
+    if (diff < bestDiff || (diff === bestDiff && k > best)) { best = k; bestDiff = diff; }
+  }
+  return best;
+}
+
+function createLevelDiagnosticSheets(item, fontScale = 1) {
+  resetSheetContext();
+  const sources = (item.sourceIds || []).map((id) => catalogMap[id]).filter(Boolean);
+  const pageCount = Math.max(1, Math.ceil(sources.length / DIAGNOSTIC_SOURCES_PER_PAGE));
+  const sheets = [];
+  const ranges = [];
+  let problemIndex = 1;
+  let prevLevel = null;
+
+  for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+    const pageSources = sources.slice(pageIndex * DIAGNOSTIC_SOURCES_PER_PAGE, (pageIndex + 1) * DIAGNOSTIC_SOURCES_PER_PAGE);
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet diagnostic-sheet level-diagnostic-sheet';
+    sheet.style.setProperty('--font-scale', fontScale);
+    sheet.appendChild(buildDiagnosticHeader(item, pageIndex, pageCount));
+    if (pageIndex === 0) sheet.appendChild(buildStudentLine());
+
+    const columns = document.createElement('div');
+    columns.className = 'diagnostic-columns';
+    // 블록을 두 단에 고르게 (예: 6개 → 3+3, 7개 → 4+3). 도형(wide) 블록은 2칸 무게로 센다.
+    const perColumn = splitLevelColumns(pageSources);
+    [pageSources.slice(0, perColumn), pageSources.slice(perColumn)].forEach((colSources) => {
+      const column = document.createElement('div');
+      column.className = 'diagnostic-column';
+      const entries = colSources.map((source, i) => ({ source, continued: i === 0 && source.level === prevLevel }));
+      problemIndex = appendLevelColumn(column, entries, problemIndex, ranges);
+      if (colSources.length) prevLevel = colSources[colSources.length - 1].level;
+      columns.appendChild(column);
+    });
+    sheet.appendChild(columns);
+    sheets.push(sheet);
+  }
+
+  sheets.push(buildJudgeSheet(item, ranges));
+  return sheets;
+}
+
 export function createDiagnosticSheets(item, fontScale = 1) {
+  if (item.diagnosticFrom === 'level') return createLevelDiagnosticSheets(item, fontScale);
   resetSheetContext();
 
   const sources = (item.sourceIds || [])

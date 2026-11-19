@@ -55,6 +55,29 @@ export function 진단지(overrides = {}) {
 }
 
 /**
+ * 수준 진단지 그룹 (2026-11-19)
+ *
+ * 같은 단원에서 `level` 이 지정된 학습지를 모아 수준별 블록(4문항씩)으로 만든다.
+ *   level 0 = 선수학습 · 1 = 기초 · 2 = 표준
+ * 정답 보기를 켜면 판정표(통과 기준·미통과 시 학습지)와 번호별 기록표가 함께 나온다.
+ */
+export function 수준진단지(overrides = {}) {
+  const { label = '수준 진단지', ...opts } = overrides;
+  return {
+    section: '진단지',
+    lessonRef: '수준 진단',
+    defaults: { kind: 'diagnostic', grid: 'diagnostic', count: 0, defaultFontScale: 0.8 },
+    items: [
+      학습지(label, null, {
+        ...opts,
+        kind: 'diagnostic',
+        diagnosticFrom: 'level',
+      }),
+    ],
+  };
+}
+
+/**
  * 차시(본단원) 그룹
  */
 export function 차시(lessonRef, ...args) {
@@ -150,6 +173,14 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const diagnosticFrom = overrides.diagnosticFrom || defaults.diagnosticFrom || null;
       const sourceIds = overrides.sourceIds || defaults.sourceIds || null;
       const controls = overrides.controls || defaults.controls || null;
+      // 배치 프리셋 (layout.js LAYOUT_PRESETS). 문자열 또는 { preset, rows, countMultiple }
+      const layout = overrides.layout || defaults.layout || null;
+      // 선수학습 복제본 → 원래 학년의 원본 학습지 (sheetRef)
+      const source = overrides.source || null;
+      // 단원 안 수준: 0 선수학습 · 1 기초 · 2 표준 (수준 진단지에 들어갈 학습지만 지정)
+      const level = (overrides.level ?? defaults.level ?? null);
+      // 진단지에서만 쓰는 짧은 문항 생성기 (학습지 문항이 진단지 한 칸에 너무 길 때)
+      const diagnosticGenerator = overrides.diagnosticGenerator || null;
 
       entries.push({
         id,
@@ -168,8 +199,27 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         diagnosticFrom,
         sourceIds,
         controls,
+        layout,
+        source,
+        level,
+        diagnosticGenerator,
       });
     }
+  }
+
+  for (const entry of entries) {
+    if (entry.kind !== 'diagnostic' || entry.diagnosticFrom !== 'level' || entry.sourceIds) continue;
+    const sources = entries
+      .filter((candidate) => (
+        candidate.unit === entry.unit &&
+        candidate.kind !== 'diagnostic' &&
+        candidate.level !== null && candidate.level !== undefined
+      ))
+      .map((candidate, order) => ({ candidate, order }))
+      .sort((a, b) => (a.candidate.level - b.candidate.level) || (a.order - b.order))
+      .map(({ candidate }) => candidate);
+    entry.sourceIds = sources.map((source) => source.id);
+    entry.count = entry.sourceIds.length * 4;
   }
 
   for (const entry of entries) {

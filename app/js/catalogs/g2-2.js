@@ -48,6 +48,8 @@ export const meta = {
   id: GRADE_ID,
   short: '2-2',
   name: '2학년 2학기',
+  // 저학년은 글자를 크게 시작 (학습지를 고를 때 기본값, 사용자가 바꿀 수 있음)
+  defaultFontScale: 1.2,
   units: {
     u1: { short: '1단원', name: '네 자리수' },
     u2: { short: '2단원', name: '곱셈구구' },

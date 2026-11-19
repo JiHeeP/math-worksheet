@@ -59,182 +59,131 @@ export const GRID_LAYOUTS = {
   single:   { minCols: 1, maxCols: 1, maxRows: 4, targetCellAspect: 2.6, minCellWidth: 120, minCellHeight: 48, widthPriority: 2, baseGap: [10, 12] },
 };
 
-export const THREE_PLUS_HORIZONTAL_IDS = new Set([
-  'u1_main_addsub',
-  'u1_main_muldiv',
-  'u1_main_addsubmul',
-  'u1_main_addsubdiv',
-  'u1_main_mix',
-]);
+/* ── 학습지별 배치 프리셋 ──
+   카탈로그의 학습지 옵션 `layout` 으로 지정한다 (2026-11-19, 예전 ID 목록 11묶음을 대체).
+     학습지('…', gen, { id: 'u5_main_add', layout: 'oneCol' })
+     학습지('…', gen, { id: '…', layout: { preset: 'oneColRows', rows: 6 } })
+   문항 수를 2·4의 배수로 맞춰야 하는 섞기 학습지는 { …, countMultiple: 2 } 를 함께 쓴다.
 
-export const TWO_COLUMN_WORKSHEET_IDS = new Set([
-  'u4_main_red_process',
-  'u4_main_lcd_process',
-]);
+   twoColAtNormalFont : 글자 '보통' 이하 2열(풀이 줄 세로로 쌓기), '크게' 이상 1열 한 줄 풀이
+   splitWriteBox      : 가로셈 + 가르기 쓰기 칸, 2열 8행
+   twoCol             : 2열 고정 (긴 과정 연습)
+   mixedSeparate      : 대분수 자연수·분수 따로 계산, 2열 3행
+   oneCol             : 1열 6행 (단계 풀이 한 줄)
+   oneColRows         : 1열, 행 수 지정 (rows)
+   fracTwoCol         : 분수 2열 8행
+   threePlusHoriz     : 세 수 이상 가로식, 2열 */
 
-export const ONE_COLUMN_WORKSHEET_IDS = new Set([
-  'u1_main_add_ge1',
-  'u1_main_one_minus_frac',
-  'u1_main_int_minus_frac',
-  'u1_main_mixed_add_carry',
-  'u1_main_int_minus_mixed',
-  'u1_main_mixed_sub_borrow',
-  'u5_main_add',
-  'u5_main_add_ge1',
-  'u5_main_mixed_add_improper',
-  'u5_main_mixed_add_carry_improper',
-  'u5_main_sub',
-  'u5_main_mixed_sub_no_borrow_improper',
-  'u5_main_mixed_sub_borrow_improper',
-  'u2_main_frac_times_int_step',
-  'u2_main_int_times_frac_step',
-  'u2_main_unit_times_unit_step',
-  'u2_main_frac_times_frac_step',
-  'u2_main_mixed_times_mixed_step',
-  'u1_main_int_div_int_frac_step',
-  'u1_main_frac_div_int_step',
-  'u1_main_mixed_div_int_step',
-  'u1_main_frac_div_frac_step',
-  'u1_main_int_div_frac_step',
-  'u1_main_mixed_div_frac_step',
-  'u4_main_decimal_times_int_frac_step',
-  'u4_main_int_times_decimal_frac_step',
-  'u4_main_decimal_times_decimal_frac_step',
-]);
+export const LAYOUT_PRESETS = [
+  'twoColAtNormalFont', 'splitWriteBox', 'twoCol', 'mixedSeparate',
+  'oneCol', 'oneColRows', 'fracTwoCol', 'threePlusHoriz',
+];
 
-/* 글자 크기 '보통' 이하에서는 2열(풀이 줄을 세로로 쌓음), '크게' 이상에서는 1열 한 줄 풀이 */
-export const TWO_COLUMN_AT_NORMAL_FONT_IDS = new Set([
-  'u2_main_mixed_times_int_step',
-  'u2_main_int_times_mixed_step',
-]);
-
-/* 5-2 분수 총연습: 분모 같은 분수 유형 섞기 중 받아올림·받아내림 단계 풀이(긴 줄)가
-   섞이는 장 → 1열로 쌓는다. 값 = 최대 행 수.
-   반반 섞기는 6행(3:3 정확히), 4유형 섞기는 8행(글자 '작게'면 유형별 2문항씩, '보통'은 7문항) */
-export const SAME_FRAC_MIXED_ONE_COLUMN_ROWS = {
-  frac_review_same_add_24: 6,
-  frac_review_same_sub_13: 6,
-  frac_review_same_add_all: 8,
-  frac_review_same_sub_all: 8,
-};
-
-export const FRACTION_TWO_COLUMN_WORKSHEET_IDS = new Set([
-  'u2_main_mixed_times_mixed',
-]);
-
-export const MULTI_ROW_MIXED_SEPARATE_IDS = new Set([
-  'u5_main_mixed_add_separate',
-  'u5_main_mixed_add_carry_separate',
-  'u5_main_mixed_sub_no_borrow_separate',
-  'u5_main_mixed_sub_borrow_separate',
-  'u2_main_mixed_times_int_separate',
-  'u2_main_int_times_mixed_separate',
-]);
-
-export const SPLIT_WRITE_BOX_WORKSHEET_IDS = new Set([
-  'u7_main_1d1d_carry_horiz_prac',
-  'u7_main_teen_borrow_horiz_prac',
-  'u7_main_2d1d_carry_horiz_prac',
-  'u7_main_1d1d_carry',
-  'u7_main_teen_borrow',
-  'u7_main_2d1d_carry',
-]);
+export function getLayoutSpec(item) {
+  const raw = item && item.layout;
+  if (!raw) return null;
+  return typeof raw === 'string' ? { preset: raw } : raw;
+}
 
 export function getHtmlLayoutConfig(item, fontScale = 1) {
   const base = GRID_LAYOUTS[item.grid];
   if (!base) return null;
-  // layoutId: 다른 단원 학습지를 복제한 항목(예: 5-2 분수 총연습)이 원본 배치를 그대로 쓰도록
-  const localId = item.layoutId || item.id.replace(/^g\d-\d_/, '');
+  const spec = getLayoutSpec(item);
+  if (!spec || !spec.preset) return base;
 
-  if (TWO_COLUMN_AT_NORMAL_FONT_IDS.has(localId)) {
-    if ((Number(fontScale) || 1) <= 1) {
+  switch (spec.preset) {
+    case 'twoColAtNormalFont':
+      if ((Number(fontScale) || 1) <= 1) {
+        return {
+          ...base,
+          minCols: 2, maxCols: 2, maxRows: 6, widthPriority: 1,
+          targetCellAspect: 1.9,
+          minCellWidth: 76,
+          minCellHeight: 34,
+          baseGap: [8, 10],
+        };
+      }
       return {
         ...base,
-        minCols: 2, maxCols: 2, maxRows: 6, widthPriority: 1,
-        targetCellAspect: 1.9,
-        minCellWidth: 76,
+        minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
+        targetCellAspect: 4.8,
+        minCellWidth: 120,
         minCellHeight: 34,
+        baseGap: [6, 0],
+      };
+
+    case 'splitWriteBox':
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
+        targetCellAspect: 1.55,
+        minCellWidth: Math.max(base.minCellWidth || 0, 90),
+        minCellHeight: Math.max(base.minCellHeight || 0, 28),
+      };
+
+    case 'twoCol':
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, widthPriority: 1.5,
+        minCellWidth: Math.max(base.minCellWidth || 0, 76),
+      };
+
+    case 'mixedSeparate':
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, maxRows: 3, widthPriority: 1,
+        targetCellAspect: 1.08,
+        minCellWidth: 76,
+        minCellHeight: 72,
+        baseGap: [8, 8],
+      };
+
+    case 'oneCol':
+      return {
+        ...base,
+        minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
+        targetCellAspect: 4.8,
+        minCellWidth: 120,
+        minCellHeight: 34,
+        baseGap: [6, 0],
+      };
+
+    case 'oneColRows':
+      return {
+        ...base,
+        minCols: 1, maxCols: 1, maxRows: spec.rows || 6, widthPriority: 2,
+        targetCellAspect: 4.8,
+        minCellWidth: 120,
+        minCellHeight: 28,
+        baseGap: [6, 0],
+      };
+
+    case 'fracTwoCol':
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
+        targetCellAspect: 1.85,
+        minCellWidth: 76,
+        minCellHeight: 24,
         baseGap: [8, 10],
       };
-    }
-    return {
-      ...base,
-      minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
-      targetCellAspect: 4.8,
-      minCellWidth: 120,
-      minCellHeight: 34,
-      baseGap: [6, 0],
-    };
-  }
 
-  if (SPLIT_WRITE_BOX_WORKSHEET_IDS.has(localId)) {
-    return {
-      ...base,
-      minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
-      targetCellAspect: 1.55,
-      minCellWidth: Math.max(base.minCellWidth || 0, 90),
-      minCellHeight: Math.max(base.minCellHeight || 0, 28),
-    };
-  }
+    case 'threePlusHoriz':
+      return {
+        ...base,
+        minCols: 2, maxCols: 2, widthPriority: 2,
+        minCellWidth: Math.max(base.minCellWidth || 0, 78),
+      };
 
-  if (TWO_COLUMN_WORKSHEET_IDS.has(localId)) {
-    return {
-      ...base,
-      minCols: 2, maxCols: 2, widthPriority: 1.5,
-      minCellWidth: Math.max(base.minCellWidth || 0, 76),
-    };
+    default:
+      return base;
   }
+}
 
-  if (MULTI_ROW_MIXED_SEPARATE_IDS.has(localId)) {
-    return {
-      ...base,
-      minCols: 2, maxCols: 2, maxRows: 3, widthPriority: 1,
-      targetCellAspect: 1.08,
-      minCellWidth: 76,
-      minCellHeight: 72,
-      baseGap: [8, 8],
-    };
-  }
-
-  if (ONE_COLUMN_WORKSHEET_IDS.has(localId)) {
-    return {
-      ...base,
-      minCols: 1, maxCols: 1, maxRows: 6, widthPriority: 2,
-      targetCellAspect: 4.8,
-      minCellWidth: 120,
-      minCellHeight: 34,
-      baseGap: [6, 0],
-    };
-  }
-
-  if (SAME_FRAC_MIXED_ONE_COLUMN_ROWS[localId]) {
-    return {
-      ...base,
-      minCols: 1, maxCols: 1, maxRows: SAME_FRAC_MIXED_ONE_COLUMN_ROWS[localId], widthPriority: 2,
-      targetCellAspect: 4.8,
-      minCellWidth: 120,
-      minCellHeight: 28,
-      baseGap: [6, 0],
-    };
-  }
-
-  if (FRACTION_TWO_COLUMN_WORKSHEET_IDS.has(localId)) {
-    return {
-      ...base,
-      minCols: 2, maxCols: 2, maxRows: 8, widthPriority: 2,
-      targetCellAspect: 1.85,
-      minCellWidth: 76,
-      minCellHeight: 24,
-      baseGap: [8, 10],
-    };
-  }
-
-  if (!THREE_PLUS_HORIZONTAL_IDS.has(localId)) return base;
-  return {
-    ...base,
-    minCols: 2, maxCols: 2, widthPriority: 2,
-    minCellWidth: Math.max(base.minCellWidth || 0, 78),
-  };
+/** 문항 수 배수 제약 (반반 섞기 등). 없으면 1. */
+export function getCountMultiple(item) {
+  const spec = getLayoutSpec(item);
+  return (spec && spec.countMultiple) || 1;
 }
 
 export function resolveGridLayout(config, count, fontScale = 1) {

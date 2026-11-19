@@ -79,6 +79,20 @@ export function shapeProblem(svg, prompt, answerHtml, note = '') {
   `);
 }
 
+/**
+ * 진단지용 한 줄 꼴: 식 = □ (풀이 단계 없이 최종 답만, 기약분수·대분수)
+ * fracLcdStep / mixedImproperStep / mixedSeparateStep 데이터를 받는다.
+ */
+function compactFracProblem({ w1 = 0, n1, d1, w2 = 0, n2, d2, op }) {
+  const left = w1 ? mixedD(w1, n1, d1) : fracD(n1, d1);
+  const right = w2 ? mixedD(w2, n2, d2) : fracD(n2, d2);
+  const a = (w1 * d1 + n1) * d2;
+  const b = (w2 * d2 + n2) * d1;
+  const num = op === '+' ? a + b : a - b;
+  const opText = op === '+' ? '+' : '\u2212';
+  return htmlProblem('frac-row', `${left} <span class="op-txt">${opText}</span> ${right} <span class="eq-txt">=</span> ${formulaResultHtml(num, d1 * d2)}`);
+}
+
 function fracStepProblem(stepsHtml, itemClass = '') {
   return htmlProblem('concept-layout', `
     <div class="concept-card">
@@ -909,6 +923,7 @@ export const T = {
   /** 분수 통분 연산 - 진분수 (1줄 풀이) */
   fracLcdStep: {
     grid: 'wide', count: 6,
+    compact: (data) => compactFracProblem(data),
     render: ({ n1, d1, n2, d2, op, showImproperResultStep }) => {
       const steps = op === '+'
         ? inlineFracAdd(n1, d1, n2, d2, showImproperResultStep)
@@ -920,6 +935,7 @@ export const T = {
   /** 대분수 연산 - 가분수 변환 방식 (1줄) */
   mixedImproperStep: {
     grid: 'wide', count: 6,
+    compact: (data) => compactFracProblem(data),
     render: ({ w1, n1, d1, w2, n2, d2, op, showImproperResultStep }) => {
       const lines = op === '+'
         ? inlineMixedAddImproper(w1, n1, d1, w2, n2, d2, showImproperResultStep)
@@ -931,6 +947,7 @@ export const T = {
   /** 대분수 연산 - 자연수/분수 따로 */
   mixedSeparateStep: {
     grid: 'wide', count: 6,
+    compact: (data) => compactFracProblem(data),
     render: ({ w1, n1, d1, w2, n2, d2, op }) => {
       const lines = op === '+'
         ? inlineMixedAddSeparate(w1, n1, d1, w2, n2, d2)
