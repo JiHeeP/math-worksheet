@@ -150,6 +150,12 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const diagnosticFrom = overrides.diagnosticFrom || defaults.diagnosticFrom || null;
       const sourceIds = overrides.sourceIds || defaults.sourceIds || null;
       const controls = overrides.controls || defaults.controls || null;
+      // 배치 프리셋 (layout.js LAYOUT_PRESETS). 문자열 또는 { preset, rows, countMultiple }
+      const layout = overrides.layout || defaults.layout || null;
+      // 선수학습 복제본 → 원래 학년의 원본 학습지 (sheetRef)
+      const source = overrides.source || null;
+      // 단원 안 수준: 0 선수학습 · 1 기초 · 2 표준 (수준 진단지에 들어갈 학습지만 지정)
+      const level = (overrides.level ?? defaults.level ?? null);
 
       entries.push({
         id,
@@ -168,6 +174,9 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         diagnosticFrom,
         sourceIds,
         controls,
+        layout,
+        source,
+        level,
       });
     }
   }

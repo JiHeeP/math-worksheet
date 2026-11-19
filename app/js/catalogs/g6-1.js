@@ -34,7 +34,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       prereqs: [unitRef('g5-2', 'u2')],
     }),
     학습지('(자연수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1IntDivIntAsFracStep, {
-      id: 'u1_main_int_div_int_frac_step',
+      id: 'u1_main_int_div_int_frac_step', layout: 'oneCol',
       prereqs: [unitRef('g5-2', 'u2')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
@@ -45,7 +45,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       prereqs: [unitRef('g5-2', 'u2')],
     }),
     학습지('(진분수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1FracDivIntStep, {
-      id: 'u1_main_frac_div_int_step',
+      id: 'u1_main_frac_div_int_step', layout: 'oneCol',
       prereqs: [unitRef('g5-2', 'u2')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
@@ -54,7 +54,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
       prereqs: [unitRef('g5-2', 'u2')],
     }),
     학습지('(대분수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1MixedDivIntStep, {
-      id: 'u1_main_mixed_div_int_step',
+      id: 'u1_main_mixed_div_int_step', layout: 'oneCol',
       prereqs: [unitRef('g5-2', 'u2')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
