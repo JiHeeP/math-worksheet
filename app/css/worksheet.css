@@ -1487,12 +1487,14 @@ button:disabled:active { transform: none; }
 
 .decimal-vertical-grid,
 .decimal-longdiv-grid {
-  --cell: calc(20px * var(--font-scale, 1));
-  --op-cell: calc(18px * var(--font-scale, 1));
+  /* 자연수 세로셈 격자(.pdf-grid-table, 26px)와 같은 크기감 — 칸이 작으면 소수점이 숫자에 붙어 보임 */
+  --cell: calc(28px * var(--font-scale, 1));
+  --op-cell: calc(24px * var(--font-scale, 1));
+  --grid-line: #9aa1ad;
   display: grid;
   position: relative;
   margin-top: 4px;
-  font-size: calc(17px * var(--font-scale, 1));
+  font-size: calc(20px * var(--font-scale, 1));
   font-weight: 500;
   line-height: 1;
   color: #1f2937;
@@ -1504,6 +1506,9 @@ button:disabled:active { transform: none; }
 }
 
 .decimal-longdiv-grid {
+  /* 나눗셈은 계산 줄이 많아 칸을 너무 키우면 한 장 문항 수가 줄어듦 */
+  --cell: calc(22px * var(--font-scale, 1));
+  font-size: calc(18px * var(--font-scale, 1));
   grid-template-columns: repeat(var(--cols), var(--cell));
   grid-template-rows: repeat(var(--rows), var(--cell));
 }
@@ -1513,11 +1518,11 @@ button:disabled:active { transform: none; }
   position: relative;
   z-index: 0;
   background-image:
-    linear-gradient(to right, #6a7280 1.25px, transparent 1.25px),
-    linear-gradient(to bottom, #6a7280 1.25px, transparent 1.25px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: var(--cell) var(--cell);
-  border-right: 1.25px solid #6a7280;
-  border-bottom: 1.25px solid #6a7280;
+  border-right: 1px solid var(--grid-line);
+  border-bottom: 1px solid var(--grid-line);
   pointer-events: none;
 }
 
@@ -1548,6 +1553,8 @@ button:disabled:active { transform: none; }
   grid-column: 1;
   grid-row: var(--row);
   font-weight: 700;
+  /* × 를 격자 바로 옆에 붙이지 않고 칸 가운데에 */
+  font-size: 0.95em;
 }
 
 .decimal-point-on-line {
@@ -1565,9 +1572,10 @@ button:disabled:active { transform: none; }
   position: absolute;
   content: "";
   left: 0;
-  top: 64%;
-  width: calc(5px * var(--font-scale, 1));
-  height: calc(5px * var(--font-scale, 1));
+  /* 숫자 아래쪽(글자 밑선) 높이 — 교과서처럼 두 숫자 사이 아래에 찍힌 점 */
+  top: 73%;
+  width: calc(4.5px * var(--font-scale, 1));
+  height: calc(4.5px * var(--font-scale, 1));
   border-radius: 50%;
   background: currentColor;
   transform: translate(-50%, -50%);
@@ -1623,7 +1631,25 @@ button:disabled:active { transform: none; }
   pointer-events: none;
 }
 
+/* 부분곱이 있을 때: 부분곱 줄과 답(합) 줄 사이 선 — 자연수 세로셈 격자와 같은 모양 */
+.decimal-vertical-sum-line {
+  z-index: 3;
+  grid-column: 1 / -1;
+  grid-row: var(--sum-row);
+  height: 0;
+  border-top: 2px solid #2f3640;
+  align-self: start;
+  pointer-events: none;
+}
+
 /* 소수 곱셈 계산 과정 2: 자연수 세로셈 → (1/□ 배) → 소수 세로셈 */
+.decimal-natural-step .decimal-vertical-grid {
+  /* 한 문항에 격자 두 개가 나란히 들어가므로 조금 작게 */
+  --cell: calc(22px * var(--font-scale, 1));
+  --op-cell: calc(18px * var(--font-scale, 1));
+  font-size: calc(17px * var(--font-scale, 1));
+}
+
 .decimal-natural-step {
   display: flex;
   align-items: flex-start;
@@ -1638,7 +1664,7 @@ button:disabled:active { transform: none; }
   justify-content: center;
   /* 격자 위쪽 두 행(곱하는 두 수) 높이에 맞춰 가운데 정렬 */
   margin-top: 4px;
-  height: calc(60px * var(--font-scale, 1));
+  height: calc(44px * var(--font-scale, 1));
   gap: calc(4px * var(--font-scale, 1));
   font-size: calc(15px * var(--font-scale, 1));
   white-space: nowrap;

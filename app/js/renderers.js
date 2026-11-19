@@ -113,6 +113,8 @@ function decimalVerticalGridHtml(problem) {
     decimalPointNode(num1, topStart, 1),
     decimalDigitNodes(num2, bottomStart, 2),
     decimalPointNode(num2, bottomStart, 2),
+    // 부분곱 줄이 있으면 답(합) 줄 위에도 선
+    workRows > 0 ? `<span class="decimal-vertical-sum-line" style="--sum-row:${rows};"></span>` : '',
     decimalDigitNodes(ans, answerStart, rows, true),
     decimalPointNode(ans, answerStart, rows, true),
   ].join('');
