@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>초등 수학 연습지 생성기</title>
   <link rel="icon" href="favicon.svg?v=20260507" type="image/svg+xml">
-  <link rel="stylesheet" href="css/worksheet.css?v=20261116-decimal-times-decimal-mix">
+  <link rel="stylesheet" href="css/worksheet.css?v=20261119-level-diagnostic">
 </head>
 <body>
 
@@ -27,6 +27,8 @@
     <div class="input-group">
       <label for="worksheetSelect">연습지</label>
       <select id="worksheetSelect"></select>
+      <button type="button" class="jump-button" id="jumpButton" hidden></button>
+      <select id="jumpSelect" class="jump-select" hidden aria-label="선수학습으로 이동"></select>
     </div>
 
     <div class="input-group stage-filter-group" aria-label="학습 단계 필터">
@@ -116,6 +118,6 @@
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20261116-review-units"></script>
+<script type="module" src="js/app.js?v=20261119-level-diagnostic"></script>
 </body>
 </html>

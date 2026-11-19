@@ -52,8 +52,8 @@ const u3 = defineUnit(GRADE_ID, 'u3', '곱셈과 나눗셈', [
   ]),
   // [4수01-07] 몇십으로 나누기 → 몇십몇으로 나누기 (비바샘 4-1 3단원 5·6차시)
   차시('몇십으로 나누기, 몇십몇으로 나누기 (몫 한 자리)', { kind: 'pdf', grid: 'divgrid', count: 9 }, [
-    학습지('몇십으로 나누기 (몫 한 자리)', genG41U3DivByTens, { id: 'u3_main_div_by_tens' }),
-    학습지('몇십몇으로 나누기 (몫 한 자리)', genG41U3DivBy2dQuot1, { id: 'u3_main_div_by_2d_q1' }),
+    학습지('몇십으로 나누기 (몫 한 자리)', genG41U3DivByTens, { id: 'u3_main_div_by_tens', layout: { countMultiple: 2 } }),
+    학습지('몇십몇으로 나누기 (몫 한 자리)', genG41U3DivBy2dQuot1, { id: 'u3_main_div_by_2d_q1', layout: { countMultiple: 2 } }),
   ]),
   // [4수01-08] 어림셈
   차시('곱셈과 나눗셈 어림셈', { grid: 'practice', count: 12 }, [

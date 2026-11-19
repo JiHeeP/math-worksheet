@@ -3,9 +3,10 @@
 import {
   GRADE_META, DEFAULT_GRADE_ID,
   catalogMap, getUnitsOfGrade, getUnitMeta, getWorksheetsByUnit, getGradeMeta,
+  resolvePrereq,
 } from './catalog.js';
 import { createDiagnosticSheets, createSheet, getWorksheetLimit } from './renderers.js';
-import { getHtmlLayoutConfig } from './layout.js';
+import { getHtmlLayoutConfig, getCountMultiple } from './layout.js';
 
 let answerShown = false;
 let selectedGugudanDans = [2];
@@ -14,6 +15,12 @@ let selectedFractionStage = 2;
 let selectedSectionFilter = '본단원';
 const fitCountCache = new Map();
 const SECTION_FILTERS = ['전체', '진단지', '선수학습', '본단원'];
+const DEFAULT_STAGE = 2;
+// 난이도 버튼 라벨 (catalog controls.*Difficulty.labels 로 학습지별 덮어쓰기 가능)
+const STAGE_LABELS = {
+  numberStage: { labels: ['1~20', '20~50', '50~99'], hint: '계산에 쓰는 수의 범위' },
+  fractionStage: { labels: ['쉬움', '보통', '어려움'], hint: '분모와 자연수 부분의 크기 (쉬움 = 작은 수)' },
+};
 
 function populateGradeSelect() {
   const gradeSelect = document.getElementById('gradeSelect');
@@ -112,8 +119,12 @@ function updateStageControl(controlId, datasetKey, item, getControlMeta, current
 
   const allowed = meta.stages || [1, 2, 3];
   const effectiveStage = clampStageToAllowed(currentStage, allowed);
+  const labelSet = STAGE_LABELS[datasetKey] || { labels: [], hint: '' };
+  const labels = meta.labels || labelSet.labels;
+  control.title = meta.hint || labelSet.hint;
   control.querySelectorAll('.dan-button').forEach((button) => {
     const stage = Number(button.dataset[datasetKey]);
+    if (labels[stage - 1]) button.textContent = labels[stage - 1];
     const isAllowed = allowed.includes(stage);
     button.disabled = !isAllowed;
     button.classList.toggle('is-disabled', !isAllowed);
@@ -178,6 +189,162 @@ function updateSectionFilterControl(items) {
   });
 }
 
+/* ── 학습지가 바뀔 때: 그 학습지에 맞는 기본값으로 되돌림 ──
+   - 글자 크기: 학습지 기본값 → 학기 기본값 → 보통 (예전에는 진단지의 '작게'가 다음 학습지로 남았음)
+   - 난이도: 2단계(보통)로 초기화 (사용자 결정 2026-11-19)
+   - 해당 없는 조절은 숨김 (진단지의 문제 수 등) */
+/* 글자 크기 중 이 학습지가 A4에 1문항도 제대로 안 들어가는 크기는 고를 수 없게 한다.
+   (예: 긴 단계 풀이 1열 학습지의 '아주 크게') 측정은 화면이 먼저 바뀐 뒤 따로 한다. */
+let fontCheckTimer = null;
+function updateFontOptions(item) {
+  const select = document.getElementById('fontScale');
+  Array.from(select.options).forEach((option) => {
+    option.disabled = false;
+    option.textContent = option.textContent.replace(/ \(너무 큼\)$/, '');
+  });
+  clearTimeout(fontCheckTimer);
+  if (!item || item.kind === 'diagnostic') return;
+  fontCheckTimer = setTimeout(() => {
+    const current = catalogMap[document.getElementById('worksheetSelect').value];
+    if (current !== item) return;
+    const ctx = getCurrentGeneratorContext(item);
+    Array.from(select.options).forEach((option) => {
+      const scale = parseFloat(option.value);
+      if (!(scale > 1)) return;
+      if (getWorksheetLimit(item, scale) <= 1) return;
+      if (getSafeWorksheetLimit(item, scale, ctx) > 1) return;
+      option.disabled = true;
+      option.textContent += ' (너무 큼)';
+    });
+  }, 50);
+}
+
+function applyWorksheetDefaults(item) {
+  if (!item) return;
+  selectedNumberStage = DEFAULT_STAGE;
+  selectedFractionStage = DEFAULT_STAGE;
+  applyWorksheetDefaultFontScale(item);
+  const countGroup = document.getElementById('problemCount').closest('.input-group');
+  if (countGroup) countGroup.hidden = item.kind === 'diagnostic';
+  document.getElementById('problemCount').value = '';
+  updateAllStageControls(item);
+  updateJumpControl(item);
+  updateSelectedMeta();
+  updateFontOptions(item);
+}
+
+/* ── 선수학습 ↔ 원본 이동 ── */
+
+function formatActionTag(action) {
+  return action && action.grade ? ` (${formatGradeShort(action.grade)})` : '';
+}
+
+function getJumpTargets(item) {
+  if (!item) return [];
+  const targets = [];
+  const seen = new Set();
+  const add = (label, action) => {
+    if (!action) return;
+    const key = `${action.grade}/${action.unit}/${action.sheet || ''}/${action.section || ''}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    targets.push({ label, action });
+  };
+
+  // 1) 선수학습 복제본 → 원래 학년 학습지
+  if (item.source) {
+    const r = resolvePrereq(item.source, item.grade);
+    if (r.action) add(`원래 학습지로${formatActionTag(r.action)}`, r.action);
+  }
+  // 2) 같은 단원에 [선수학습] 항목이 있으면 그 목록으로
+  if (item.section !== '선수학습') {
+    const hasPre = getWorksheetsByUnit(item.grade, item.unit).some((x) => x.section === '선수학습');
+    if (hasPre) add('이 단원 선수학습으로', { grade: item.grade, unit: item.unit, section: '선수학습' });
+  }
+  // 3) 카탈로그 prereqs (다른 학기 단원·학습지)
+  (item.prereqs || []).forEach((p) => {
+    const r = resolvePrereq(p, item.grade);
+    if (r.action) add(`선수학습: ${r.label}`, r.action);
+  });
+  return targets;
+}
+
+let currentJumpTargets = [];
+
+function updateJumpControl(item) {
+  const button = document.getElementById('jumpButton');
+  const select = document.getElementById('jumpSelect');
+  if (!button || !select) return;
+  currentJumpTargets = getJumpTargets(item);
+
+  button.hidden = currentJumpTargets.length !== 1;
+  select.hidden = currentJumpTargets.length < 2;
+  if (currentJumpTargets.length === 1) {
+    button.textContent = `${currentJumpTargets[0].label} →`;
+  } else if (currentJumpTargets.length > 1) {
+    select.innerHTML = ['<option value="">선수학습으로 이동…</option>']
+      .concat(currentJumpTargets.map((t, i) => `<option value="${i}">${t.label}</option>`))
+      .join('');
+    select.value = '';
+  }
+}
+
+function jumpTo(index) {
+  const target = currentJumpTargets[index];
+  if (target) navigateTo(target.action, { push: true });
+}
+
+/* ── 주소(#학기/단원/학습지)로 열기 · 뒤로 가기 ── */
+
+function buildHash() {
+  const sheet = document.getElementById('worksheetSelect').value;
+  return `#${currentGradeId()}/${getCurrentUnitId()}/${sheet}`;
+}
+
+function syncHash(push = false) {
+  const hash = buildHash();
+  if (location.hash === hash) return;
+  try {
+    if (push) history.pushState(null, '', hash);
+    else history.replaceState(null, '', hash);
+  } catch (e) { /* file:// 등에서 실패해도 동작에는 지장 없음 */ }
+}
+
+function parseHash() {
+  const raw = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+  if (!raw) return null;
+  const [grade, unit, sheet] = raw.split('/');
+  if (!GRADE_META[grade]) return null;
+  const action = { grade };
+  if (unit && getUnitMeta(grade, unit)) action.unit = unit;
+  if (sheet && catalogMap[sheet] && catalogMap[sheet].grade === grade) {
+    action.sheet = sheet;
+    action.unit = catalogMap[sheet].unit;
+  }
+  return action;
+}
+
+function navigateTo(action, { push = false, generateNow = true } = {}) {
+  if (!action || !GRADE_META[action.grade]) return;
+  const gradeSelect = document.getElementById('gradeSelect');
+  const unitSelect = document.getElementById('unitSelect');
+  gradeSelect.value = action.grade;
+  populateUnitSelect(action.grade);
+  const unitId = action.unit && getUnitMeta(action.grade, action.unit)
+    ? action.unit
+    : Object.keys(getUnitsOfGrade(action.grade))[0];
+  unitSelect.value = unitId;
+
+  const sheet = action.sheet ? catalogMap[action.sheet] : null;
+  if (sheet) selectedSectionFilter = sheet.section;
+  else if (action.section) selectedSectionFilter = action.section;
+  else selectedSectionFilter = '본단원';
+
+  populateWorksheetSelect(action.grade, unitId, action.sheet);
+  syncHash(push);
+  if (generateNow) generate('replace');
+}
+
 function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
   const allItems = getWorksheetsByUnit(gradeId, unitId);
@@ -196,9 +363,7 @@ function populateWorksheetSelect(gradeId, unitId, preferredId) {
   if (nextId) {
     const item = catalogMap[nextId];
     worksheetSelect.value = nextId;
-    applyWorksheetDefaultFontScale(item);
-    updateAllStageControls(item);
-    updateSelectedMeta();
+    applyWorksheetDefaults(item);
   }
 }
 
@@ -210,10 +375,17 @@ function getCurrentFontScale() {
   return parseFloat(document.getElementById('fontScale').value) || 1;
 }
 
+function getDefaultFontScale(item) {
+  if (!item) return 1;
+  if (item.defaultFontScale) return item.defaultFontScale;
+  const gradeMeta = getGradeMeta(item.grade);
+  return (gradeMeta && gradeMeta.defaultFontScale) || 1;
+}
+
 function applyWorksheetDefaultFontScale(item) {
-  if (!item || !item.defaultFontScale) return;
+  if (!item) return;
   const fontScaleSelect = document.getElementById('fontScale');
-  const nextValue = String(item.defaultFontScale);
+  const nextValue = String(getDefaultFontScale(item));
   if (fontScaleSelect.value === nextValue) return;
   fontScaleSelect.value = nextValue;
   const container = document.getElementById('sheets-container');
@@ -297,7 +469,9 @@ function hasProblemContentOverflow(sheet) {
     return content.some((child) => {
       const rect = child.getBoundingClientRect();
       const isDecimalGrid = child.matches('.decimal-vertical-grid, .decimal-longdiv-grid, .decimal-natural-step');
-      const scrollOverflow = !isDecimalGrid && (child.scrollWidth > child.clientWidth + 1 || child.scrollHeight > child.clientHeight + 1);
+      // 글자 크기 1.2배처럼 소수 픽셀이 생기면 scroll/client 높이가 반올림 때문에 2px 까지 어긋난다.
+      // (예전에는 이 오차로 '크게'에서 세로셈 학습지가 1문항만 나왔음)
+      const scrollOverflow = !isDecimalGrid && (child.scrollWidth > child.clientWidth + 2 || child.scrollHeight > child.clientHeight + 2);
       const outsideItem = (
         rect.left < itemRect.left - 1 ||
         rect.right > itemRect.right + 1 ||
@@ -323,32 +497,58 @@ function getColumnAttempts(item, count, fontScale = 1) {
   return attempts;
 }
 
-function createFittedSheet(item, desiredCount, fontScale, updateCache = false, generatorContext = {}) {
+/* ── 문제 수 맞추기 ──
+   문제마다 길이가 무작위라, 한 번만 재면 쪽마다·생성할 때마다 문항 수가 달라졌다 (2026-11-19 정비).
+   1) 기준 문항 수: 여러 번 재서 가장 작은 값 (FIT_TRIALS) → 학습지·글자 크기·난이도별로 캐시
+   2) 쪽마다 그 수로 맞을 때까지 문제만 다시 뽑기 (PAGE_RETRIES)
+   3) 그래도 다른 쪽이 생기면 가장 작은 수로 모든 쪽을 맞춤
+   4) layout.countMultiple (반반 섞기 등) 이 있으면 그 배수로 */
+const FIT_TRIALS = 4;
+const PAGE_RETRIES = 6;
+
+function roundToCountMultiple(item, count) {
+  const multiple = getCountMultiple(item);
+  if (multiple <= 1 || count < multiple) return count;
+  return count - (count % multiple);
+}
+
+function prepareMeasureHost(fontScale) {
   const host = getMeasureHost();
   host.style.setProperty('--font-scale', fontScale);
   host.style.setProperty('--pdf-scale', fontScale);
-  const hardLimit = getWorksheetLimit(item, fontScale);
-  const start = Math.min(hardLimit, Math.max(1, desiredCount || hardLimit));
+  return host;
+}
 
-  for (let count = start; count >= 1; count--) {
+function tryCreateAtCount(item, count, fontScale, generatorContext, retries = 1) {
+  const host = prepareMeasureHost(fontScale);
+  for (let attempt = 0; attempt < retries; attempt++) {
     for (const options of getColumnAttempts(item, count, fontScale)) {
       const sheet = createSheet(item, count, fontScale, {
         ...(options || {}),
         generatorContext,
       });
       host.appendChild(sheet);
-      const fits = sheetFits(sheet);
-      if (fits) {
-        if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale, generatorContext), count);
-        return { sheet, count };
-      }
+      if (sheetFits(sheet)) return sheet;
       sheet.remove();
     }
   }
+  return null;
+}
 
+function createFittedSheet(item, desiredCount, fontScale, generatorContext = {}) {
+  const hardLimit = getWorksheetLimit(item, fontScale);
+  const start = Math.min(hardLimit, Math.max(1, desiredCount || hardLimit));
+  const multiple = getCountMultiple(item);
+
+  for (let count = start; count >= 1; count--) {
+    if (multiple > 1 && count >= multiple && count % multiple !== 0) continue;
+    const sheet = tryCreateAtCount(item, count, fontScale, generatorContext, 1);
+    if (sheet) return { sheet, count };
+  }
+
+  const host = prepareMeasureHost(fontScale);
   const fallback = createSheet(item, 1, fontScale, { generatorContext });
   host.appendChild(fallback);
-  if (updateCache) fitCountCache.set(getFitCacheKey(item, fontScale, generatorContext), 1);
   return { sheet: fallback, count: 1 };
 }
 
@@ -358,9 +558,15 @@ function getSafeWorksheetLimit(item, fontScale, generatorContext = {}) {
   const key = getFitCacheKey(item, fontScale, generatorContext);
   if (fitCountCache.has(key)) return fitCountCache.get(key);
 
-  const hardLimit = getWorksheetLimit(item, fontScale);
-  const { sheet, count } = createFittedSheet(item, hardLimit, fontScale, true, generatorContext);
-  sheet.remove();
+  let count = getWorksheetLimit(item, fontScale);
+  for (let trial = 0; trial < FIT_TRIALS; trial++) {
+    const fitted = createFittedSheet(item, count, fontScale, generatorContext);
+    fitted.sheet.remove();
+    count = fitted.count;
+    if (count <= 1) break;
+  }
+  count = roundToCountMultiple(item, count);
+  fitCountCache.set(key, count);
   return count;
 }
 
@@ -385,7 +591,10 @@ function generate(mode) {
   if (item.kind === 'diagnostic') {
     const totalCount = getWorksheetLimit(item);
     for (let i = 0; i < pageCount; i++) {
-      createDiagnosticSheets(item, fontScale).forEach((sheet) => container.appendChild(sheet));
+      createDiagnosticSheets(item, fontScale).forEach((sheet) => {
+        container.appendChild(sheet);
+        fitLevelDiagnosticBlocks(sheet);
+      });
     }
     problemCountInput.value = '';
     problemCountInput.dataset.max = totalCount;
@@ -395,25 +604,45 @@ function generate(mode) {
 
   const maxCount = getSafeWorksheetLimit(item, fontScale, generatorContext);
   const hasCustomCount = customCount > 0;
-  const desiredCount = hasCustomCount ? Math.min(getWorksheetLimit(item, fontScale), customCount) : maxCount;
-  let fittedCount = maxCount;
+  const desiredCount = roundToCountMultiple(
+    item,
+    hasCustomCount ? Math.min(getWorksheetLimit(item, fontScale), customCount) : maxCount,
+  );
+
+  const pages = [];
   for (let i = 0; i < pageCount; i++) {
-    const fitted = createFittedSheet(
-      item,
-      desiredCount,
-      fontScale,
-      !hasCustomCount || customCount > maxCount,
-      generatorContext,
-    );
-    fittedCount = Math.min(fittedCount, fitted.count);
-    container.appendChild(fitted.sheet);
+    const sheet = tryCreateAtCount(item, desiredCount, fontScale, generatorContext, PAGE_RETRIES);
+    if (sheet) pages.push({ sheet, count: desiredCount });
+    else pages.push(createFittedSheet(item, Math.max(1, desiredCount - 1), fontScale, generatorContext));
   }
+
+  // 쪽마다 문항 수가 같도록: 더 많은 쪽은 가장 작은 수로 다시 만든다.
+  const fittedCount = Math.min(...pages.map((p) => p.count));
+  pages.forEach((page, index) => {
+    if (page.count === fittedCount) return;
+    const redo = tryCreateAtCount(item, fittedCount, fontScale, generatorContext, PAGE_RETRIES);
+    if (!redo) return;
+    page.sheet.remove();
+    pages[index] = { sheet: redo, count: fittedCount };
+  });
+  pages.forEach((page) => container.appendChild(page.sheet));
 
   if (!customCount || customCount > fittedCount) {
     problemCountInput.value = customCount > fittedCount ? fittedCount : '';
     problemCountInput.dataset.max = fittedCount;
     problemCountInput.placeholder = fittedCount;
   }
+}
+
+/* 수준 진단지: 2열로 넘치는 블록(대분수 답·개념 문제 등)은 1열 4줄로 바꾼다. */
+function fitLevelDiagnosticBlocks(sheet) {
+  if (!sheet.classList.contains('level-diagnostic-sheet')) return;
+  sheet.querySelectorAll('.diagnostic-problems').forEach((grid) => {
+    const overflow = Array.from(grid.querySelectorAll('.diagnostic-problem')).some((p) => (
+      p.scrollWidth > p.clientWidth + 1
+    ));
+    if (overflow) grid.classList.add('single-col');
+  });
 }
 
 function toggleAnswers() {
@@ -428,10 +657,12 @@ document.getElementById('gradeSelect').addEventListener('change', (event) => {
   populateUnitSelect(gradeId);
   const firstUnitId = Object.keys(getUnitsOfGrade(gradeId))[0];
   populateWorksheetSelect(gradeId, firstUnitId);
+  syncHash();
 });
 
 document.getElementById('unitSelect').addEventListener('change', (event) => {
   populateWorksheetSelect(currentGradeId(), event.target.value);
+  syncHash();
 });
 
 document.getElementById('sectionFilter').addEventListener('click', (event) => {
@@ -442,14 +673,25 @@ document.getElementById('sectionFilter').addEventListener('click', (event) => {
   if (!SECTION_FILTERS.includes(nextFilter)) return;
   selectedSectionFilter = nextFilter;
   populateWorksheetSelect(currentGradeId(), getCurrentUnitId());
+  syncHash();
   generate('replace');
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {
   const item = catalogMap[document.getElementById('worksheetSelect').value];
-  applyWorksheetDefaultFontScale(item);
-  updateAllStageControls(item);
-  updateSelectedMeta();
+  applyWorksheetDefaults(item);
+  syncHash();
+});
+
+document.getElementById('jumpButton').addEventListener('click', () => jumpTo(0));
+document.getElementById('jumpSelect').addEventListener('change', (event) => {
+  if (event.target.value === '') return;
+  jumpTo(Number(event.target.value));
+});
+
+window.addEventListener('popstate', () => {
+  const action = parseHash();
+  if (action) navigateTo(action, { push: false });
 });
 
 document.getElementById('problemCount').addEventListener('input', sanitizeProblemCountInput);
@@ -527,7 +769,12 @@ window.toggleAnswers = toggleAnswers;
 /* ── 초기화 ── */
 
 populateGradeSelect();
-populateUnitSelect(DEFAULT_GRADE_ID);
-const firstUnitId = Object.keys(getUnitsOfGrade(DEFAULT_GRADE_ID))[0];
-populateWorksheetSelect(DEFAULT_GRADE_ID, firstUnitId);
-generate('replace');
+const initialAction = parseHash();
+if (initialAction) {
+  navigateTo(initialAction, { push: false });
+} else {
+  populateUnitSelect(DEFAULT_GRADE_ID);
+  const firstUnitId = Object.keys(getUnitsOfGrade(DEFAULT_GRADE_ID))[0];
+  populateWorksheetSelect(DEFAULT_GRADE_ID, firstUnitId);
+  generate('replace');
+}

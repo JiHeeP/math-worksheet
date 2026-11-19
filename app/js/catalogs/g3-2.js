@@ -53,7 +53,7 @@ export function mul2d2dPrincipleSheets(idPrefix) {
     학습지('곱셈 원리 ② 넓이 그림으로 알아보기', T.mul2d2dArea, genG32U1Mul2d2dPrinciple, id('area')),
     학습지('곱셈 원리 ③ 자릿값으로 갈라서 계산하기', T.mul2d2dSplit, genG32U1Mul2d2dPrinciple, id('split')),
     학습지('곱셈 원리 ④ 세로셈 — 두 줄로 나누어 쓰기', T.mul2d2dVertical, genG32U1Mul2d2dPrinciple, id('vertical')),
-    학습지('곱셈 원리 ⑤ 틀린 풀이 고치기', T.mul2d2dErrorFix, genG32U1Mul2d2dErrorFix, id('error_fix')),
+    학습지('곱셈 원리 ⑤ 틀린 풀이 고치기', T.mul2d2dErrorFix, genG32U1Mul2d2dErrorFix, { ...id('error_fix'), layout: { countMultiple: 2 } }),
     학습지('곱셈 원리 ⑥ 문장으로 설명하기 (빈칸 채우기)', T.mul2d2dSentence, genG32U1Mul2d2dPrinciple, id('sentence')),
   ];
 }
@@ -66,7 +66,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
     학습지('(세 자리 수) × (한 자리 수) (올림 여러 번)', genG32U1Mul3d1dCarryMany, { id: 'u1_main_mul_3d1d_cn' }),
   ]),
   차시('(몇십) × (몇십), (몇) × (몇십몇)', { grid: 'standard', count: 20 }, [
-    학습지('(몇십) × (몇십), (몇십몇) × (몇십)', genG32U1MulTensTens, { id: 'u1_main_mul_tens_tens' }),
+    학습지('(몇십) × (몇십), (몇십몇) × (몇십)', genG32U1MulTensTens, { id: 'u1_main_mul_tens_tens', layout: { countMultiple: 2 } }),
     학습지('(몇) × (몇십몇)', genG32U1MulOnesTensOnes, { id: 'u1_main_mul_ones_2d' }),
   ]),
   // [4수01-08] 어림셈
@@ -83,7 +83,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '곱셈', [
 const u3 = defineUnit(GRADE_ID, 'u3', '나눗셈', [
   // [4수01-06] 내림 있음·없음, 나머지 있음·없음 단계별 (소단원 순서: 2022 개정 3-2 나눗셈)
   차시('(몇십) ÷ (몇)', { kind: 'pdf', grid: 'standard', count: 12 }, [
-    학습지('(몇십) ÷ (몇) (내림 없음·있음)', genG32U3DivTens, { id: 'u3_main_div_tens' }),
+    학습지('(몇십) ÷ (몇) (내림 없음·있음)', genG32U3DivTens, { id: 'u3_main_div_tens', layout: { countMultiple: 2 } }),
   ]),
   차시('(몇십몇) ÷ (몇), 내림·나머지 단계별', { kind: 'pdf', grid: 'standard', count: 12 }, [
     학습지('(몇십몇) ÷ (몇) (내림 없음, 나머지 없음)', genG32U3Div2d1dNoBringNoRem, { id: 'u3_main_div_2d1d_nb' }),

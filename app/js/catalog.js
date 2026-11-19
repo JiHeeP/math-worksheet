@@ -55,6 +55,29 @@ export function 진단지(overrides = {}) {
 }
 
 /**
+ * 수준 진단지 그룹 (2026-11-19)
+ *
+ * 같은 단원에서 `level` 이 지정된 학습지를 모아 수준별 블록(4문항씩)으로 만든다.
+ *   level 0 = 선수학습 · 1 = 기초 · 2 = 표준
+ * 정답 보기를 켜면 판정표(통과 기준·미통과 시 학습지)와 번호별 기록표가 함께 나온다.
+ */
+export function 수준진단지(overrides = {}) {
+  const { label = '수준 진단지', ...opts } = overrides;
+  return {
+    section: '진단지',
+    lessonRef: '수준 진단',
+    defaults: { kind: 'diagnostic', grid: 'diagnostic', count: 0, defaultFontScale: 0.8 },
+    items: [
+      학습지(label, null, {
+        ...opts,
+        kind: 'diagnostic',
+        diagnosticFrom: 'level',
+      }),
+    ],
+  };
+}
+
+/**
  * 차시(본단원) 그룹
  */
 export function 차시(lessonRef, ...args) {
@@ -179,6 +202,21 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         level,
       });
     }
+  }
+
+  for (const entry of entries) {
+    if (entry.kind !== 'diagnostic' || entry.diagnosticFrom !== 'level' || entry.sourceIds) continue;
+    const sources = entries
+      .filter((candidate) => (
+        candidate.unit === entry.unit &&
+        candidate.kind !== 'diagnostic' &&
+        candidate.level !== null && candidate.level !== undefined
+      ))
+      .map((candidate, order) => ({ candidate, order }))
+      .sort((a, b) => (a.candidate.level - b.candidate.level) || (a.order - b.order))
+      .map(({ candidate }) => candidate);
+    entry.sourceIds = sources.map((source) => source.id);
+    entry.count = entry.sourceIds.length * 4;
   }
 
   for (const entry of entries) {

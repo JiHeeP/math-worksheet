@@ -8,7 +8,7 @@
  * 가져와 defineUnit 으로 묶어주면 됩니다.
  */
 
-import { defineUnit, 진단지, 선수학습, 차시, 학습지, ext, unitRef, sheetRef } from '../catalog.js';
+import { defineUnit, 진단지, 수준진단지, 선수학습, 차시, 학습지, ext, unitRef, sheetRef } from '../catalog.js';
 import { T } from '../templates.js';
 
 import {
@@ -64,6 +64,7 @@ const GRADE_ID = 'g5-1';
 
 const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
   진단지({ id: 'u1_pre_diagnostic' }),
+  수준진단지({ id: 'u1_level_diagnostic' }),
   선수학습({ kind: 'pdf', grid: 'standard', count: 20 }, [
     학습지('두 자리 수 덧셈', genU1PreAdd2d, { id: 'u1_pre_add_2d', source: sheetRef('g2-1', 'u3_main_add_2d_vertical'), from: 'g2-1' }),
     학습지('두 자리 수 뺄셈', genU1PreSub2d, { id: 'u1_pre_sub_2d', source: sheetRef('g2-1', 'u3_main_sub_2d_vertical'), from: 'g2-1' }),
@@ -71,17 +72,17 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
     학습지('두 자리 수 ÷ 한 자리 수 (세로셈)', genU1PreDiv2d1d, { id: 'u1_pre_div_2d1d', source: sheetRef('g3-2', 'u3_main_div_2d1d'), kind: 'html', count: 12, from: 'g3-2' }),
     학습지('두 자리 수 ÷ 한 자리 수 (나머지 없음)', genU1PreDiv2d1dNoRem, { id: 'u1_pre_div_2d1d_norem', source: sheetRef('g3-2', 'u3_main_div_norem'), count: 12, from: 'g3-2' }),
     학습지('두 자리 수 ÷ 한 자리 수 (나머지 있음)', genU1PreDiv2d1dRem, { id: 'u1_pre_div_2d1d_rem', source: sheetRef('g3-2', 'u3_main_div_rem'), count: 12, from: 'g3-2' }),
-    학습지('세 자리 수 덧셈', genU1PreAdd, { id: 'u1_pre_add', source: sheetRef('g3-1', 'u1_main_add_3d'), count: 15, from: 'g3-1' }),
-    학습지('세 자리 수 뺄셈', genU1PreSub, { id: 'u1_pre_sub', source: sheetRef('g3-1', 'u1_main_sub_3d'), count: 15, from: 'g3-1' }),
-    학습지('두 자리 수 × 두 자리 수 (세로셈)', genU1PreMul, { id: 'u1_pre_mul', source: sheetRef('g3-2', 'u1_main_mul_2d2d'), count: 12, from: 'g3-2' }),
+    학습지('세 자리 수 덧셈', genU1PreAdd, { id: 'u1_pre_add', level: 0, source: sheetRef('g3-1', 'u1_main_add_3d'), count: 15, from: 'g3-1' }),
+    학습지('세 자리 수 뺄셈', genU1PreSub, { id: 'u1_pre_sub', level: 0, source: sheetRef('g3-1', 'u1_main_sub_3d'), count: 15, from: 'g3-1' }),
+    학습지('두 자리 수 × 두 자리 수 (세로셈)', genU1PreMul, { id: 'u1_pre_mul', level: 0, source: sheetRef('g3-2', 'u1_main_mul_2d2d'), count: 12, from: 'g3-2' }),
     학습지('세 자리 수 × 두 자리 수 (세로셈)', genU1PreMul3x2, { id: 'u1_pre_mul_3x2', source: sheetRef('g4-1', 'u3_main_mul_3d2d'), count: 12, from: 'g4-1' }),
-    학습지('두 자리 수 나눗셈 (가로셈)', genU1PreDiv, { id: 'u1_pre_div', source: sheetRef('g4-1', 'u3_main_div_2d_horiz'), kind: 'html', from: 'g4-1' }),
+    학습지('두 자리 수 나눗셈 (가로셈)', genU1PreDiv, { id: 'u1_pre_div', level: 0, source: sheetRef('g4-1', 'u3_main_div_2d_horiz'), kind: 'html', from: 'g4-1' }),
     학습지('세 자리 수 ÷ 두 자리 수 (세로셈)', genDiv3d2, { id: 'u1_pre_div_3d2', source: sheetRef('g4-1', 'u3_main_div_3d2d'), grid: 'divgrid', count: 9, from: 'g4-1' }),
     학습지('세 자리 수 ÷ 한 자리 수 (세로셈)', genDiv3d1, { id: 'u1_pre_div_3d1', source: sheetRef('g3-2', 'u3_main_div_3d1'), grid: 'divgrid', count: 9, from: 'g3-2' }),
   ]),
   차시('1차시 덧셈과 뺄셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('덧셈·뺄셈 혼합(순서)', genU1MainAddSubOrder, {
-      id: 'u1_main_addsub_order',
+      id: 'u1_main_addsub_order', level: 1,
       prereqs: [unitRef('g3-1', 'u1')],
       controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
@@ -98,7 +99,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
   ]),
   차시('2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('곱셈·나눗셈 혼합(순서)', genU1MainMulDivOrder, {
-      id: 'u1_main_muldiv_order',
+      id: 'u1_main_muldiv_order', level: 1,
       prereqs: [unitRef('g3-2', 'u1'), unitRef('g3-2', 'u3')],
       controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
@@ -121,7 +122,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
       prereqs: [sheetRef('u1_main_addsubmul_order')],
     }),
     학습지('덧셈·뺄셈·곱셈 혼합(괄호, 순서)', genU1MainAddSubMul, {
-      id: 'u1_main_addsubmul', layout: 'threePlusHoriz',
+      id: 'u1_main_addsubmul', level: 2, layout: 'threePlusHoriz',
       prereqs: [sheetRef('u1_main_addsubmul_paren')],
     }),
   ]),
@@ -151,7 +152,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
       controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('사칙 혼합(괄호, 순서)', genU1MainMix, {
-      id: 'u1_main_mix', layout: 'threePlusHoriz',
+      id: 'u1_main_mix', level: 2, layout: 'threePlusHoriz',
       prereqs: [sheetRef('u1_main_mix_paren')],
       controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
@@ -160,19 +161,20 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
 
 const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   진단지({ id: 'u2_pre_diagnostic' }),
+  수준진단지({ id: 'u2_level_diagnostic' }),
   선수학습({ grid: 'dense', count: 36 }, [
-    학습지('곱셈구구', genU2PreMul, { id: 'u2_pre_mul', source: sheetRef('g2-2', 'u2_main_gugudan_basic'), from: 'g2-2', controls: { gugudanDan: true } }),
-    학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u2_pre_div', source: sheetRef('g3-1', 'u3_main_div_one_digit'), from: 'g3-1' }),
+    학습지('곱셈구구', genU2PreMul, { id: 'u2_pre_mul', level: 0, source: sheetRef('g2-2', 'u2_main_gugudan_basic'), from: 'g2-2', controls: { gugudanDan: true } }),
+    학습지('나눗셈 (한 자리 나누기)', genU2PreDiv, { id: 'u2_pre_div', level: 0, source: sheetRef('g3-1', 'u3_main_div_one_digit'), from: 'g3-1' }),
   ]),
   차시('1차시 약수 이해하기', [
     학습지('약수 이해', genU2MainFactorConcept, {
-      id: 'u2_main_factor', grid: 'concept', count: 10,
+      id: 'u2_main_factor', level: 1, grid: 'concept', count: 10,
       prereqs: [unitRef('g2-2', 'u2'), unitRef('g3-2', 'u3')],
     }),
   ]),
   차시('2차시 배수 이해하기', [
     학습지('배수 이해', genU2MainMultipleConcept, {
-      id: 'u2_main_multiple', grid: 'concept', count: 10,
+      id: 'u2_main_multiple', level: 1, grid: 'concept', count: 10,
       prereqs: [unitRef('g2-2', 'u2')],
     }),
   ]),
@@ -184,7 +186,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   ]),
   차시('4차시 두 수의 최대공약수 구하기', [
     학습지('최대공약수', T.divMethod, genU2MainGcdData, {
-      id: 'u2_main_gcd', count: 6,
+      id: 'u2_main_gcd', level: 2, count: 6,
       prereqs: [sheetRef('u2_main_common_factor')],
     }),
   ]),
@@ -196,35 +198,37 @@ const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   ]),
   차시('6차시 두 수의 최소공배수 구하기', [
     학습지('최소공배수', T.divMethod, genU2MainLcmData, {
-      id: 'u2_main_lcm', count: 6,
+      id: 'u2_main_lcm', level: 2, count: 6,
       prereqs: [sheetRef('u2_main_common_multiple')],
     }),
   ]),
 ]);
 
 const u3 = defineUnit(GRADE_ID, 'u3', '규칙과 대응', [
+  수준진단지({ id: 'u3_level_diagnostic' }),
   차시('1차시 두 양 사이의 관계 알아보기(1)', [
-    학습지('두 양 사이의 관계 찾기 (1)', genU3MainRelationFind1, { id: 'u3_main_relation_find1', grid: 'concept', count: 10 }),
+    학습지('두 양 사이의 관계 찾기 (1)', genU3MainRelationFind1, { id: 'u3_main_relation_find1', level: 1, grid: 'concept', count: 10 }),
   ]),
   차시('2차시 두 양 사이의 관계 알아보기(2)', [
     학습지('두 양 사이의 관계 찾기 (2)', genU3MainRelationFind2, { id: 'u3_main_relation_find2', grid: 'concept', count: 10 }),
   ]),
   차시('3차시 대응 관계를 식으로 나타내기', [
-    학습지('대응 관계 표 완성', genU3MainRelationTable, { id: 'u3_main_relation_table', grid: 'concept', count: 10 }),
+    학습지('대응 관계 표 완성', genU3MainRelationTable, { id: 'u3_main_relation_table', level: 1, grid: 'concept', count: 10 }),
   ]),
   차시('4차시 실생활에서 대응 관계를 찾아 식으로 나타내기', [
-    학습지('대응 관계 식 쓰기', genU3MainRelationFormula, { id: 'u3_main_relation_formula', grid: 'concept', count: 10 }),
+    학습지('대응 관계 식 쓰기', genU3MainRelationFormula, { id: 'u3_main_relation_formula', level: 2, grid: 'concept', count: 10 }),
   ]),
   차시('1~4차시 대응 관계 복습', [
-    학습지('실생활 대응 관계', genU3MainRelationReal, { id: 'u3_main_relation_real', grid: 'concept', count: 10 }),
+    학습지('실생활 대응 관계', genU3MainRelationReal, { id: 'u3_main_relation_real', level: 2, grid: 'concept', count: 10 }),
   ]),
 ]);
 
 const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   진단지({ id: 'u4_pre_diagnostic' }),
+  수준진단지({ id: 'u4_level_diagnostic' }),
   선수학습({ grid: 'practice', count: 15, from: 'g3-2' }, [
-    학습지('분모 같은 분수 크기 비교', genU4PreCmp, { id: 'u4_pre_cmp', source: sheetRef('g3-2', 'u5_main_frac_cmp') }),
-    학습지('가분수 → 대분수 변환', genU4PreConv, { id: 'u4_pre_conv', source: sheetRef('g3-2', 'u5_main_improper_to_mixed') }),
+    학습지('분모 같은 분수 크기 비교', genU4PreCmp, { id: 'u4_pre_cmp', level: 0, source: sheetRef('g3-2', 'u5_main_frac_cmp') }),
+    학습지('가분수 → 대분수 변환', genU4PreConv, { id: 'u4_pre_conv', level: 0, source: sheetRef('g3-2', 'u5_main_improper_to_mixed') }),
   ]),
   차시('1차시 크기가 같은 분수 알아보기', { grid: 'practice', count: 15 }, [
     학습지('크기가 같은 분수 찾기', genU4MainEquivFind, {
@@ -234,7 +238,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   ]),
   차시('2차시 크기가 같은 분수를 만드는 방법 알아보기', { grid: 'practice', count: 15 }, [
     학습지('크기가 같은 분수 만들기', genU4MainEquivMake, {
-      id: 'u4_main_equiv_make',
+      id: 'u4_main_equiv_make', level: 1,
       prereqs: [sheetRef('u4_main_equiv_find')],
     }),
   ]),
@@ -244,7 +248,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
       prereqs: [sheetRef('u4_main_equiv_make'), unitRef('u2')],
     }),
     학습지('약분', genU4MainRed, {
-      id: 'u4_main_red', grid: 'practice', count: 15,
+      id: 'u4_main_red', level: 1, grid: 'practice', count: 15,
       prereqs: [sheetRef('u4_main_red_process')],
     }),
   ]),
@@ -254,7 +258,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
       prereqs: [sheetRef('u4_main_red'), unitRef('u2')],
     }),
     학습지('통분', genU4MainLcd, {
-      id: 'u4_main_lcd', grid: 'practice', count: 15,
+      id: 'u4_main_lcd', level: 2, grid: 'practice', count: 15,
       prereqs: [sheetRef('u4_main_lcd_process')],
     }),
   ]),
@@ -274,17 +278,18 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
 
 const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
   진단지({ id: 'u5_pre_diagnostic' }),
+  수준진단지({ id: 'u5_level_diagnostic' }),
   선수학습({ grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 같은 분수의 덧셈', genU5PreAdd, { id: 'u5_pre_add', source: sheetRef('g4-2', 'u1_main_add'), from: 'g4-2' }),
-    학습지('분모 같은 분수의 덧셈 (합이 1 이상)', genU5PreAddGe1, { id: 'u5_pre_add_ge1', source: sheetRef('g4-2', 'u1_main_add_ge1'), from: 'g4-2' }),
-    학습지('분모 같은 분수의 뺄셈', genU5PreSub, { id: 'u5_pre_sub', source: sheetRef('g4-2', 'u1_main_sub'), from: 'g4-2' }),
+    학습지('분모 같은 분수의 덧셈 (합이 1 이상)', genU5PreAddGe1, { id: 'u5_pre_add_ge1', level: 0, source: sheetRef('g4-2', 'u1_main_add_ge1'), from: 'g4-2' }),
+    학습지('분모 같은 분수의 뺄셈', genU5PreSub, { id: 'u5_pre_sub', level: 0, source: sheetRef('g4-2', 'u1_main_sub'), from: 'g4-2' }),
     학습지('대분수 − 분수 (분모 같은)', genU5PreMixedSub, { id: 'u5_pre_mixed_sub', source: sheetRef('g4-2', 'u1_main_mixed_sub_frac'), from: 'g4-2' }),
     학습지('대분수 → 가분수 (과정 연습)', genU5PreMixedToImproperProcess, { id: 'u5_pre_mixed_to_improper_process', source: sheetRef('g3-2', 'u5_main_mixed_to_improper_process'), grid: 'concept', count: 8, from: 'g3-2' }),
-    학습지('대분수 → 가분수', genU5PreMixedToImproper, { id: 'u5_pre_mixed_to_improper', source: sheetRef('g3-2', 'u5_main_mixed_to_improper'), from: 'g3-2' }),
+    학습지('대분수 → 가분수', genU5PreMixedToImproper, { id: 'u5_pre_mixed_to_improper', level: 0, source: sheetRef('g3-2', 'u5_main_mixed_to_improper'), from: 'g3-2' }),
   ]),
   차시('1~2차시 (진분수)+(진분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 다른 진분수의 덧셈 (합이 1 미만)', T.fracLcdStep, genFracAddLt1, {
-      id: 'u5_main_add', layout: 'oneCol',
+      id: 'u5_main_add', level: 1, layout: 'oneCol',
       prereqs: [unitRef('u4'), unitRef('g4-2', 'u1')],
     }),
     학습지('분모 다른 진분수의 덧셈 (합이 1 이상)', T.fracLcdStep, genFracAddGe1, {
@@ -306,13 +311,13 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
       prereqs: [sheetRef('u5_main_mixed_add_improper')],
     }),
     학습지('받아올림 대분수 덧셈 (자연수·분수 따로)', T.mixedSeparateStep, genMixedAddCarry, {
-      id: 'u5_main_mixed_add_carry_separate', layout: 'mixedSeparate',
+      id: 'u5_main_mixed_add_carry_separate', level: 2, layout: 'mixedSeparate',
       prereqs: [sheetRef('u5_main_mixed_add_separate')],
     }),
   ]),
   차시('4차시 (진분수)-(진분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분모 다른 진분수의 뺄셈', T.fracLcdStep, genFracSub, {
-      id: 'u5_main_sub', layout: 'oneCol',
+      id: 'u5_main_sub', level: 1, layout: 'oneCol',
       prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1')],
     }),
   ]),
@@ -332,7 +337,7 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
       prereqs: [sheetRef('u5_main_mixed_sub_no_borrow_improper')],
     }),
     학습지('대분수 뺄셈 - 받아내림 있음 (자연수·분수 따로)', T.mixedSeparateStep, genMixedSubBorrow, {
-      id: 'u5_main_mixed_sub_borrow_separate', layout: 'mixedSeparate',
+      id: 'u5_main_mixed_sub_borrow_separate', level: 2, layout: 'mixedSeparate',
       prereqs: [sheetRef('u5_main_mixed_sub_no_borrow_separate')],
     }),
   ]),
@@ -340,13 +345,14 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
 
 const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
   진단지({ id: 'u6_pre_diagnostic' }),
+  수준진단지({ id: 'u6_level_diagnostic' }),
   선수학습({ grid: 'standard', count: 20, from: 'g3-1' }, [
-    학습지('단위 변환 (cm, m, km)', genU6PreUnit, { id: 'u6_pre_unit', source: sheetRef('g3-1', 'u5_main_unit_convert') }),
-    학습지('길이의 합과 차', genU6PreLen, { id: 'u6_pre_len', source: sheetRef('g3-1', 'u5_main_len_sum_diff') }),
+    학습지('단위 변환 (cm, m, km)', genU6PreUnit, { id: 'u6_pre_unit', level: 0, source: sheetRef('g3-1', 'u5_main_unit_convert') }),
+    학습지('길이의 합과 차', genU6PreLen, { id: 'u6_pre_len', level: 0, source: sheetRef('g3-1', 'u5_main_len_sum_diff') }),
   ]),
   차시('1차시 다각형의 둘레 구하기', [
     학습지('다각형의 둘레', genU6MainPerimeter, {
-      id: 'u6_main_perimeter', grid: 'wide', count: 8,
+      id: 'u6_main_perimeter', level: 1, grid: 'wide', count: 8,
       prereqs: [ext('[4-2] 다각형')],
     }),
   ]),
@@ -358,7 +364,7 @@ const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
   ]),
   차시('3차시 직사각형의 넓이 구하기', [
     학습지('직사각형 넓이', genU6MainRect, {
-      id: 'u6_main_rect', grid: 'wide', count: 8,
+      id: 'u6_main_rect', level: 1, grid: 'wide', count: 8,
       prereqs: [sheetRef('u6_main_unit_square')],
     }),
   ]),
@@ -370,13 +376,13 @@ const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
   ]),
   차시('5차시 평행사변형의 넓이 구하기', [
     학습지('평행사변형 넓이', genU6MainPara, {
-      id: 'u6_main_para', grid: 'wide', count: 8,
+      id: 'u6_main_para', level: 2, grid: 'wide', count: 8,
       prereqs: [sheetRef('u6_main_rect'), ext('[4-2] 사각형')],
     }),
   ]),
   차시('6~7차시 삼각형의 넓이 구하기', [
     학습지('삼각형 넓이', genU6MainTri, {
-      id: 'u6_main_tri', grid: 'wide', count: 8,
+      id: 'u6_main_tri', level: 2, grid: 'wide', count: 8,
       prereqs: [sheetRef('u6_main_para'), ext('[4-2] 삼각형')],
     }),
   ]),

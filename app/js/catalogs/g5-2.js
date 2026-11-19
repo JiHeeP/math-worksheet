@@ -304,13 +304,13 @@ const REVIEW_FRAC_CONTROLS = { controls: { fractionDifficulty: { stages: [1, 2, 
 
 const reviewSame = defineUnit(GRADE_ID, REVIEW_UNIT_ID, '분수 총연습', [
   차시('분모가 같은 분수의 덧셈', REVIEW_FRAC_CONTROLS, [
-    학습지('분모 같은 분수의 덧셈: 진분수끼리 (합이 1 이상·미만 섞기)', T.sameFracMixed, genG52ReviewSameAdd13, { id: 'frac_review_same_add_13' }),
-    학습지('분모 같은 분수의 덧셈: 대분수끼리 (받아올림 있음·없음 섞기)', T.sameFracMixed, genG52ReviewSameAdd24, { id: 'frac_review_same_add_24', layout: { preset: 'oneColRows', rows: 6 } }),
+    학습지('분모 같은 분수의 덧셈: 진분수끼리 (합이 1 이상·미만 섞기)', T.sameFracMixed, genG52ReviewSameAdd13, { id: 'frac_review_same_add_13', layout: { countMultiple: 2 } }),
+    학습지('분모 같은 분수의 덧셈: 대분수끼리 (받아올림 있음·없음 섞기)', T.sameFracMixed, genG52ReviewSameAdd24, { id: 'frac_review_same_add_24', layout: { preset: 'oneColRows', rows: 6, countMultiple: 2 } }),
     학습지('분모 같은 분수의 덧셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameAddAll, { id: 'frac_review_same_add_all', layout: { preset: 'oneColRows', rows: 8 } }),
   ]),
   차시('분모가 같은 분수의 뺄셈', REVIEW_FRAC_CONTROLS, [
-    학습지('분모 같은 분수의 뺄셈: 받아내림 있음 ((자연수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub13, { id: 'frac_review_same_sub_13', layout: { preset: 'oneColRows', rows: 6 } }),
-    학습지('분모 같은 분수의 뺄셈: 받아내림 없음 ((진분수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub24, { id: 'frac_review_same_sub_24' }),
+    학습지('분모 같은 분수의 뺄셈: 받아내림 있음 ((자연수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub13, { id: 'frac_review_same_sub_13', layout: { preset: 'oneColRows', rows: 6, countMultiple: 2 } }),
+    학습지('분모 같은 분수의 뺄셈: 받아내림 없음 ((진분수)−(진분수), (대분수)−(대분수))', T.sameFracMixed, genG52ReviewSameSub24, { id: 'frac_review_same_sub_24', layout: { countMultiple: 2 } }),
     학습지('분모 같은 분수의 뺄셈: 모두 섞기', T.sameFracMixed, genG52ReviewSameSubAll, { id: 'frac_review_same_sub_all', layout: { preset: 'oneColRows', rows: 8 } }),
   ]),
 ]);
