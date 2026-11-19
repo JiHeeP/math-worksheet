@@ -199,7 +199,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
 const DECIMAL_MUL_GRID_LAYOUT = { grid: 'wide', count: 8 };
 const DECIMAL_MUL_FRAC_STEP_LAYOUT = { grid: 'wide', count: 6 };
 const DECIMAL_MUL_NATURAL_STEP_LAYOUT = { grid: 'wide', count: 6 };
-const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3')];
+const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3'), unitRef('g3-2', 'u1'), unitRef('g4-1', 'u3')];
 
 const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
   차시('1차시 (소수) × (자연수)', { grid: 'practice', count: 15 }, [

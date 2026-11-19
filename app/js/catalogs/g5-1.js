@@ -41,7 +41,7 @@ import {
   genU4MainEquivFind, genU4MainEquivMake,
   genU4MainRedProcess, genU4MainRed,
   genU4MainLcdProcess, genU4MainLcd,
-  genU4MainCmp, genU4MainDecCmp,
+  genU4MainCmp, genU4MainCmpCompact, genU4MainDecCmp,
 } from '../generators/g5-1/u4.js';
 
 import {
@@ -100,7 +100,7 @@ const u1 = defineUnit(GRADE_ID, 'u1', '자연수의 혼합계산', [
   차시('2차시 곱셈과 나눗셈이 섞여 있는 식 계산하기', { grid: 'standard', count: 20 }, [
     학습지('곱셈·나눗셈 혼합(순서)', genU1MainMulDivOrder, {
       id: 'u1_main_muldiv_order', level: 1,
-      prereqs: [unitRef('g3-2', 'u1'), unitRef('g3-2', 'u3')],
+      prereqs: [unitRef('g3-2', 'u1'), unitRef('g3-2', 'u3'), unitRef('g4-1', 'u3')],
       controls: { numberDifficulty: { stages: [1, 2, 3] } },
     }),
     학습지('곱셈·나눗셈 혼합(괄호)', genU1MainMulDivParen, {
@@ -169,7 +169,7 @@ const u2 = defineUnit(GRADE_ID, 'u2', '약수와 배수', [
   차시('1차시 약수 이해하기', [
     학습지('약수 이해', genU2MainFactorConcept, {
       id: 'u2_main_factor', level: 1, grid: 'concept', count: 10,
-      prereqs: [unitRef('g2-2', 'u2'), unitRef('g3-2', 'u3')],
+      prereqs: [unitRef('g2-2', 'u2'), unitRef('g3-1', 'u3'), unitRef('g3-2', 'u3')],
     }),
   ]),
   차시('2차시 배수 이해하기', [
@@ -264,7 +264,7 @@ const u4 = defineUnit(GRADE_ID, 'u4', '약분과 통분', [
   ]),
   차시('5차시 분수의 크기 비교하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('분수 크기 비교', genU4MainCmp, {
-      id: 'u4_main_cmp', grid: 'concept', count: 8,
+      id: 'u4_main_cmp', level: 2, diagnosticGenerator: genU4MainCmpCompact, grid: 'concept', count: 8,
       prereqs: [sheetRef('u4_main_lcd')],
     }),
   ]),
@@ -300,18 +300,18 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
   차시('3차시 (대분수)+(대분수) 계산하기', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('대분수 덧셈 (가분수 변환)', T.mixedImproperStep, genMixedAddNoCarry, {
       id: 'u5_main_mixed_add_improper', layout: 'oneCol',
-      prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1')],
+      prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1'), unitRef('g3-2', 'u5')],
     }),
     학습지('대분수 덧셈 (자연수·분수 따로)', T.mixedSeparateStep, genMixedAddNoCarry, {
       id: 'u5_main_mixed_add_separate', layout: 'mixedSeparate',
       prereqs: [sheetRef('u5_main_add'), unitRef('g4-2', 'u1')],
     }),
     학습지('받아올림 대분수 덧셈 (가분수 변환)', T.mixedImproperStep, genMixedAddCarry, {
-      id: 'u5_main_mixed_add_carry_improper', layout: 'oneCol',
+      id: 'u5_main_mixed_add_carry_improper', level: 2, layout: 'oneCol',
       prereqs: [sheetRef('u5_main_mixed_add_improper')],
     }),
     학습지('받아올림 대분수 덧셈 (자연수·분수 따로)', T.mixedSeparateStep, genMixedAddCarry, {
-      id: 'u5_main_mixed_add_carry_separate', level: 2, layout: 'mixedSeparate',
+      id: 'u5_main_mixed_add_carry_separate', layout: 'mixedSeparate',
       prereqs: [sheetRef('u5_main_mixed_add_separate')],
     }),
   ]),
@@ -333,11 +333,11 @@ const u5 = defineUnit(GRADE_ID, 'u5', '분수의 덧셈과 뺄셈', [
   ]),
   차시('6차시 (대분수)-(대분수) 계산하기(2)', { controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('대분수 뺄셈 - 받아내림 있음 (가분수 변환)', T.mixedImproperStep, genMixedSubBorrow, {
-      id: 'u5_main_mixed_sub_borrow_improper', layout: 'oneCol',
+      id: 'u5_main_mixed_sub_borrow_improper', level: 2, layout: 'oneCol',
       prereqs: [sheetRef('u5_main_mixed_sub_no_borrow_improper')],
     }),
     학습지('대분수 뺄셈 - 받아내림 있음 (자연수·분수 따로)', T.mixedSeparateStep, genMixedSubBorrow, {
-      id: 'u5_main_mixed_sub_borrow_separate', level: 2, layout: 'mixedSeparate',
+      id: 'u5_main_mixed_sub_borrow_separate', layout: 'mixedSeparate',
       prereqs: [sheetRef('u5_main_mixed_sub_no_borrow_separate')],
     }),
   ]),
@@ -388,13 +388,13 @@ const u6 = defineUnit(GRADE_ID, 'u6', '다각형의 둘레와 넓이', [
   ]),
   차시('8~9차시 사다리꼴의 넓이 구하기', [
     학습지('사다리꼴 넓이', genU6MainTrap, {
-      id: 'u6_main_trap', grid: 'wide', count: 8,
+      id: 'u6_main_trap', level: 2, grid: 'wide', count: 8,
       prereqs: [sheetRef('u6_main_para'), sheetRef('u6_main_tri')],
     }),
   ]),
   차시('10~11차시 마름모의 넓이 구하기', [
     학습지('마름모 넓이', genU6MainRhombus, {
-      id: 'u6_main_rhombus', grid: 'wide', count: 8,
+      id: 'u6_main_rhombus', level: 2, grid: 'wide', count: 8,
       prereqs: [sheetRef('u6_main_para')],
     }),
   ]),

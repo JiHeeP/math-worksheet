@@ -477,6 +477,7 @@ function renderDiagnosticProblem(problem, idx) {
 
 function generateDiagnosticProblem(source) {
   // 단계 풀이 템플릿은 진단지에서 '식 = □' 한 줄 꼴(compact)로 줄인다.
+  if (source.diagnosticGenerator) return generateWithUnique(source.diagnosticGenerator);
   const bound = source.generator;
   if (bound && bound._template && bound._template.compact && bound._generator) {
     return generateWithUnique((ctx, idx) => bound._template.compact(bound._generator(ctx || {}, idx)));
@@ -608,6 +609,26 @@ function buildJudgeSheet(item, ranges) {
   return sheet;
 }
 
+function levelBlockWeight(source) {
+  return source.grid === 'wide' ? 2 : 1;
+}
+
+// 왼쪽 단에 넣을 블록 수: 두 단의 무게 차가 가장 작은 곳 (같으면 왼쪽을 더 많이)
+function splitLevelColumns(sources) {
+  const weights = sources.map(levelBlockWeight);
+  const total = weights.reduce((a, b) => a + b, 0);
+  let best = Math.ceil(sources.length / 2);
+  let bestDiff = Infinity;
+  let left = 0;
+  for (let k = 0; k <= sources.length; k++) {
+    if (k > 0) left += weights[k - 1];
+    if (k > DIAGNOSTIC_SOURCES_PER_COLUMN || sources.length - k > DIAGNOSTIC_SOURCES_PER_COLUMN) continue;
+    const diff = Math.abs(total - 2 * left);
+    if (diff < bestDiff || (diff === bestDiff && k > best)) { best = k; bestDiff = diff; }
+  }
+  return best;
+}
+
 function createLevelDiagnosticSheets(item, fontScale = 1) {
   resetSheetContext();
   const sources = (item.sourceIds || []).map((id) => catalogMap[id]).filter(Boolean);
@@ -627,8 +648,8 @@ function createLevelDiagnosticSheets(item, fontScale = 1) {
 
     const columns = document.createElement('div');
     columns.className = 'diagnostic-columns';
-    // 블록을 두 단에 고르게 (예: 6개 → 3+3, 7개 → 4+3)
-    const perColumn = Math.min(DIAGNOSTIC_SOURCES_PER_COLUMN, Math.ceil(pageSources.length / 2));
+    // 블록을 두 단에 고르게 (예: 6개 → 3+3, 7개 → 4+3). 도형(wide) 블록은 2칸 무게로 센다.
+    const perColumn = splitLevelColumns(pageSources);
     [pageSources.slice(0, perColumn), pageSources.slice(perColumn)].forEach((colSources) => {
       const column = document.createElement('div');
       column.className = 'diagnostic-column';

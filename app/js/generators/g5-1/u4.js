@@ -93,6 +93,17 @@ export function genU4MainCmp(ctx = {}) {
   return htmlProblem('concept-layout', `<div class="concept-card"><div class="concept-answer">${fracD(n1, d1)} ${symBlank(n1 / d1 > n2 / d2 ? '>' : '<')} ${fracD(n2, d2)}</div><div class="lcd-process-row"><span class="lcd-label">통분</span>${fracD(n1, d1)} <span class="eq-txt">=</span> ${fracBlank(cn1, common)}<span class="op-txt">,</span>${fracD(n2, d2)} <span class="eq-txt">=</span> ${fracBlank(cn2, common)}</div></div>`);
 }
 
+// 진단지용: 통분 과정 없이 크기 비교 한 줄만 (분모 다른 두 진분수)
+export function genU4MainCmpCompact(ctx = {}) {
+  const { d1, d2 } = pickLcdPair(ctx);
+  let n1, n2, tries = 0;
+  do {
+    n1 = rand(1, d1 - 1); n2 = rand(1, d2 - 1);
+    tries++;
+  } while (n1 / d1 === n2 / d2 && tries < 30);
+  return htmlProblem('frac-row', `${fracD(n1, d1)} ${symBlank(n1 / d1 > n2 / d2 ? '>' : '<')} ${fracD(n2, d2)}`);
+}
+
 function decToFrac(dec) {
   const str = String(dec), dotIdx = str.indexOf('.');
   if (dotIdx === -1) return { n: Number(dec), d: 1 };

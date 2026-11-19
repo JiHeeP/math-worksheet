@@ -140,6 +140,7 @@ data-ans 속성 파싱 → 음의 부호 / 소수점 / "0" 단독 토큰 0건 �
 | `layout.countMultiple` | 문항 수를 이 배수로 (반반 섞기 = 2) | `layout: { countMultiple: 2 }` |
 | `source` | [선수학습] 복제본 → 원래 학년 원본 학습지. **선수학습 항목은 필수** (audit 4번) | `source: sheetRef('g2-1', 'u3_main_add_2d_vertical')` |
 | `level` | 수준 진단지 블록: 0 선수학습 · 1 기초 · 2 표준. 지정한 학습지만 `수준진단지()` 에 들어감 | `level: 1` |
+| `diagnosticGenerator` | 진단지에서만 쓰는 짧은 문항 생성기 (학습지 문항이 진단지 한 칸에 너무 길 때) | `diagnosticGenerator: genU4MainCmpCompact` |
 
 - 수준 진단지: 단원 groups 에 `수준진단지({ id: 'u1_level_diagnostic' })`. 블록마다 4문항, 정답 보기를 켜면 판정표(4문항 중 3개 이상 = 통과)와 번호별 기록표 쪽이 붙는다. **학생 이름 칸 금지, 번호만.**
 - 단계 풀이 템플릿이 진단지에서 '식 = □' 한 줄로 줄어들게 하려면 템플릿에 `compact(data)` 를 둔다 (`fracLcdStep` 등 참고).

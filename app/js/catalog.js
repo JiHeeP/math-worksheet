@@ -179,6 +179,8 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
       const source = overrides.source || null;
       // 단원 안 수준: 0 선수학습 · 1 기초 · 2 표준 (수준 진단지에 들어갈 학습지만 지정)
       const level = (overrides.level ?? defaults.level ?? null);
+      // 진단지에서만 쓰는 짧은 문항 생성기 (학습지 문항이 진단지 한 칸에 너무 길 때)
+      const diagnosticGenerator = overrides.diagnosticGenerator || null;
 
       entries.push({
         id,
@@ -200,6 +202,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         layout,
         source,
         level,
+        diagnosticGenerator,
       });
     }
   }

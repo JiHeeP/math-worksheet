@@ -31,31 +31,31 @@ const u1 = defineUnit(GRADE_ID, 'u1', '분수의 나눗셈', [
   차시('1차시 자연수의 나눗셈을 분수로 나타내기', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(자연수) ÷ (자연수)를 분수로 나타내기', genG61U1IntDivIntAsFrac, {
       id: 'u1_main_int_div_int_frac',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
     }),
     학습지('(자연수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1IntDivIntAsFracStep, {
       id: 'u1_main_int_div_int_frac_step', layout: 'oneCol',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
   ]),
   차시('2차시 (분수) ÷ (자연수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(진분수) ÷ (자연수)', genG61U1FracDivInt, {
       id: 'u1_main_frac_div_int',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
     }),
     학습지('(진분수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1FracDivIntStep, {
       id: 'u1_main_frac_div_int_step', layout: 'oneCol',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
     학습지('(대분수) ÷ (자연수)', genG61U1MixedDivInt, {
       id: 'u1_main_mixed_div_int',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
     }),
     학습지('(대분수) ÷ (자연수) 계산 과정', T.fracDivStep, genG61U1MixedDivIntStep, {
       id: 'u1_main_mixed_div_int_step', layout: 'oneCol',
-      prereqs: [unitRef('g5-2', 'u2')],
+      prereqs: [unitRef('g5-2', 'u2'), unitRef('g5-1', 'u4')],
       ...FRAC_DIV_STEP_LAYOUT,
     }),
   ]),

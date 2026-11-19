@@ -1757,6 +1757,13 @@ button:disabled:active { transform: none; }
   flex: 1;
   min-height: 0;
 }
+/* 도형 블록이 있는 단: 계산 블록은 내용 높이만, 남는 높이는 도형 블록이 나눠 가진다 */
+.level-diagnostic-sheet .diagnostic-column:has(svg) .diagnostic-block:not(:has(svg)) { flex: 0 0 auto; }
+.level-diagnostic-sheet .diagnostic-column:has(svg) .diagnostic-block:not(:has(svg)) .diagnostic-problems {
+  grid-template-rows: none;
+  grid-auto-rows: auto;
+  row-gap: 10px;
+}
 /* 문항이 칸을 넘치면(대분수 답, 개념 문제) 한 줄에 1문항, 그 블록은 세로로 더 넓게 */
 .level-diagnostic-sheet .diagnostic-block:has(.single-col) { flex-grow: 1.7; }
 .level-diagnostic-sheet .diagnostic-problems.single-col {
