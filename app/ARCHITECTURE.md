@@ -86,6 +86,7 @@ defineUnit('g5-1', 'u1', '자연수의 혼합 계산', [
 |------|------|
 | `defineUnit(unitId, unitName, groups)` | 단원 정의 |
 | `선수학습(defaults, items)` | 선수학습 그룹 (공통 속성 + 학습지들) |
+| `선수복제(sourceGrade, sourceLocalId, localId)` | 앞 학기 본단원 학습지를 [선수학습] 으로 복제 (생성기·배치는 원본 그대로, `from`·`source` 자동) |
 | `차시(lessonRef, [defaults], items)` | 차시 그룹 |
 | `학습지(label, [template], generator, [overrides])` | 개별 학습지 |
 

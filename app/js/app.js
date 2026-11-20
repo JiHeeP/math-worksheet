@@ -295,14 +295,11 @@ function getJumpTargets(item) {
   // 1) 선수학습 복제본 → 원래 학년 학습지
   if (item.source) {
     const r = resolvePrereq(item.source, item.grade);
-    if (r.action) add(`원래 학습지로${formatActionTag(r.action)}`, r.action);
+    // '원래 학습지로' 는 '방금 있던 곳으로 돌아가기' 로 읽혀서 학기를 앞에 둔 이름으로 바꿨다 (2026-11-20).
+    if (r.action) add(`${formatGradeShort(r.action.grade)} 학습지로 이동`, r.action);
   }
-  // 2) 같은 단원에 [선수학습] 항목이 있으면 그 목록으로
-  if (item.section !== '선수학습') {
-    const hasPre = getWorksheetsByUnit(item.grade, item.unit).some((x) => x.section === '선수학습');
-    if (hasPre) add('이 단원 선수학습으로', { grade: item.grade, unit: item.unit, section: '선수학습' });
-  }
-  // 3) 카탈로그 prereqs (다른 학기 단원·학습지)
+  // 2) 카탈로그 prereqs (앞 학년 단원·학습지). '이 단원 선수학습으로'는 학습 단계 필터가 없어져
+  //    같은 드롭다운 안으로 옮겨 가는 것뿐이라 뺐다 (사용자 결정 2026-11-20).
   (item.prereqs || []).forEach((p) => {
     const r = resolvePrereq(p, item.grade);
     if (r.action) add(`선수학습: ${r.label}`, r.action);
@@ -312,10 +309,53 @@ function getJumpTargets(item) {
 
 let currentJumpTargets = [];
 
+/* 이동 버튼으로 떠나온 자리 기록. 맨 위가 '돌아가기' 대상 (사용자 요청 2026-11-20). */
+const jumpBackStack = [];
+const JUMP_BACK_LIMIT = 10;
+
+function currentLocation() {
+  return {
+    grade: currentGradeId(),
+    unit: getCurrentUnitId(),
+    sheet: document.getElementById('worksheetSelect').value,
+  };
+}
+
+// 떠나온 단원에 (드롭다운·뒤로 가기 등으로) 이미 와 있으면 돌아갈 곳이 아니므로 지운다.
+function pruneJumpBackStack() {
+  const here = currentLocation();
+  while (jumpBackStack.length) {
+    const top = jumpBackStack[jumpBackStack.length - 1];
+    const gone = !GRADE_META[top.grade] || !catalogMap[top.sheet];
+    if (gone || (top.grade === here.grade && top.unit === here.unit)) jumpBackStack.pop();
+    else break;
+  }
+}
+
+function updateJumpBackButton() {
+  const back = document.getElementById('jumpBackButton');
+  if (!back) return;
+  pruneJumpBackStack();
+  const top = jumpBackStack[jumpBackStack.length - 1];
+  back.hidden = !top;
+  if (!top) return;
+  const unitMeta = getUnitMeta(top.grade, top.unit);
+  const unitName = unitMeta && unitMeta.name ? ` ${unitMeta.name}` : '';
+  back.textContent = `← 돌아가기 (${formatGradeShort(top.grade)}${unitName})`;
+  back.title = catalogMap[top.sheet] ? catalogMap[top.sheet].label : '';
+}
+
+function jumpBack() {
+  pruneJumpBackStack();
+  const top = jumpBackStack.pop();
+  if (top) navigateTo(top, { push: true });
+}
+
 function updateJumpControl(item) {
   const button = document.getElementById('jumpButton');
   const select = document.getElementById('jumpSelect');
   if (!button || !select) return;
+  updateJumpBackButton();
   currentJumpTargets = getJumpTargets(item);
 
   button.hidden = currentJumpTargets.length !== 1;
@@ -332,7 +372,10 @@ function updateJumpControl(item) {
 
 function jumpTo(index) {
   const target = currentJumpTargets[index];
-  if (target) navigateTo(target.action, { push: true });
+  if (!target) return;
+  jumpBackStack.push(currentLocation());
+  if (jumpBackStack.length > JUMP_BACK_LIMIT) jumpBackStack.shift();
+  navigateTo(target.action, { push: true });
 }
 
 /* ── 주소(#학기/단원/학습지)로 열기 · 뒤로 가기 ── */
@@ -377,7 +420,7 @@ function navigateTo(action, { push = false, generateNow = true } = {}) {
     : Object.keys(getUnitsOfGrade(action.grade))[0];
   unitSelect.value = unitId;
 
-  // 학습지가 없고 구분만 있으면(예: '이 단원 선수학습으로') 그 구분의 첫 학습지
+  // 학습지가 없고 구분만 있으면 그 구분의 첫 학습지
   let preferredId = action.sheet && catalogMap[action.sheet] ? action.sheet : null;
   if (!preferredId && action.section) {
     const first = getWorksheetsByUnit(action.grade, unitId).find((item) => item.section === action.section);
@@ -640,7 +683,7 @@ function generate(mode) {
     for (let i = 0; i < pageCount; i++) {
       createDiagnosticSheets(item, fontScale).forEach((sheet) => {
         container.appendChild(sheet);
-        fitLevelDiagnosticBlocks(sheet);
+        fitDiagnosticBlocks(sheet);
       });
     }
     problemCountInput.value = '';
@@ -681,14 +724,26 @@ function generate(mode) {
   }
 }
 
-/* 수준 진단지: 2열로 넘치는 블록(대분수 답·개념 문제 등)은 1열 4줄로 바꾼다. */
-function fitLevelDiagnosticBlocks(sheet) {
-  if (!sheet.classList.contains('level-diagnostic-sheet')) return;
-  sheet.querySelectorAll('.diagnostic-problems').forEach((grid) => {
-    const overflow = Array.from(grid.querySelectorAll('.diagnostic-problem')).some((p) => (
-      p.scrollWidth > p.clientWidth + 1
-    ));
-    if (overflow) grid.classList.add('single-col');
+/* 진단지: 2열로 넘치는 블록(대분수 답·통분·개념 문제 등)은 1열 4줄로 바꾼다.
+   선수학습 진단지는 한 단이 6칸 고정이라, 그 블록이 2칸을 쓰게 한다 (단에 빈 칸이 있을 때만). */
+const DIAGNOSTIC_ROWS_PER_COLUMN = 6;
+
+function fitDiagnosticBlocks(sheet) {
+  if (!sheet.classList.contains('diagnostic-sheet')) return;
+  const isLevel = sheet.classList.contains('level-diagnostic-sheet');
+  sheet.querySelectorAll('.diagnostic-column').forEach((column) => {
+    let usedRows = column.querySelectorAll('.diagnostic-block').length;
+    column.querySelectorAll('.diagnostic-problems').forEach((grid) => {
+      const overflow = Array.from(grid.querySelectorAll('.diagnostic-problem')).some((p) => (
+        p.scrollWidth > p.clientWidth + 1
+      ));
+      if (!overflow) return;
+      if (isLevel) { grid.classList.add('single-col'); return; }
+      if (usedRows >= DIAGNOSTIC_ROWS_PER_COLUMN) return; // 빈 칸이 없으면 그대로 둔다
+      grid.classList.add('single-col');
+      grid.closest('.diagnostic-block').classList.add('diagnostic-block-tall');
+      usedRows++;
+    });
   });
 }
 
@@ -725,6 +780,7 @@ document.getElementById('worksheetSelect').addEventListener('change', () => {
 });
 
 document.getElementById('jumpButton').addEventListener('click', () => jumpTo(0));
+document.getElementById('jumpBackButton').addEventListener('click', jumpBack);
 document.getElementById('jumpSelect').addEventListener('change', (event) => {
   if (event.target.value === '') return;
   jumpTo(Number(event.target.value));
