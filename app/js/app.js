@@ -297,12 +297,8 @@ function getJumpTargets(item) {
     const r = resolvePrereq(item.source, item.grade);
     if (r.action) add(`원래 학습지로${formatActionTag(r.action)}`, r.action);
   }
-  // 2) 같은 단원에 [선수학습] 항목이 있으면 그 목록으로
-  if (item.section !== '선수학습') {
-    const hasPre = getWorksheetsByUnit(item.grade, item.unit).some((x) => x.section === '선수학습');
-    if (hasPre) add('이 단원 선수학습으로', { grade: item.grade, unit: item.unit, section: '선수학습' });
-  }
-  // 3) 카탈로그 prereqs (다른 학기 단원·학습지)
+  // 2) 카탈로그 prereqs (앞 학년 단원·학습지). '이 단원 선수학습으로'는 학습 단계 필터가 없어져
+  //    같은 드롭다운 안으로 옮겨 가는 것뿐이라 뺐다 (사용자 결정 2026-11-20).
   (item.prereqs || []).forEach((p) => {
     const r = resolvePrereq(p, item.grade);
     if (r.action) add(`선수학습: ${r.label}`, r.action);
@@ -377,7 +373,7 @@ function navigateTo(action, { push = false, generateNow = true } = {}) {
     : Object.keys(getUnitsOfGrade(action.grade))[0];
   unitSelect.value = unitId;
 
-  // 학습지가 없고 구분만 있으면(예: '이 단원 선수학습으로') 그 구분의 첫 학습지
+  // 학습지가 없고 구분만 있으면 그 구분의 첫 학습지
   let preferredId = action.sheet && catalogMap[action.sheet] ? action.sheet : null;
   if (!preferredId && action.section) {
     const first = getWorksheetsByUnit(action.grade, unitId).find((item) => item.section === action.section);
