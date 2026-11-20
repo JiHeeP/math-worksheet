@@ -25,32 +25,90 @@ body {
   color: #2f3640;
 }
 
+/* 컨트롤 카드 — ① 무엇을 만들까요 → ② 어떻게 만들까요 → 만들기 (2026-11-20 디자인 A) */
 .controls {
   width: min(100%, var(--control-width));
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  padding: 18px 20px;
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 18px;
   box-shadow: 0 12px 32px rgba(31, 41, 55, 0.12);
   margin-bottom: 22px;
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  position: sticky;
-  top: 18px;
-  z-index: 100;
+  overflow: hidden;
 }
 
-.control-stack {
+.cv-head {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  flex: 1 1 620px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e6eaf1;
 }
+
+.cv-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1f2a3a;
+  letter-spacing: -0.3px;
+}
+
+.cv-sec {
+  display: grid;
+  gap: 12px;
+  padding: 16px 24px 18px;
+}
+
+.cv-sec-settings {
+  border-top: 1px dashed #e1e6ee;
+  background: #fafbfd;
+}
+
+.cv-step {
+  font-size: 12px;
+  font-weight: 800;
+  color: #2b7a5b;
+}
+
+.cv-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.cv-foot {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  border-top: 1px solid #e6eaf1;
+}
+
+.cv-spacer { flex: 1; }
+
+/* 라벨은 칸 위에 */
+.controls .f {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.controls .f > label,
+.controls .dan-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5d6a7e;
+}
+
+.controls .f-body {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.controls .f-grow { flex: 1 1 380px; }
+.controls .f-grow #worksheetSelect { flex: 1; min-width: 0; }
 
 .input-group {
   display: flex;
@@ -71,8 +129,7 @@ input[type="number"],
   background: white;
 }
 
-#unitSelect { min-width: 250px; }
-#worksheetSelect { min-width: 420px; }
+#unitSelect { min-width: 240px; }
 
 input[type="number"],
 .number-input {
@@ -106,34 +163,32 @@ button:disabled:hover { opacity: 0.42; }
 button:disabled:active { transform: none; }
 
 .btn-refresh { background: #23b26d; color: white; }
-.btn-add { background: #ef8f1d; color: white; }
-.btn-answer { background: #6f58c9; color: white; }
-.btn-print { background: #2d8ae2; color: white; }
+.btn-refresh { padding: 12px 22px; font-size: 15px; }
+.btn-add,
+.btn-answer,
+.btn-print { background: #ffffff; color: #334155; border: 2px solid #d8dee9; }
 
 /* 선수학습 진단지 바로 만들기 (학습 단계 필터를 대신하는 버튼 1개, 2026-11-20) */
 .pre-diagnostic-button[hidden] { display: none !important; }
 .pre-diagnostic-button {
   padding: 8px 12px;
-  border: 2px solid #263242;
+  border: 2px solid #2b7a5b;
   border-radius: 10px;
   background: #ffffff;
-  color: #263242;
+  color: #2b7a5b;
   font-size: 13px;
   font-weight: 700;
   font-family: inherit;
   white-space: nowrap;
   cursor: pointer;
 }
-.pre-diagnostic-button:hover { background: #eef1f6; }
+.pre-diagnostic-button:hover { background: #eef7f2; }
 
 .dan-control {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 6px 4px 10px;
-  border: 1px solid #d5dbea;
-  border-radius: 8px;
-  background: #ffffff;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .dan-control[hidden] { display: none; }
@@ -2107,12 +2162,13 @@ button:disabled:active { transform: none; }
 }
 
 @media screen and (max-width: 980px) {
-  .controls { align-items: stretch; }
-  .control-stack { flex-direction: column; align-items: stretch; }
-  .input-group { justify-content: space-between; }
+  .cv-head, .cv-sec, .cv-foot { padding-left: 16px; padding-right: 16px; }
+  .cv-title { font-size: 15px; }
+  .cv-row > .f:not(.f-grow) { flex: 1 1 140px; }
+  .cv-row > .f select { width: 100%; }
   #unitSelect,
   #worksheetSelect { min-width: 0; width: 100%; }
-  .input-group:has(#worksheetSelect) { flex-wrap: wrap; }
+  .controls .f-body { flex-wrap: wrap; }
   .jump-select { max-width: none; flex: 1 1 100%; }
 }
 
