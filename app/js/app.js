@@ -295,7 +295,8 @@ function getJumpTargets(item) {
   // 1) 선수학습 복제본 → 원래 학년 학습지
   if (item.source) {
     const r = resolvePrereq(item.source, item.grade);
-    if (r.action) add(`원래 학습지로${formatActionTag(r.action)}`, r.action);
+    // '원래 학습지로' 는 '방금 있던 곳으로 돌아가기' 로 읽혀서 학기를 앞에 둔 이름으로 바꿨다 (2026-11-20).
+    if (r.action) add(`${formatGradeShort(r.action.grade)} 학습지로 이동`, r.action);
   }
   // 2) 카탈로그 prereqs (앞 학년 단원·학습지). '이 단원 선수학습으로'는 학습 단계 필터가 없어져
   //    같은 드롭다운 안으로 옮겨 가는 것뿐이라 뺐다 (사용자 결정 2026-11-20).
@@ -308,10 +309,53 @@ function getJumpTargets(item) {
 
 let currentJumpTargets = [];
 
+/* 이동 버튼으로 떠나온 자리 기록. 맨 위가 '돌아가기' 대상 (사용자 요청 2026-11-20). */
+const jumpBackStack = [];
+const JUMP_BACK_LIMIT = 10;
+
+function currentLocation() {
+  return {
+    grade: currentGradeId(),
+    unit: getCurrentUnitId(),
+    sheet: document.getElementById('worksheetSelect').value,
+  };
+}
+
+// 떠나온 단원에 (드롭다운·뒤로 가기 등으로) 이미 와 있으면 돌아갈 곳이 아니므로 지운다.
+function pruneJumpBackStack() {
+  const here = currentLocation();
+  while (jumpBackStack.length) {
+    const top = jumpBackStack[jumpBackStack.length - 1];
+    const gone = !GRADE_META[top.grade] || !catalogMap[top.sheet];
+    if (gone || (top.grade === here.grade && top.unit === here.unit)) jumpBackStack.pop();
+    else break;
+  }
+}
+
+function updateJumpBackButton() {
+  const back = document.getElementById('jumpBackButton');
+  if (!back) return;
+  pruneJumpBackStack();
+  const top = jumpBackStack[jumpBackStack.length - 1];
+  back.hidden = !top;
+  if (!top) return;
+  const unitMeta = getUnitMeta(top.grade, top.unit);
+  const unitName = unitMeta && unitMeta.name ? ` ${unitMeta.name}` : '';
+  back.textContent = `← 돌아가기 (${formatGradeShort(top.grade)}${unitName})`;
+  back.title = catalogMap[top.sheet] ? catalogMap[top.sheet].label : '';
+}
+
+function jumpBack() {
+  pruneJumpBackStack();
+  const top = jumpBackStack.pop();
+  if (top) navigateTo(top, { push: true });
+}
+
 function updateJumpControl(item) {
   const button = document.getElementById('jumpButton');
   const select = document.getElementById('jumpSelect');
   if (!button || !select) return;
+  updateJumpBackButton();
   currentJumpTargets = getJumpTargets(item);
 
   button.hidden = currentJumpTargets.length !== 1;
@@ -328,7 +372,10 @@ function updateJumpControl(item) {
 
 function jumpTo(index) {
   const target = currentJumpTargets[index];
-  if (target) navigateTo(target.action, { push: true });
+  if (!target) return;
+  jumpBackStack.push(currentLocation());
+  if (jumpBackStack.length > JUMP_BACK_LIMIT) jumpBackStack.shift();
+  navigateTo(target.action, { push: true });
 }
 
 /* ── 주소(#학기/단원/학습지)로 열기 · 뒤로 가기 ── */
@@ -721,6 +768,7 @@ document.getElementById('worksheetSelect').addEventListener('change', () => {
 });
 
 document.getElementById('jumpButton').addEventListener('click', () => jumpTo(0));
+document.getElementById('jumpBackButton').addEventListener('click', jumpBack);
 document.getElementById('jumpSelect').addEventListener('change', (event) => {
   if (event.target.value === '') return;
   jumpTo(Number(event.target.value));

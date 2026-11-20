@@ -210,6 +210,13 @@ button:disabled:active { transform: none; }
   cursor: pointer;
 }
 .jump-button:hover { background: #dcecff; }
+/* 이동해 온 뒤에만 보이는 돌아가기 버튼 */
+.jump-back {
+  border-color: #c9ced6;
+  background: #fff;
+  color: #3b4350;
+}
+.jump-back:hover { background: #f1f3f6; }
 .jump-select {
   max-width: 260px;
   border-color: #9ec5f0;
@@ -2170,6 +2177,7 @@ button:disabled:active { transform: none; }
   #worksheetSelect { min-width: 0; width: 100%; }
   .controls .f-body { flex-wrap: wrap; }
   .jump-select { max-width: none; flex: 1 1 100%; }
+  .controls .f-body #worksheetSelect { flex: 1 1 100%; }
 }
 
 @media screen and (max-width: 850px) {
