@@ -683,7 +683,7 @@ function generate(mode) {
     for (let i = 0; i < pageCount; i++) {
       createDiagnosticSheets(item, fontScale).forEach((sheet) => {
         container.appendChild(sheet);
-        fitLevelDiagnosticBlocks(sheet);
+        fitDiagnosticBlocks(sheet);
       });
     }
     problemCountInput.value = '';
@@ -724,14 +724,26 @@ function generate(mode) {
   }
 }
 
-/* 수준 진단지: 2열로 넘치는 블록(대분수 답·개념 문제 등)은 1열 4줄로 바꾼다. */
-function fitLevelDiagnosticBlocks(sheet) {
-  if (!sheet.classList.contains('level-diagnostic-sheet')) return;
-  sheet.querySelectorAll('.diagnostic-problems').forEach((grid) => {
-    const overflow = Array.from(grid.querySelectorAll('.diagnostic-problem')).some((p) => (
-      p.scrollWidth > p.clientWidth + 1
-    ));
-    if (overflow) grid.classList.add('single-col');
+/* 진단지: 2열로 넘치는 블록(대분수 답·통분·개념 문제 등)은 1열 4줄로 바꾼다.
+   선수학습 진단지는 한 단이 6칸 고정이라, 그 블록이 2칸을 쓰게 한다 (단에 빈 칸이 있을 때만). */
+const DIAGNOSTIC_ROWS_PER_COLUMN = 6;
+
+function fitDiagnosticBlocks(sheet) {
+  if (!sheet.classList.contains('diagnostic-sheet')) return;
+  const isLevel = sheet.classList.contains('level-diagnostic-sheet');
+  sheet.querySelectorAll('.diagnostic-column').forEach((column) => {
+    let usedRows = column.querySelectorAll('.diagnostic-block').length;
+    column.querySelectorAll('.diagnostic-problems').forEach((grid) => {
+      const overflow = Array.from(grid.querySelectorAll('.diagnostic-problem')).some((p) => (
+        p.scrollWidth > p.clientWidth + 1
+      ));
+      if (!overflow) return;
+      if (isLevel) { grid.classList.add('single-col'); return; }
+      if (usedRows >= DIAGNOSTIC_ROWS_PER_COLUMN) return; // 빈 칸이 없으면 그대로 둔다
+      grid.classList.add('single-col');
+      grid.closest('.diagnostic-block').classList.add('diagnostic-block-tall');
+      usedRows++;
+    });
   });
 }
 

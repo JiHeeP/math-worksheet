@@ -139,6 +139,44 @@ export function 학습지(label, templateOrGen, genOrOverrides, overrides) {
 }
 
 /**
+ * 앞 학기 본단원 학습지를 [선수학습] 으로 복제 (2026-11-20)
+ *
+ * 문항 생성기·배치·문항 수·조절은 원본 그대로 쓰고, 출처(from)와 원본 연결(source)을 자동으로 붙인다.
+ * 원본이 세로셈 격자(pdfMap)면 그 연결도 따라온다. 이름을 바꾸려면 overrides.label.
+ *
+ *   import * as g41 from './g4-1.js';
+ *   선수학습({}, [ 선수복제(g41, 'u1_main_place_value', 'u1_pre_place_value') ])
+ *
+ * @param {object} sourceGrade   - 원본 학기 카탈로그 모듈 ({ meta, entries, pdfMap })
+ * @param {string} sourceLocalId - 원본 학습지 ID (학기 prefix 없이)
+ * @param {string} localId       - 이 단원에서 쓸 ID (학기 prefix 없이)
+ */
+export function 선수복제(sourceGrade, sourceLocalId, localId, overrides = {}) {
+  const sourceGradeId = sourceGrade.meta.id;
+  const sourceId = `${sourceGradeId}_${sourceLocalId}`;
+  const entry = sourceGrade.entries.find((candidate) => candidate.id === sourceId);
+  if (!entry) throw new Error(`선수복제: 원본 학습지를 찾을 수 없음 (${sourceId})`);
+  const { label = entry.label, ...rest } = overrides;
+  const inherited = { kind: entry.kind, grid: entry.grid, count: entry.count };
+  ['defaultFontScale', 'controls', 'layout', 'diagnosticGenerator'].forEach((key) => {
+    if (entry[key]) inherited[key] = entry[key];
+  });
+  return {
+    label,
+    template: null,
+    generator: entry.generator,
+    pdfOp: entry.pdfOp || (sourceGrade.pdfMap || {})[sourceId] || null,
+    overrides: {
+      ...inherited,
+      id: localId,
+      from: sourceGradeId,
+      source: sheetRef(sourceGradeId, sourceLocalId),
+      ...rest,
+    },
+  };
+}
+
+/**
  * 단원 정의 → 카탈로그 항목 배열로 변환
  *
  * @param {string} gradeId  - 'g5-1' 형식의 학기 식별자
@@ -154,7 +192,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
     const { section, lessonRef, defaults = {}, items } = group;
 
     for (const item of items) {
-      const { label, template, generator, overrides } = item;
+      const { label, template, generator, overrides, pdfOp = null } = item;
 
       const templateDefaults = template ? { grid: template.grid, count: template.count } : {};
 
@@ -198,6 +236,7 @@ export function defineUnit(gradeId, unitId, unitName, groups) {
         defaultFontScale,
         diagnosticFrom,
         sourceIds,
+        pdfOp, // 선수복제가 넘겨준 세로셈 격자 종류 (없으면 null → pdfMap 을 봄)
         controls,
         layout,
         source,
@@ -315,11 +354,11 @@ export function buildSheetTitle(item) {
 }
 
 export function isPdfWorksheet(item) {
-  return Boolean(PDF_WORKSHEET_MAP[item.id]);
+  return Boolean(item.pdfOp || PDF_WORKSHEET_MAP[item.id]);
 }
 
 export function getPdfOpType(item) {
-  return PDF_WORKSHEET_MAP[item.id];
+  return item.pdfOp || PDF_WORKSHEET_MAP[item.id];
 }
 
 /**
