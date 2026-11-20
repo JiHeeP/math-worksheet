@@ -110,51 +110,21 @@ button:disabled:active { transform: none; }
 .btn-answer { background: #6f58c9; color: white; }
 .btn-print { background: #2d8ae2; color: white; }
 
-.stage-filter-group {
-  gap: 8px;
-}
-
-.stage-filter-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #45546d;
-  white-space: nowrap;
-}
-
-.stage-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
-  border: 1px solid #d5dbea;
+/* 선수학습 진단지 바로 만들기 (학습 단계 필터를 대신하는 버튼 1개, 2026-11-20) */
+.pre-diagnostic-button[hidden] { display: none !important; }
+.pre-diagnostic-button {
+  padding: 8px 12px;
+  border: 2px solid #263242;
   border-radius: 10px;
-  background: #f3f6fa;
-}
-
-.stage-filter-button {
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  background: transparent;
-  color: #45546d;
-  justify-content: center;
+  background: #ffffff;
+  color: #263242;
   font-size: 13px;
   font-weight: 700;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
 }
-
-.stage-filter-button.is-active {
-  border-color: #263242;
-  background: #263242;
-  color: #ffffff;
-  box-shadow: 0 1px 3px rgba(31, 41, 55, 0.18);
-}
-
-.stage-filter-button:disabled {
-  background: transparent;
-  color: #8a94a6;
-  box-shadow: none;
-}
+.pre-diagnostic-button:hover { background: #eef1f6; }
 
 .dan-control {
   display: inline-flex;
@@ -2140,12 +2110,6 @@ button:disabled:active { transform: none; }
   .controls { align-items: stretch; }
   .control-stack { flex-direction: column; align-items: stretch; }
   .input-group { justify-content: space-between; }
-  .stage-filter-group { align-items: stretch; }
-  .stage-filter {
-    flex: 1;
-    justify-content: center;
-  }
-  .stage-filter-button { flex: 1 1 auto; }
   #unitSelect,
   #worksheetSelect { min-width: 0; width: 100%; }
   .input-group:has(#worksheetSelect) { flex-wrap: wrap; }

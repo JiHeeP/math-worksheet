@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>초등 수학 연습지 생성기</title>
   <link rel="icon" href="favicon.svg?v=20260507" type="image/svg+xml">
-  <link rel="stylesheet" href="css/worksheet.css?v=20261120-level-review">
+  <link rel="stylesheet" href="css/worksheet.css?v=20261120-remember-last">
 </head>
 <body>
 
@@ -31,15 +31,7 @@
       <select id="jumpSelect" class="jump-select" hidden aria-label="선수학습으로 이동"></select>
     </div>
 
-    <div class="input-group stage-filter-group" aria-label="학습 단계 필터">
-      <span class="stage-filter-label">학습 단계</span>
-      <div class="stage-filter" id="sectionFilter" role="group" aria-label="학습 단계">
-        <button type="button" class="stage-filter-button" data-section-filter="전체" aria-pressed="false">전체</button>
-        <button type="button" class="stage-filter-button" data-section-filter="진단지" aria-pressed="false">진단지</button>
-        <button type="button" class="stage-filter-button" data-section-filter="선수학습" aria-pressed="false">선수학습</button>
-        <button type="button" class="stage-filter-button is-active" data-section-filter="본단원" aria-pressed="true">본단원</button>
-      </div>
-    </div>
+    <button type="button" class="pre-diagnostic-button" id="preDiagnosticButton" hidden>선수학습 진단지 만들기</button>
   </div>
 
   <div class="input-group">
@@ -118,6 +110,6 @@
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20261120-level-review"></script>
+<script type="module" src="js/app.js?v=20261120-remember-last"></script>
 </body>
 </html>

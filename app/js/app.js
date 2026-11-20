@@ -12,9 +12,9 @@ let answerShown = false;
 let selectedGugudanDans = [2];
 let selectedNumberStage = 2;
 let selectedFractionStage = 2;
-let selectedSectionFilter = '본단원';
 const fitCountCache = new Map();
-const SECTION_FILTERS = ['전체', '진단지', '선수학습', '본단원'];
+// 이 브라우저에서 마지막으로 고른 학기·단원·연습지·쪽수·글자 크기·난이도 (2026-11-20)
+const LAST_STATE_KEY = 'mathWorksheet.lastState.v1';
 const DEFAULT_STAGE = 2;
 // 난이도 버튼 라벨 (catalog controls.*Difficulty.labels 로 학습지별 덮어쓰기 가능)
 const STAGE_LABELS = {
@@ -163,30 +163,71 @@ function getCurrentUnitId() {
   return document.getElementById('unitSelect').value;
 }
 
-function getSectionFilteredItems(items) {
-  if (selectedSectionFilter === '전체') return items;
-  return items.filter((item) => item.section === selectedSectionFilter);
+/* ── 선수학습 진단지 바로 만들기 (학습 단계 필터 대신, 2026-11-20) ── */
+
+function getPreDiagnosticItem(gradeId, unitId) {
+  return getWorksheetsByUnit(gradeId, unitId)
+    .find((item) => item.kind === 'diagnostic' && item.diagnosticFrom !== 'level') || null;
 }
 
-function ensureSectionFilterAvailable(items) {
-  if (selectedSectionFilter === '전체') return;
-  if (items.some((item) => item.section === selectedSectionFilter)) return;
-  selectedSectionFilter = '전체';
+function updatePreDiagnosticButton() {
+  const button = document.getElementById('preDiagnosticButton');
+  if (!button) return;
+  button.hidden = !getPreDiagnosticItem(currentGradeId(), getCurrentUnitId());
 }
 
-function updateSectionFilterControl(items) {
-  const control = document.getElementById('sectionFilter');
-  if (!control) return;
+/* ── 마지막 선택 기억 (브라우저 localStorage, 기기마다 따로) ── */
 
-  const available = new Set(items.map((item) => item.section));
-  control.querySelectorAll('.stage-filter-button').forEach((button) => {
-    const section = button.dataset.sectionFilter;
-    const disabled = section !== '전체' && !available.has(section);
-    const active = section === selectedSectionFilter;
-    button.disabled = disabled;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  });
+function readLastState() {
+  try {
+    const raw = localStorage.getItem(LAST_STATE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveLastState() {
+  const sheet = document.getElementById('worksheetSelect').value;
+  if (!sheet) return;
+  const state = {
+    grade: currentGradeId(),
+    unit: getCurrentUnitId(),
+    sheet,
+    pageCount: parseInt(document.getElementById('pageCount').value, 10) || 1,
+    fontScale: document.getElementById('fontScale').value,
+    numberStage: selectedNumberStage,
+    fractionStage: selectedFractionStage,
+    gugudanDans: selectedGugudanDans,
+  };
+  try {
+    localStorage.setItem(LAST_STATE_KEY, JSON.stringify(state));
+  } catch (e) { /* 사생활 보호 모드 등에서 저장이 막혀도 동작에는 지장 없음 */ }
+}
+
+/* 저장된 쪽수·글자 크기·난이도를 되살린다 (같은 연습지일 때만) */
+function restoreLastSettings(state) {
+  if (!state || state.sheet !== document.getElementById('worksheetSelect').value) return;
+  const pageCount = parseInt(state.pageCount, 10);
+  if (pageCount >= 1 && pageCount <= 20) document.getElementById('pageCount').value = pageCount;
+
+  const fontSelect = document.getElementById('fontScale');
+  const fontOption = Array.from(fontSelect.options).find((o) => o.value === String(state.fontScale));
+  if (fontOption) {
+    fontSelect.value = fontOption.value;
+    const container = document.getElementById('sheets-container');
+    container.style.setProperty('--font-scale', fontOption.value);
+    container.style.setProperty('--pdf-scale', fontOption.value);
+  }
+  if ([1, 2, 3].includes(state.numberStage)) selectedNumberStage = state.numberStage;
+  if ([1, 2, 3].includes(state.fractionStage)) selectedFractionStage = state.fractionStage;
+  if (Array.isArray(state.gugudanDans)) {
+    const dans = state.gugudanDans.filter((d) => Number.isInteger(d) && d >= 2 && d <= 9);
+    if (dans.length) selectedGugudanDans = [...new Set(dans)].sort((x, y) => x - y);
+  }
+  const item = catalogMap[state.sheet];
+  updateAllStageControls(item);
+  updateSelectedMeta();
 }
 
 /* ── 학습지가 바뀔 때: 그 학습지에 맞는 기본값으로 되돌림 ──
@@ -302,6 +343,7 @@ function buildHash() {
 }
 
 function syncHash(push = false) {
+  saveLastState();
   const hash = buildHash();
   if (location.hash === hash) return;
   try {
@@ -335,36 +377,40 @@ function navigateTo(action, { push = false, generateNow = true } = {}) {
     : Object.keys(getUnitsOfGrade(action.grade))[0];
   unitSelect.value = unitId;
 
-  const sheet = action.sheet ? catalogMap[action.sheet] : null;
-  if (sheet) selectedSectionFilter = sheet.section;
-  else if (action.section) selectedSectionFilter = action.section;
-  else selectedSectionFilter = '본단원';
+  // 학습지가 없고 구분만 있으면(예: '이 단원 선수학습으로') 그 구분의 첫 학습지
+  let preferredId = action.sheet && catalogMap[action.sheet] ? action.sheet : null;
+  if (!preferredId && action.section) {
+    const first = getWorksheetsByUnit(action.grade, unitId).find((item) => item.section === action.section);
+    if (first) preferredId = first.id;
+  }
 
-  populateWorksheetSelect(action.grade, unitId, action.sheet);
+  populateWorksheetSelect(action.grade, unitId, preferredId);
   syncHash(push);
   if (generateNow) generate('replace');
 }
 
 function populateWorksheetSelect(gradeId, unitId, preferredId) {
   const worksheetSelect = document.getElementById('worksheetSelect');
-  const allItems = getWorksheetsByUnit(gradeId, unitId);
-  ensureSectionFilterAvailable(allItems);
-  updateSectionFilterControl(allItems);
-
-  const items = getSectionFilteredItems(allItems);
+  const items = getWorksheetsByUnit(gradeId, unitId);
   worksheetSelect.innerHTML = items.map((item) => {
     // `from` 이 명시된 항목 (선수학습) 만 출처 태그 표시.
     // 본단원은 현재 학기와 같아서 태그 생략 (사용자 결정 2026-05-02).
     const tag = item.from ? ` (${formatGradeShort(item.from)})` : '';
-    return `<option value="${item.id}">[${item.section}] ${item.label}${tag}</option>`;
+    // [본단원] 머리표는 쓰지 않는다 (사용자 결정 2026-11-20). [선수학습]·[진단지]만 표시.
+    const prefix = item.section === '본단원' ? '' : `[${item.section}] `;
+    return `<option value="${item.id}">${prefix}${item.label}${tag}</option>`;
   }).join('');
 
-  const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : (items[0] && items[0].id);
+  // 고른 학습지가 없으면 본단원 첫 학습지 (예전 '본단원' 필터 기본값과 같은 시작점)
+  const firstMain = items.find((item) => item.section === '본단원');
+  const fallbackId = (firstMain || items[0] || {}).id;
+  const nextId = preferredId && items.some((item) => item.id === preferredId) ? preferredId : fallbackId;
   if (nextId) {
     const item = catalogMap[nextId];
     worksheetSelect.value = nextId;
     applyWorksheetDefaults(item);
   }
+  updatePreDiagnosticButton();
 }
 
 function currentGradeId() {
@@ -577,6 +623,7 @@ function generate(mode) {
   const pageCount = Math.min(20, Math.max(1, parseInt(document.getElementById('pageCount').value, 10) || 1));
   const item = catalogMap[worksheetId];
   if (!item) return;
+  saveLastState();
 
   const customCount = parseInt(problemCountInput.value, 10);
   const fontScale = getCurrentFontScale();
@@ -665,16 +712,10 @@ document.getElementById('unitSelect').addEventListener('change', (event) => {
   syncHash();
 });
 
-document.getElementById('sectionFilter').addEventListener('click', (event) => {
-  const button = event.target.closest('.stage-filter-button');
-  if (!button || button.disabled) return;
-
-  const nextFilter = button.dataset.sectionFilter;
-  if (!SECTION_FILTERS.includes(nextFilter)) return;
-  selectedSectionFilter = nextFilter;
-  populateWorksheetSelect(currentGradeId(), getCurrentUnitId());
-  syncHash();
-  generate('replace');
+document.getElementById('preDiagnosticButton').addEventListener('click', () => {
+  const item = getPreDiagnosticItem(currentGradeId(), getCurrentUnitId());
+  if (!item) return;
+  navigateTo({ grade: item.grade, unit: item.unit, sheet: item.id }, { push: true });
 });
 
 document.getElementById('worksheetSelect').addEventListener('change', () => {
@@ -761,7 +802,10 @@ document.getElementById('fontScale').addEventListener('change', () => {
   container.style.setProperty('--font-scale', scale);
   container.style.setProperty('--pdf-scale', scale);
   updateSelectedMeta();
+  saveLastState();
 });
+
+document.getElementById('pageCount').addEventListener('change', saveLastState);
 
 window.generate = generate;
 window.toggleAnswers = toggleAnswers;
@@ -770,8 +814,16 @@ window.toggleAnswers = toggleAnswers;
 
 populateGradeSelect();
 const initialAction = parseHash();
+const lastState = readLastState();
 if (initialAction) {
   navigateTo(initialAction, { push: false });
+} else if (lastState && GRADE_META[lastState.grade]) {
+  navigateTo(
+    { grade: lastState.grade, unit: lastState.unit, sheet: catalogMap[lastState.sheet] ? lastState.sheet : null },
+    { push: false, generateNow: false },
+  );
+  restoreLastSettings(lastState);
+  generate('replace');
 } else {
   populateUnitSelect(DEFAULT_GRADE_ID);
   const firstUnitId = Object.keys(getUnitsOfGrade(DEFAULT_GRADE_ID))[0];
