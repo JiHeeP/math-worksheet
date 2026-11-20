@@ -8,116 +8,124 @@
   <meta http-equiv="Expires" content="0">
   <title>초등 수학 연습지 생성기</title>
   <link rel="icon" href="favicon.svg?v=20260507" type="image/svg+xml">
-  <link rel="stylesheet" href="css/worksheet.css?v=20261120-level-review">
+  <link rel="stylesheet" href="css/worksheet.css?v=20261120-design-a">
 </head>
 <body>
 
 <div class="controls">
-  <div class="control-stack">
-    <div class="input-group">
-      <label for="gradeSelect">학년·학기</label>
-      <select id="gradeSelect"></select>
-    </div>
+  <div class="cv-head">
+    <h1 class="cv-title">초등 수학 연습지 만들기</h1>
+    <button type="button" class="pre-diagnostic-button" id="preDiagnosticButton" hidden>선수학습 진단지 만들기</button>
+  </div>
 
-    <div class="input-group">
-      <label for="unitSelect">단원</label>
-      <select id="unitSelect"></select>
-    </div>
+  <section class="cv-sec" aria-labelledby="cvStep1">
+    <div class="cv-step" id="cvStep1">① 무엇을 만들까요</div>
+    <div class="cv-row">
+      <div class="input-group f">
+        <label for="gradeSelect">학년·학기</label>
+        <select id="gradeSelect"></select>
+      </div>
 
-    <div class="input-group">
-      <label for="worksheetSelect">연습지</label>
-      <select id="worksheetSelect"></select>
-      <button type="button" class="jump-button" id="jumpButton" hidden></button>
-      <select id="jumpSelect" class="jump-select" hidden aria-label="선수학습으로 이동"></select>
-    </div>
+      <div class="input-group f">
+        <label for="unitSelect">단원</label>
+        <select id="unitSelect"></select>
+      </div>
 
-    <div class="input-group stage-filter-group" aria-label="학습 단계 필터">
-      <span class="stage-filter-label">학습 단계</span>
-      <div class="stage-filter" id="sectionFilter" role="group" aria-label="학습 단계">
-        <button type="button" class="stage-filter-button" data-section-filter="전체" aria-pressed="false">전체</button>
-        <button type="button" class="stage-filter-button" data-section-filter="진단지" aria-pressed="false">진단지</button>
-        <button type="button" class="stage-filter-button" data-section-filter="선수학습" aria-pressed="false">선수학습</button>
-        <button type="button" class="stage-filter-button is-active" data-section-filter="본단원" aria-pressed="true">본단원</button>
+      <div class="input-group f f-grow">
+        <label for="worksheetSelect">연습지</label>
+        <div class="f-body">
+          <select id="worksheetSelect"></select>
+          <button type="button" class="jump-button" id="jumpButton" hidden></button>
+          <select id="jumpSelect" class="jump-select" hidden aria-label="선수학습으로 이동"></select>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="input-group">
-    <label for="pageCount">쪽수</label>
-    <input type="number" id="pageCount" value="1" min="1" max="20">
-  </div>
+  <section class="cv-sec cv-sec-settings" aria-labelledby="cvStep2">
+    <div class="cv-step" id="cvStep2">② 어떻게 만들까요</div>
+    <div class="cv-row">
+      <div class="input-group f">
+        <label for="pageCount">쪽수</label>
+        <input type="number" id="pageCount" value="1" min="1" max="20">
+      </div>
 
-  <div class="input-group">
-    <label for="problemCount">문제 수</label>
-    <input type="text" class="number-input" id="problemCount" value="" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="기본">
-  </div>
+      <div class="input-group f">
+        <label for="problemCount">문제 수</label>
+        <input type="text" class="number-input" id="problemCount" value="" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="기본">
+      </div>
 
-  <div class="input-group">
-    <label for="fontScale">글자 크기</label>
-    <select id="fontScale">
-      <option value="0.8">작게</option>
-      <option value="1" selected>보통</option>
-      <option value="1.2">크게</option>
-      <option value="1.5">아주 크게</option>
-    </select>
-  </div>
+      <div class="input-group f">
+        <label for="fontScale">글자 크기</label>
+        <select id="fontScale">
+          <option value="0.8">작게</option>
+          <option value="1" selected>보통</option>
+          <option value="1.2">크게</option>
+          <option value="1.5">아주 크게</option>
+        </select>
+      </div>
 
-  <button class="btn-refresh" onclick="generate('replace')">
-    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-    새로 만들기
-  </button>
-
-  <button class="btn-add" onclick="generate('append')">
-    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-    이어 붙이기
-  </button>
-
-  <button class="btn-answer" onclick="toggleAnswers()">
-    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-    정답 보기
-  </button>
-
-  <div class="dan-control" id="gugudanDanControl" hidden aria-label="곱셈구구 단 선택">
-    <span class="dan-label">단</span>
-    <div class="dan-buttons">
-      <button type="button" class="dan-button" data-dan="2" aria-pressed="true">2</button>
-      <button type="button" class="dan-button" data-dan="3" aria-pressed="false">3</button>
-      <button type="button" class="dan-button" data-dan="4" aria-pressed="false">4</button>
-      <button type="button" class="dan-button" data-dan="5" aria-pressed="false">5</button>
-      <button type="button" class="dan-button" data-dan="6" aria-pressed="false">6</button>
-      <button type="button" class="dan-button" data-dan="7" aria-pressed="false">7</button>
-      <button type="button" class="dan-button" data-dan="8" aria-pressed="false">8</button>
-      <button type="button" class="dan-button" data-dan="9" aria-pressed="false">9</button>
+    <div class="dan-control" id="gugudanDanControl" hidden aria-label="곱셈구구 단 선택">
+      <span class="dan-label">단</span>
+      <div class="dan-buttons">
+        <button type="button" class="dan-button" data-dan="2" aria-pressed="true">2</button>
+        <button type="button" class="dan-button" data-dan="3" aria-pressed="false">3</button>
+        <button type="button" class="dan-button" data-dan="4" aria-pressed="false">4</button>
+        <button type="button" class="dan-button" data-dan="5" aria-pressed="false">5</button>
+        <button type="button" class="dan-button" data-dan="6" aria-pressed="false">6</button>
+        <button type="button" class="dan-button" data-dan="7" aria-pressed="false">7</button>
+        <button type="button" class="dan-button" data-dan="8" aria-pressed="false">8</button>
+        <button type="button" class="dan-button" data-dan="9" aria-pressed="false">9</button>
+      </div>
     </div>
-  </div>
 
-  <div class="dan-control" id="numberStageControl" hidden aria-label="자연수 난이도 단계 선택">
-    <span class="dan-label">난이도</span>
-    <div class="dan-buttons">
-      <button type="button" class="dan-button" data-number-stage="1" aria-pressed="false">1단계</button>
-      <button type="button" class="dan-button is-active" data-number-stage="2" aria-pressed="true">2단계</button>
-      <button type="button" class="dan-button" data-number-stage="3" aria-pressed="false">3단계</button>
+    <div class="dan-control" id="numberStageControl" hidden aria-label="자연수 난이도 단계 선택">
+      <span class="dan-label">난이도</span>
+      <div class="dan-buttons">
+        <button type="button" class="dan-button" data-number-stage="1" aria-pressed="false">1단계</button>
+        <button type="button" class="dan-button is-active" data-number-stage="2" aria-pressed="true">2단계</button>
+        <button type="button" class="dan-button" data-number-stage="3" aria-pressed="false">3단계</button>
+      </div>
     </div>
-  </div>
 
-  <div class="dan-control" id="fractionStageControl" hidden aria-label="분수 난이도 단계 선택">
-    <span class="dan-label">난이도</span>
-    <div class="dan-buttons">
-      <button type="button" class="dan-button" data-fraction-stage="1" aria-pressed="false">1단계</button>
-      <button type="button" class="dan-button is-active" data-fraction-stage="2" aria-pressed="true">2단계</button>
-      <button type="button" class="dan-button" data-fraction-stage="3" aria-pressed="false">3단계</button>
+    <div class="dan-control" id="fractionStageControl" hidden aria-label="분수 난이도 단계 선택">
+      <span class="dan-label">난이도</span>
+      <div class="dan-buttons">
+        <button type="button" class="dan-button" data-fraction-stage="1" aria-pressed="false">1단계</button>
+        <button type="button" class="dan-button is-active" data-fraction-stage="2" aria-pressed="true">2단계</button>
+        <button type="button" class="dan-button" data-fraction-stage="3" aria-pressed="false">3단계</button>
+      </div>
     </div>
+    </div>
+  </section>
+
+  <div class="cv-foot">
+    <button class="btn-refresh" onclick="generate('replace')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      새로 만들기
+    </button>
+
+    <button class="btn-add" onclick="generate('append')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+      이어 붙이기
+    </button>
+
+    <div class="cv-spacer"></div>
+
+    <button class="btn-answer" onclick="toggleAnswers()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+      정답 보기
+    </button>
+
+    <button class="btn-print" onclick="window.print()">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2M7 9h10V4H7v5zm10 8H7v5h10v-5z"/></svg>
+      인쇄
+    </button>
   </div>
-
-  <button class="btn-print" onclick="window.print()">
-    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2M7 9h10V4H7v5zm10 8H7v5h10v-5z"/></svg>
-    인쇄
-  </button>
-
 </div>
 
 <div id="sheets-container"></div>
 
-<script type="module" src="js/app.js?v=20261120-level-review"></script>
+<script type="module" src="js/app.js?v=20261120-design-a"></script>
 </body>
 </html>
