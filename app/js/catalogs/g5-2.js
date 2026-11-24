@@ -12,7 +12,7 @@
  * 미구현: 3단원 합동과 대칭, 5단원 직육면체, 6단원 평균과 가능성
  */
 
-import { defineUnit, 차시, 학습지, ext, unitRef } from '../catalog.js';
+import { defineUnit, 진단지, 선수학습, 선수복제, 차시, 학습지, ext, unitRef } from '../catalog.js';
 import { T } from '../templates.js';
 
 import {
@@ -54,42 +54,64 @@ import {
 import { entries as g51Entries } from './g5-1.js';
 import { mul2d2dPrincipleSheets } from './g3-2.js';
 
+// [선수학습] 복제 원본이 있는 앞 학기 카탈로그
+import * as g22 from './g2-2.js';
+import * as g31 from './g3-1.js';
+import * as g32 from './g3-2.js';
+import * as g41 from './g4-1.js';
+import * as g42 from './g4-2.js';
+import * as g51 from './g5-1.js';
+
 const GRADE_ID = 'g5-2';
 
 /* ── 1단원 수의 범위와 어림하기 ── */
 
+const RANGE_ROUND_PREREQS = [unitRef('g4-1', 'u1')];
+
 const u1 = defineUnit(GRADE_ID, 'u1', '수의 범위와 어림하기', [
+  진단지({ id: 'u1_pre_diagnostic' }),
+  선수학습({}, [
+    선수복제(g41, 'u1_main_place_value', 'u1_pre_place_value'),
+    선수복제(g41, 'u1_main_compare_big', 'u1_pre_compare_big'),
+  ]),
   차시('1차시 이상과 이하 알아보기', { grid: 'concept', count: 8 }, [
-    학습지('이상인 수 찾기', genG52U1IneqGE, { id: 'u1_main_ineq_ge' }),
-    학습지('이하인 수 찾기', genG52U1IneqLE, { id: 'u1_main_ineq_le' }),
+    학습지('이상인 수 찾기', genG52U1IneqGE, { id: 'u1_main_ineq_ge', prereqs: RANGE_ROUND_PREREQS }),
+    학습지('이하인 수 찾기', genG52U1IneqLE, { id: 'u1_main_ineq_le', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('2차시 초과와 미만 알아보기', { grid: 'concept', count: 8 }, [
-    학습지('초과인 수 찾기', genG52U1IneqGT, { id: 'u1_main_ineq_gt' }),
-    학습지('미만인 수 찾기', genG52U1IneqLT, { id: 'u1_main_ineq_lt' }),
+    학습지('초과인 수 찾기', genG52U1IneqGT, { id: 'u1_main_ineq_gt', prereqs: RANGE_ROUND_PREREQS }),
+    학습지('미만인 수 찾기', genG52U1IneqLT, { id: 'u1_main_ineq_lt', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('3차시 수의 범위', { grid: 'concept', count: 8 }, [
-    학습지('이상과 이하의 범위', genG52U1RangeGELE, { id: 'u1_main_range_gele' }),
+    학습지('이상과 이하의 범위', genG52U1RangeGELE, { id: 'u1_main_range_gele', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('4차시 올림', { grid: 'standard', count: 20 }, [
-    학습지('올림', genG52U1RoundUp, { id: 'u1_main_round_up' }),
+    학습지('올림', genG52U1RoundUp, { id: 'u1_main_round_up', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('5차시 버림', { grid: 'standard', count: 20 }, [
-    학습지('버림', genG52U1RoundDown, { id: 'u1_main_round_down' }),
+    학습지('버림', genG52U1RoundDown, { id: 'u1_main_round_down', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('6차시 반올림', { grid: 'standard', count: 20 }, [
-    학습지('반올림', genG52U1RoundHalf, { id: 'u1_main_round_half' }),
+    학습지('반올림', genG52U1RoundHalf, { id: 'u1_main_round_half', prereqs: RANGE_ROUND_PREREQS }),
   ]),
   차시('4~6차시 어림 혼합', { grid: 'standard', count: 20 }, [
-    학습지('어림 혼합 (올림·버림·반올림)', genG52U1RoundMix, { id: 'u1_main_round_mix' }),
+    학습지('어림 혼합 (올림·버림·반올림)', genG52U1RoundMix, { id: 'u1_main_round_mix', prereqs: RANGE_ROUND_PREREQS }),
   ]),
 ]);
 
 /* ── 2단원 분수의 곱셈 ── */
 
-const FRAC_MUL_PREREQS = [unitRef('g5-1', 'u5'), unitRef('g3-2', 'u1')];
+const FRAC_MUL_PREREQS = [unitRef('g5-1', 'u5'), unitRef('g5-1', 'u4'), unitRef('g3-2', 'u1')];
 const FRAC_MUL_STEP_LAYOUT = { grid: 'wide', count: 6 };
 
 const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
+  진단지({ id: 'u2_pre_diagnostic' }),
+  선수학습({}, [
+    선수복제(g51, 'u4_main_red', 'u2_pre_red'),
+    선수복제(g32, 'u5_main_mixed_to_improper', 'u2_pre_mixed_to_improper'),
+    선수복제(g32, 'u5_main_improper_to_mixed', 'u2_pre_improper_to_mixed'),
+    선수복제(g22, 'u2_main_gugudan_basic', 'u2_pre_gugudan'),
+  ]),
   차시('1차시 (진분수) × (자연수)', { grid: 'practice', count: 15, controls: { fractionDifficulty: { stages: [1, 2, 3] } } }, [
     학습지('(진분수) × (자연수)', genG52U2FracTimesInt, {
       id: 'u2_main_frac_times_int',
@@ -199,9 +221,17 @@ const u2 = defineUnit(GRADE_ID, 'u2', '분수의 곱셈', [
 const DECIMAL_MUL_GRID_LAYOUT = { grid: 'wide', count: 8 };
 const DECIMAL_MUL_FRAC_STEP_LAYOUT = { grid: 'wide', count: 6 };
 const DECIMAL_MUL_NATURAL_STEP_LAYOUT = { grid: 'wide', count: 6 };
-const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3'), unitRef('g3-2', 'u1'), unitRef('g4-1', 'u3')];
+const DECIMAL_MUL_PREREQS = [unitRef('g4-2', 'u3'), unitRef('g3-2', 'u1'), unitRef('g4-1', 'u3'), unitRef('u2')];
 
 const u4 = defineUnit(GRADE_ID, 'u4', '소수의 곱셈', [
+  진단지({ id: 'u4_pre_diagnostic' }),
+  선수학습({}, [
+    선수복제(g42, 'u3_main_decimal_relation', 'u4_pre_decimal_relation'),
+    선수복제(g31, 'u6_main_decimal_to_frac', 'u4_pre_decimal_to_frac'),
+    선수복제(g31, 'u6_main_hundredths_to_decimal', 'u4_pre_hundredths_to_decimal'),
+    선수복제(g32, 'u1_main_mul_3d1d_cn', 'u4_pre_mul_3d1d'),
+    선수복제(g32, 'u1_main_mul_2d2d', 'u4_pre_mul_2d2d'),
+  ]),
   차시('1차시 (소수) × (자연수)', { grid: 'practice', count: 15 }, [
     학습지('(소수) × (자연수) 계산 과정 1 (분수로)', T.decimalFracStep, genG52U4DecimalTimesIntMixedPlaces, {
       id: 'u4_main_decimal_times_int_frac_step', layout: 'oneCol',

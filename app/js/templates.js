@@ -826,6 +826,8 @@ export const T = {
   decimalVertical: {
     grid: 'wide', count: 8,
     render: (data) => ({ kind: 'decimalVertical', ...data }),
+    // 진단지에서는 격자 대신 한 줄 식으로 (2.6 × 3 = □)
+    compact: ({ num1, num2, op, ans }) => horizProblem(`${num1} ${op} ${num2}`, numBlank(ans)),
   },
 
   /** 소수 곱셈 가로셈: 2.6 × 3 = □ */
@@ -887,6 +889,8 @@ export const T = {
   decimalLongDiv: {
     grid: 'wide', count: 6,
     render: (data) => ({ kind: 'decimalLongDiv', ...data }),
+    // 진단지에서는 격자 대신 한 줄 식으로 (27.2 ÷ 8 = □)
+    compact: ({ dvnd, dvsr, quot }) => horizProblem(`${dvnd} \u00f7 ${dvsr}`, numBlank(quot)),
   },
 
   /** 개념 카드 (질문 + 답) */

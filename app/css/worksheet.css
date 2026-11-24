@@ -210,6 +210,13 @@ button:disabled:active { transform: none; }
   cursor: pointer;
 }
 .jump-button:hover { background: #dcecff; }
+/* 이동해 온 뒤에만 보이는 돌아가기 버튼 */
+.jump-back {
+  border-color: #c9ced6;
+  background: #fff;
+  color: #3b4350;
+}
+.jump-back:hover { background: #f1f3f6; }
 .jump-select {
   max-width: 260px;
   border-color: #9ec5f0;
@@ -1795,14 +1802,6 @@ button:disabled:active { transform: none; }
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: repeat(4, minmax(0, 1fr));
 }
-/* 수준 진단지는 본단원 개념·대응 문제가 섞이므로 질문 문장을 보인다 (도형은 그림이 설명하므로 숨김 유지) */
-.level-diagnostic-sheet .diagnostic-html .concept-question,
-.level-diagnostic-sheet .diagnostic-html .relation-question {
-  display: block;
-  margin-bottom: 2px;
-  font-size: 0.85em;
-  white-space: normal;
-}
 .level-diagnostic-sheet .diagnostic-html svg {
   max-width: 100%;
   height: auto;
@@ -1902,6 +1901,19 @@ button:disabled:active { transform: none; }
 
 .diagnostic-block:first-child {
   border-top-color: #2f3640;
+}
+
+/* 선수학습 진단지: 2열로 넘치는 블록(통분 등)은 2칸 높이를 쓰고 한 줄에 1문항 (app.js fitDiagnosticBlocks) */
+.diagnostic-block-tall {
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+}
+.diagnostic-block-tall .diagnostic-problems.single-col {
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
 }
 
 .diagnostic-block-title {
@@ -2009,11 +2021,18 @@ button:disabled:active { transform: none; }
   white-space: nowrap;
 }
 
-.diagnostic-html .concept-question,
-.diagnostic-html .relation-question,
+/* 도형은 그림이 설명하므로 질문 문장을 숨긴다. 개념·대응 문제는 질문이 없으면 풀 수 없어 보인다
+   (예: 5-2 1단원 선수학습 '큰 수의 자릿값' — 604162에서 만의 자리 숫자). */
 .diagnostic-html .shape-question,
 .diagnostic-html .small-note {
   display: none;
+}
+.diagnostic-html .concept-question,
+.diagnostic-html .relation-question {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.85em;
+  white-space: normal;
 }
 
 /* ── (두 자리 수) × (두 자리 수) 곱셈의 원리 (3-2 1단원, 5-2 곱셈 총연습) ── */
@@ -2170,6 +2189,7 @@ button:disabled:active { transform: none; }
   #worksheetSelect { min-width: 0; width: 100%; }
   .controls .f-body { flex-wrap: wrap; }
   .jump-select { max-width: none; flex: 1 1 100%; }
+  .controls .f-body #worksheetSelect { flex: 1 1 100%; }
 }
 
 @media screen and (max-width: 850px) {
