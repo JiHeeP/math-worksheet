@@ -757,6 +757,52 @@ function mulVerticalPartialHtml(data) {
   ], { value: total, answer: true });
 }
 
+/**
+ * 세로셈 과정 연습 — 자리 이름(천·백·십·일) 격자에 부분곱 두 줄과 합을 쓴다.
+ *   1줄: a × (일의 자리 수)  — 파란색
+ *   2줄: a × (몇십)          — 주황색, 일의 자리 칸은 회색 (0 자리)
+ *   guided=true : 2줄 일의 자리 0 이 미리 쓰여 있고, 줄 옆 식도 다 보여 줌
+ *   guided=false: 0 도 학생이 쓰고, 줄 옆 식의 곱하는 수(몇, 몇십)를 빈칸으로
+ * 학생이 쓰는 칸은 모두 빈 칸 (정답 보기에서만 숫자) — 몇 자리인지도 스스로 정한다.
+ */
+function mulProcessGridHtml(data, guided) {
+  const { a, b, tens, ones } = data;
+  const { tensValue, onesProduct, tensDigitProduct, total } = mulParts(data);
+  const COLS = 4; // 99 × 99 = 9801 → 네 자리면 충분
+  const pad = (value) => {
+    const digits = value === null ? [] : String(value).split('');
+    while (digits.length < COLS) digits.unshift('');
+    return digits;
+  };
+  const cell = (d, cls = '', isAnswer = false) => {
+    const ans = isAnswer && d !== '' ? ` data-ans="${d}"` : '';
+    return `<td class="mul-proc-cell${cls ? ` ${cls}` : ''}"${ans}>${d}</td>`;
+  };
+  const op = (text = '') => `<td class="mul-proc-op">${text}</td>`;
+  const label = (html, cls) => `<td class="mul-proc-label ${cls}">${html}</td>`;
+
+  const head = ['천', '백', '십', '일'].map((n) => `<th class="mul-proc-place">${n}</th>`).join('');
+  const rowA = pad(a).map((d) => cell(d)).join('');
+  const rowB = pad(b).map((d, i) => cell(d, i === 3 ? 'mul-proc-ones' : (i === 2 ? 'mul-proc-tens' : ''))).join('');
+  const rowP1 = pad(onesProduct).map((d) => cell(d, 'mul-proc-row-ones', true)).join('');
+  // 2줄: a × 몇 의 값을 십의 자리부터 (일의 자리 칸 = 0 자리)
+  const p2 = pad(tensDigitProduct).slice(1); // 세 칸 (천·백·십)
+  const rowP2 = p2.map((d) => cell(d, 'mul-proc-row-tens', true)).join('')
+    + (guided ? cell('0', 'mul-proc-zero mul-proc-zero-given') : cell('0', 'mul-proc-zero', true));
+  const rowT = pad(total).map((d) => cell(d, '', true)).join('');
+
+  const onesTxt = guided ? `${ones}` : numBlank(ones);
+  const tensTxt = guided ? `${tensValue}` : numBlank(tensValue);
+  return `<table class="mul-proc-table">
+    <tr>${op()}${head}<td></td></tr>
+    <tr>${op()}${rowA}<td></td></tr>
+    <tr class="mul-proc-sep">${op('×')}${rowB}<td></td></tr>
+    <tr>${op()}${rowP1}${label(`← ${a} × ${onesTxt}`, 'mul-proc-label-ones')}</tr>
+    <tr class="mul-proc-sep">${op('+')}${rowP2}${label(`← ${a} × ${tensTxt}`, 'mul-proc-label-tens')}</tr>
+    <tr>${op()}${rowT}<td></td></tr>
+  </table>`;
+}
+
 /** ⑤ 틀린 풀이 고치기: 왼쪽 틀린 세로셈(그대로 보여 줌) + 오른쪽 바르게 고치기 */
 function mulErrorFixHtml(data) {
   const { a, b, errorType } = data;
@@ -1096,6 +1142,20 @@ export const T = {
   mul2d2dVertical: {
     grid: 'wide', count: 6,
     render: (data) => mulPrincipleProblem(data, 'concept-layout', mulVerticalPartialHtml(data), 'mul-principle mul-principle-vertical'),
+  },
+
+  /** 세로셈 과정 연습 ① — 자리 이름 격자, 0 칸이 미리 쓰여 있음 */
+  mul2d2dProcessGuided: {
+    grid: 'concept', count: 10,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulProcessGridHtml(data, true), 'mul-principle mul-process'),
+    compact: (data) => horizProblem(`${data.a} × ${data.b}`, numBlank(data.a * data.b)),
+  },
+
+  /** 세로셈 과정 연습 ② — 0 도 학생이 쓰고, 줄 옆 곱하는 수도 빈칸 */
+  mul2d2dProcess: {
+    grid: 'concept', count: 10,
+    render: (data) => mulPrincipleProblem(data, 'concept-layout', mulProcessGridHtml(data, false), 'mul-principle mul-process'),
+    compact: (data) => horizProblem(`${data.a} × ${data.b}`, numBlank(data.a * data.b)),
   },
 
   /** ⑤ 틀린 풀이 고치기 (0을 하나 더 붙임 / 십의 자리를 일의 자리처럼 곱함) */

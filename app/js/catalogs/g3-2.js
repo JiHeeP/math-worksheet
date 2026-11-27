@@ -7,7 +7,7 @@
  * 곱셈/나눗셈은 세로셈(PDF) 표준 출력.
  *
  * 현재 구현 단원:
- *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈, 난이도 중·상) + 곱셈의 원리 6종
+ *   1단원 곱셈 — 두 자리 × 두 자리 (세로셈, 난이도 중·상) + 곱셈의 원리 6종 + 세로셈 과정 연습 2종
  *   2단원 나눗셈 — 두/세 자리 ÷ 한 자리 (세로셈, 나머지 ±)
  *   4단원 분수 — 분모 같은 분수 비교, 가분수 ↔ 대분수
  */
@@ -53,6 +53,8 @@ export function mul2d2dPrincipleSheets(idPrefix) {
     학습지('곱셈 원리 ② 넓이 그림으로 알아보기', T.mul2d2dArea, genG32U1Mul2d2dPrinciple, id('area')),
     학습지('곱셈 원리 ③ 자릿값으로 갈라서 계산하기', T.mul2d2dSplit, genG32U1Mul2d2dPrinciple, id('split')),
     학습지('곱셈 원리 ④ 세로셈 — 두 줄로 나누어 쓰기', T.mul2d2dVertical, genG32U1Mul2d2dPrinciple, id('vertical')),
+    학습지('세로셈 과정 연습 ① 자리 맞춰 쓰기 (0 칸 표시)', T.mul2d2dProcessGuided, genG32U1Mul2d2dPrinciple, id('process_guided')),
+    학습지('세로셈 과정 연습 ② 자리 맞춰 쓰기 (0도 직접)', T.mul2d2dProcess, genG32U1Mul2d2dPrinciple, id('process')),
     학습지('곱셈 원리 ⑤ 틀린 풀이 고치기', T.mul2d2dErrorFix, genG32U1Mul2d2dErrorFix, { ...id('error_fix'), layout: { countMultiple: 2 } }),
     학습지('곱셈 원리 ⑥ 문장으로 설명하기 (빈칸 채우기)', T.mul2d2dSentence, genG32U1Mul2d2dPrinciple, id('sentence')),
   ];

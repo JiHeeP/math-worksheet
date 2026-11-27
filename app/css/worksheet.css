@@ -2133,6 +2133,58 @@ button:disabled:active { transform: none; }
 .mul-col-table .mul-col-ans { color: transparent; }
 .answers-shown .mul-col-table .mul-col-ans { color: #e74c3c; }
 
+/* 세로셈 과정 연습: 자리 이름 격자 + 부분곱 두 줄 (일의 자리 곱 = 파랑, 십의 자리 곱 = 주황) */
+.mul-proc-table {
+  --mp-cell: calc(27px * var(--font-scale, 1));
+  --mp-ones: #e3efff;
+  --mp-tens: #ffecd9;
+  border-collapse: collapse;
+  font-size: calc(19px * var(--font-scale, 1));
+  font-weight: 500;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.mul-proc-table td,
+.mul-proc-table th { padding: 0; text-align: center; vertical-align: middle; }
+.mul-proc-table th.mul-proc-place {
+  height: calc(18px * var(--font-scale, 1));
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: #5b6472;
+}
+.mul-proc-table td.mul-proc-cell {
+  width: var(--mp-cell);
+  height: var(--mp-cell);
+  border: 1.2px solid #9aa1ad;
+}
+.mul-proc-table td.mul-proc-op {
+  width: calc(20px * var(--font-scale, 1));
+  font-weight: 700;
+}
+.mul-proc-table tr.mul-proc-sep td.mul-proc-cell { border-bottom: 2.5px solid #2f3640; }
+.mul-proc-table tr.mul-proc-sep td.mul-proc-op { border-bottom: 2.5px solid #2f3640; }
+.mul-proc-table td.mul-proc-ones { background: var(--mp-ones); font-weight: 700; color: #1d4ed8; }
+.mul-proc-table td.mul-proc-tens { background: var(--mp-tens); font-weight: 700; color: #c2410c; }
+.mul-proc-table td.mul-proc-row-ones { background: var(--mp-ones); }
+.mul-proc-table td.mul-proc-row-tens { background: var(--mp-tens); }
+.mul-proc-table td.mul-proc-zero { background: #d9dce1; }
+.mul-proc-table td.mul-proc-zero-given { color: #6b7280; }
+.mul-proc-table td.mul-proc-label {
+  padding-left: calc(6px * var(--font-scale, 1));
+  text-align: left;
+  white-space: nowrap;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+}
+.mul-proc-table td.mul-proc-label-ones { color: #1d4ed8; }
+.mul-proc-table td.mul-proc-label-tens { color: #c2410c; }
+.mul-proc-table td.mul-proc-label .num-blank {
+  min-width: calc(26px * var(--font-scale, 1));
+  min-height: calc(22px * var(--font-scale, 1));
+  padding: 0 calc(3px * var(--font-scale, 1));
+  font-size: calc(14px * var(--font-scale, 1));
+}
+
 /* 틀린 풀이 고치기: 틀린 세로셈 → 바르게 */
 .mul-error-fix {
   display: flex;
